@@ -229,38 +229,67 @@ function colorTagCls(cor){ const m={Azul:"tag-azul",Amarela:"tag-amarela",Amarel
 
 function parseCSV(text){
   const lines = text.trim().split("\n");
-  // Encontra a linha de cabeçalho que tem "sobram" e "lote"
-  let hi = lines.findIndex(l => l.toLowerCase().includes("sobram") && l.toLowerCase().includes("lote"));
-  if(hi < 0) hi = lines.findIndex(l => l.toLowerCase().includes("tamanho") && l.toLowerCase().includes("sobram"));
+
+  // Encontra linha de cabeçalho
+  let hi = -1;
+  for(let i = 0; i < Math.min(lines.length, 10); i++){
+    const l = lines[i].toLowerCase();
+    if(l.includes("sobram") || l.includes("restam")){hi = i; break;}
+  }
   if(hi < 0) return null;
 
-  const h = lines[hi].split(",").map(x => x.trim().toLowerCase().replace(/[^a-z0-9 ]/g,""));
+  // Normaliza headers: minúsculo, sem aspas, trim
+  const raw = lines[hi].split(",").map(x => x.trim().replace(/^["']|["']$/g,"").trim());
+  const h   = raw.map(x => x.toLowerCase()
+    .replace(/ç/g,"c").replace(/ã/g,"a").replace(/á/g,"a").replace(/â/g,"a")
+    .replace(/é/g,"e").replace(/ê/g,"e").replace(/í/g,"i")
+    .replace(/ó/g,"o").replace(/ô/g,"o").replace(/ú/g,"u")
+    .replace(/[^a-z0-9 ]/g,"").trim()
+  );
+
+  console.log("CSV headers:", h); // debug
+
   const fi = (...kws) => h.findIndex(x => kws.some(k => x.includes(k)));
-  const iT = fi("tamanho");
-  const iM = fi("modelo");
-  const iC = fi("cor");
-  const iS = fi("sobram","restam");
-  const iP = h.findIndex((x,i) => x === "preco" || x === "preo" && i > iS);
-  const iLanc = fi("lancamento","lançamento");
-  const iLt = h.findIndex(x => x === "lote");
-  const iLA = h.findIndex((x,i) => x.includes("lote") && x.includes("at") && i !== iLt);
-  const iTp = h.findIndex((x,i) => (x.includes("venda") || x.includes("lanamento")) && i !== iLanc);
+
+  const iT   = fi("tamanho");
+  const iM   = fi("modelo");
+  const iC   = fi("cor");
+  const iS   = fi("sobram","restam");
+  // Preço: coluna chamada "Preço" ou "Preco" mas NÃO lançamento
+  const iP   = h.findIndex(x => (x === "preco" || x === "preo" || x === "preco") && !x.includes("lanc"));
+  // Lançamento: coluna com "lancamento" ou "lançamento"  
+  const iLanc= fi("lancamento","lançamento","lanamento");
+  // Lote: coluna exatamente "lote" ou "lote "
+  const iLt  = h.findIndex(x => x.trim() === "lote");
+  // Lote Até: coluna com "lote" E "at"
+  const iLA  = h.findIndex((x,i) => x.includes("lote") && (x.includes("at") || x.includes("ate")) && i !== iLt);
+  // Tipo: coluna com "venda" (Pré-Venda ou Lançamento)
+  const iTp  = h.findIndex(x => x.includes("venda") || (x.includes("pre") && x.includes("venda")));
+
+  console.log("Cols → T:",iT,"M:",iM,"C:",iC,"S:",iS,"P:",iP,"Lanc:",iLanc,"Lt:",iLt,"LA:",iLA,"Tp:",iTp);
 
   if(iT < 0 || iM < 0 || iS < 0) return null;
 
   return lines.slice(hi+1).map(l => {
-    const c = l.split(",");
-    if(!c[iT]?.trim()) return null;
+    const c = l.split(",").map(x => x.trim().replace(/^["']|["']$/g,"").trim());
+    if(!c[iT]) return null;
+
+    const precoRaw = iP   >= 0 ? parseFloat(c[iP])    || 0 : 0;
+    const lancRaw  = iLanc>= 0 ? parseFloat(c[iLanc]) || 0 : 0;
+    const loteRaw  = iLt  >= 0 ? (c[iLt] || "").trim()  : "";
+    const loteAte  = iLA  >= 0 ? (c[iLA] || "").trim()  : "";
+    const tipo     = iTp  >= 0 ? (c[iTp] || "").trim()  : "";
+
     return {
-      tamanho:    c[iT]?.trim(),
-      modelo:     c[iM]?.trim(),
-      cor:        iC >= 0 ? c[iC]?.trim() : "–",
+      tamanho:    c[iT],
+      modelo:     c[iM],
+      cor:        iC >= 0 ? c[iC] : "–",
       sobram:     parseInt(c[iS]) || 0,
-      preco:      iP >= 0 ? parseFloat(c[iP]) || 0 : 0,
-      lancamento: iLanc >= 0 ? parseFloat(c[iLanc]) || 0 : 0,
-      lote:       iLt >= 0 ? c[iLt]?.trim() : "1",
-      loteAte:    iLA >= 0 ? c[iLA]?.trim() : "",
-      tipo:       iTp >= 0 ? c[iTp]?.trim() : "",
+      preco:      precoRaw,
+      lancamento: lancRaw,
+      lote:       loteRaw,
+      loteAte:    loteAte,
+      tipo:       tipo,
     };
   }).filter(r => r && r.modelo && r.tamanho);
 }
@@ -352,7 +381,10 @@ function renderCard(group){
   const loteNum  = group.lote || "1";
   const loteAte  = group.loteAte || "";
   const tipo     = group.tipo || "Pré-Venda";
-  const badgeTxt = loteAte ? `🔥 Pré-Venda · Lote ${loteNum} · até ${loteAte}` : `🔥 Pré-Venda · Lote ${loteNum}`;
+  const loteLabel = loteNum && loteNum !== "0" && loteNum !== "" ? loteNum : "1";
+  const badgeTxt = loteAte && loteAte.length > 2
+    ? `🔥 Pré-Venda · Lote ${loteLabel} · até ${loteAte}`
+    : `🔥 Pré-Venda · Lote ${loteLabel}`;
 
   const dots    = fotos.length>1 ? fotos.map((_,i) => `<button class="car-dot${i===0?" active":""}" onclick="goTo('${id}',${i})"></button>`).join("") : "";
   const navBtns = fotos.length>1 ? `<button class="car-btn car-prev" onclick="carMove('${id}',-1)">&#8249;</button><button class="car-btn car-next" onclick="carMove('${id}',1)">&#8250;</button>` : "";
