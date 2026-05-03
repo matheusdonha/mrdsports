@@ -229,68 +229,74 @@ function fmtBRL(v){ return "R$ "+Number(v).toLocaleString("pt-BR",{minimumFracti
 function colorTagCls(cor){ const m={Azul:"tag-azul",Amarela:"tag-amarela",Amarelo:"tag-amarela",Verde:"tag-verde",Preta:"tag-preta",Preto:"tag-preta"}; return m[cor]||"tag-retro"; }
 
 function parseCSV(text){
+  // Parser CSV robusto — respeita campos entre aspas
+  function parseRow(line){
+    const cols = [];
+    let cur = "", inQuotes = false;
+    for(let i = 0; i < line.length; i++){
+      const ch = line[i];
+      if(ch === '"'){ inQuotes = !inQuotes; }
+      else if(ch === ',' && !inQuotes){ cols.push(cur.trim()); cur = ""; }
+      else { cur += ch; }
+    }
+    cols.push(cur.trim());
+    return cols;
+  }
+
   const lines = text.trim().split("\n");
 
   // Acha linha de cabeçalho
   let hi = -1;
   for(let i = 0; i < Math.min(lines.length, 10); i++){
-    if(lines[i].toLowerCase().includes("sobram") || lines[i].toLowerCase().includes("restam")){
+    if(lines[i].toLowerCase().includes("sobram")||lines[i].toLowerCase().includes("restam")){
       hi = i; break;
     }
   }
   if(hi < 0) return null;
 
-  // Normaliza header: tudo minúsculo, remove acentos e caracteres não-alfanuméricos
   const norm = s => s.trim().replace(/^["']+|["']+$/g,"").trim()
     .toLowerCase()
     .replace(/ç/g,"c").replace(/[ãâàá]/g,"a").replace(/[éê]/g,"e")
     .replace(/[íî]/g,"i").replace(/[óôò]/g,"o").replace(/[úû]/g,"u")
     .replace(/[^a-z0-9]/g,"");
 
-  const raw = lines[hi].split(",");
-  const h   = raw.map(norm);
+  const h = parseRow(lines[hi]).map(norm);
   console.log("[MRD] headers:", h);
 
-  const fi = (...kws) => h.findIndex(x => kws.some(k => x.includes(k)));
+  const fi  = (...kws) => h.findIndex(x => kws.some(k => x.includes(k)));
+  const iT  = fi("tamanho");
+  const iM  = fi("modelo");
+  const iC  = fi("cor");
+  const iS  = fi("sobram","restam");
+  const iP  = h.findIndex(x => x === "preco");
+  const iLanc = fi("lancamento");
+  const iLt = h.findIndex(x => x === "lote");
+  const iLA = h.findIndex((x,i) => x === "loteate" && i !== iLt);
+  const iTp = h.findIndex(x => x === "tipo");
 
-  const iT    = fi("tamanho");
-  const iM    = fi("modelo");
-  const iC    = fi("cor");
-  const iS    = fi("sobram","restam");
-  const iP    = h.findIndex(x => x === "preco");              // exatamente "preco"
-  const iLanc = fi("lancamento");                             // "precodelancamento" contém "lancamento"
-  const iLt   = h.findIndex(x => x === "lote");              // exatamente "lote"
-  const iLA   = h.findIndex((x,i) => x === "loteate" && i !== iLt); // exatamente "loteate"
-  const iTp   = h.findIndex(x => x === "tipo");              // exatamente "tipo"
-
-  console.log("[MRD] T:"+iT+" M:"+iM+" S:"+iS+" P:"+iP+" Lanc:"+iLanc+" Lt:"+iLt+" LA:"+iLA+" Tp:"+iTp);
+  console.log("[MRD] P:"+iP+" Lanc:"+iLanc+" Lt:"+iLt+" LA:"+iLA+" Tp:"+iTp);
 
   if(iT < 0 || iM < 0 || iS < 0) return null;
 
+  const toNum = s => parseFloat((s||"").replace(/[^0-9.,]/g,"").replace(",",".")) || 0;
+
   return lines.slice(hi+1).map(l => {
-    const c = l.split(",").map(x => x.trim().replace(/^["']+|["']+$/g,"").trim());
+    const c = parseRow(l);
     if(!c[iT]) return null;
 
-    // loteAte: célula tem "07/05/2026" — pega só DD/MM
-    let loteAteRaw = (iLA >= 0 ? c[iLA] : "").trim();
-    if(loteAteRaw.length >= 5){
-      // Se formato DD/MM/YYYY ou DD-MM-YYYY, pega só primeiros 5 chars
-      loteAteRaw = loteAteRaw.replace(/-/g,"/").substring(0,5);
-    }
-
-    // tipo: usa valor original da célula (mantém acento e hífen: "Pré-Venda")
-    const tipoRaw = (iTp >= 0 ? c[iTp] : "").trim();
+    let loteAteRaw = (iLA >= 0 ? c[iLA] : "").trim().replace(/-/g,"/");
+    if(loteAteRaw.length > 5) loteAteRaw = loteAteRaw.substring(0,5);
 
     return {
       tamanho:    c[iT],
       modelo:     c[iM],
       cor:        iC >= 0 ? c[iC] : "–",
-      sobram:     parseInt(c[iS])    || 0,
-      preco:      iP    >= 0 ? parseFloat(c[iP])    || 0 : 0,
-      lancamento: iLanc >= 0 ? parseFloat(c[iLanc]) || 0 : 0,
+      sobram:     parseInt(c[iS])  || 0,
+      preco:      iP    >= 0 ? toNum(c[iP])    : 0,
+      lancamento: iLanc >= 0 ? toNum(c[iLanc]) : 0,
       lote:       (iLt >= 0 ? c[iLt] : "").trim(),
       loteAte:    loteAteRaw,
-      tipo:       tipoRaw,
+      tipo:       (iTp >= 0 ? c[iTp] : "").trim(),
     };
   }).filter(r => r && r.modelo && r.tamanho);
 }
