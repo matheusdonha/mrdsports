@@ -99,6 +99,7 @@ footer{background:var(--dark);border-top:3px solid var(--verde);padding:1.75rem 
   </div>
 </div>
 <div class="container">
+  <div id="debugPanel" style="display:none;background:#111;color:#0f0;font-family:monospace;font-size:11px;padding:12px;border-radius:8px;margin-bottom:1rem;white-space:pre-wrap;word-break:break-all"></div>
   <div class="filters-row">
     <span class="filter-label">Filtrar:</span>
     <button class="filter-btn active" onclick="setFilter('todos',this)">Todos</button>
@@ -295,7 +296,6 @@ function parseCSV(text){
 }
 
 async function loadData(){
-  // Renderiza fallback imediatamente — nunca trava no spinner
   allRows = FALLBACK;
   renderAll();
 
@@ -308,14 +308,36 @@ async function loadData(){
     clearTimeout(t);
     if(!r.ok) throw new Error("HTTP " + r.status);
     const csv = await r.text();
+
+    // Debug: mostra primeiras 2 linhas do CSV na tela
+    const dbg = document.getElementById("debugPanel");
+    const lines = csv.trim().split("\n");
+    let hi = lines.findIndex(l => l.toLowerCase().includes("sobram") || l.toLowerCase().includes("restam"));
+    dbg.style.display = "block";
+    dbg.textContent = "=== LINHA HEADER ("+hi+") ===\n" + (lines[hi]||"NAO ENCONTRADA") +
+      "\n\n=== LINHA 1 DE DADOS ===\n" + (lines[hi+1]||"VAZIA") +
+      "\n\n=== HEADERS NORMALIZADOS ===\n" + 
+      (lines[hi]||"").split(",").map(x => {
+        const norm = x.trim().replace(/^["']+|["']+$/g,"").trim()
+          .toLowerCase()
+          .replace(/ç/g,"c").replace(/[ãâàá]/g,"a").replace(/[éê]/g,"e")
+          .replace(/[íî]/g,"i").replace(/[óôò]/g,"o").replace(/[úû]/g,"u")
+          .replace(/[^a-z0-9]/g,"");
+        return '"'+x.trim()+'" → "'+norm+'"';
+      }).join("\n");
+
     const parsed = parseCSV(csv);
-    if(parsed && parsed.length > 0) {
+    dbg.textContent += "\n\n=== PARSED: " + (parsed ? parsed.length+" linhas" : "NULL") + " ===";
+    if(parsed && parsed.length > 0){
+      dbg.textContent += "\nEx linha 1: " + JSON.stringify(parsed[0]);
       allRows = parsed;
       renderAll();
     }
   } catch(e) {
+    const dbg = document.getElementById("debugPanel");
+    dbg.style.display = "block";
+    dbg.textContent = "ERRO: " + e.message;
     console.warn("Sheets:", e.message);
-    // fallback já renderizado, não faz nada
   }
 }
 
