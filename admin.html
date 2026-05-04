@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRD Sports — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--verde:#69D473;--amarelo:#FEDD00;--dark:#0D1A0D;--dark2:#111C11;--surface:#1A261A;--surface2:#223022;--border:rgba(105,212,115,.15);--txt:#F0F7F0;--muted:#7A9A7A;--red:#FF4D4D;--orange:#FFB347;--blue:#5B9BD5;--purple:#B57BFF}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Figtree',sans-serif;background:var(--dark);color:var(--txt);min-height:100vh}
+
+/* LOGIN */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 0%,rgba(105,212,115,.12) 0%,transparent 70%)}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2.5rem;width:100%;max-width:380px;text-align:center}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--amarelo);margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:2rem}
+.login-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;font-size:15px;color:var(--txt);font-family:'Figtree',sans-serif;outline:none;margin-bottom:12px;text-align:center;letter-spacing:4px}
+.login-input:focus{border-color:var(--verde)}
+.btn-login{width:100%;background:var(--verde);color:var(--dark);border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Figtree',sans-serif;transition:all .18s}
+.btn-login:hover{background:#7de087;transform:translateY(-1px)}
+.login-err{color:var(--red);font-size:13px;margin-top:10px;display:none}
+
+/* APP */
+#app{display:none}
+header{background:var(--dark2);border-bottom:2px solid var(--verde);padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.hdr-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1.5px;color:var(--amarelo)}
+.hdr-logo span{color:var(--verde)}
+.hdr-nav{display:flex;gap:5px;flex-wrap:wrap}
+.nav-btn{padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;transition:all .15s;white-space:nowrap}
+.nav-btn:hover,.nav-btn.active{background:var(--verde);border-color:var(--verde);color:var(--dark)}
+.btn-logout{background:transparent;border:1.5px solid rgba(255,77,77,.3);color:var(--red);padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif}
+.loading-bar{height:3px;background:var(--verde);width:0;position:fixed;top:0;left:0;z-index:9999;transition:width .3s}
+
+.container{max-width:1100px;margin:0 auto;padding:1.75rem 1.25rem 5rem}
+.view{display:none}.view.active{display:block}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--muted);border-left:3px solid var(--verde);padding-left:12px;margin-bottom:1.25rem}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px;margin-bottom:1.5rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1rem;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--verde)}
+.stat-card.am::before{background:var(--amarelo)}.stat-card.rd::before{background:var(--red)}.stat-card.bl::before{background:var(--blue)}.stat-card.or::before{background:var(--orange)}.stat-card.pu::before{background:var(--purple)}
+.stat-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.5px;line-height:1}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.vd{color:var(--verde)}.am{color:var(--amarelo)}.rd{color:var(--red)}.bl{color:var(--blue)}.or{color:var(--orange)}.pu{color:var(--purple)}
+
+/* FORM */
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1.25rem}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:11px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.form-group input,.form-group select,.form-group textarea{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:9px 11px;font-size:13px;color:var(--txt);font-family:'Figtree',sans-serif;outline:none;transition:border-color .15s;width:100%}
+.form-group input:focus,.form-group select:focus{border-color:var(--verde)}
+.form-group select option{background:var(--surface2)}
+.toggle-row{display:flex;gap:6px;flex-wrap:wrap}
+.toggle-btn{padding:7px 13px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;transition:all .15s}
+.toggle-btn:hover{border-color:var(--verde);color:var(--verde)}
+.toggle-btn.active{background:var(--verde);border-color:var(--verde);color:var(--dark)}
+.divider{border:none;border-top:1px solid var(--border);margin:1rem 0}
+
+/* ITEMS */
+.itens-list{display:flex;flex-direction:column;gap:8px;margin-bottom:.75rem}
+.item-row{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 11px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.item-row select,.item-row input{background:var(--dark2);border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;color:var(--txt);font-family:'Figtree',sans-serif;outline:none;flex:1;min-width:80px}
+.item-row input[type="number"]{max-width:70px}
+.btn-del{background:rgba(255,77,77,.12);border:1px solid rgba(255,77,77,.2);color:var(--red);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px;flex-shrink:0;transition:all .15s}
+.btn-del:hover{background:rgba(255,77,77,.25)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:'Figtree',sans-serif;transition:all .18s}
+.btn-vd{background:var(--verde);color:var(--dark)}.btn-vd:hover{background:#7de087;transform:translateY(-1px)}
+.btn-ol{background:transparent;border:1.5px solid var(--border);color:var(--muted)}.btn-ol:hover{border-color:var(--verde);color:var(--verde)}
+.btn-rd{background:rgba(255,77,77,.12);border:1.5px solid rgba(255,77,77,.2);color:var(--red)}.btn-rd:hover{background:rgba(255,77,77,.2)}
+.btn-am{background:var(--amarelo);color:var(--dark)}.btn-am:hover{background:#ffe633}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+
+.resumo-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:.75rem}
+.resumo-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:3px 0;color:var(--muted)}
+.resumo-row.total{font-size:16px;font-weight:800;color:var(--txt);border-top:1px solid var(--border);margin-top:6px;padding-top:6px}
+
+/* PEDIDOS */
+.search-bar{display:flex;gap:8px;margin-bottom:1rem;align-items:center;flex-wrap:wrap}
+.search-bar input{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:8px 13px;font-size:13px;color:var(--txt);font-family:'Figtree',sans-serif;outline:none;flex:1;min-width:160px}
+.search-bar input:focus{border-color:var(--verde)}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chip{padding:5px 12px;border-radius:99px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:'Figtree',sans-serif;transition:all .15s}
+.chip:hover{border-color:var(--verde);color:var(--verde)}
+.chip.active{background:var(--verde);border-color:var(--verde);color:var(--dark)}
+
+.pedidos-list{display:flex;flex-direction:column;gap:10px}
+.pedido-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.pedido-hdr{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;cursor:pointer}
+.pedido-hdr:hover{background:rgba(105,212,115,.04)}
+.pedido-num{font-size:10px;font-weight:800;color:var(--muted);margin-bottom:2px}
+.pedido-nome{font-weight:800;font-size:14px}
+.pedido-meta{font-size:11px;color:var(--muted);margin-top:1px}
+.pdg-badges{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.b-pago{background:rgba(105,212,115,.15);color:var(--verde);border:1px solid rgba(105,212,115,.3)}
+.b-pend{background:rgba(255,179,71,.15);color:var(--orange);border:1px solid rgba(255,179,71,.3)}
+.b-pg{background:rgba(91,155,213,.15);color:var(--blue);border:1px solid rgba(91,155,213,.3)}
+.b-fora{background:rgba(254,221,0,.15);color:var(--amarelo);border:1px solid rgba(254,221,0,.3)}
+.b-com{background:rgba(255,179,71,.1);color:var(--orange);border:1px solid rgba(255,179,71,.2)}
+.b-pre{background:rgba(181,123,255,.15);color:var(--purple);border:1px solid rgba(181,123,255,.3)}
+.pedido-val{font-family:'Bebas Neue',sans-serif;font-size:19px;color:var(--verde)}
+.pedido-body{display:none;border-top:1px solid var(--border);padding:12px 14px}
+.pedido-body.open{display:block}
+table.itb{width:100%;border-collapse:collapse;font-size:12px}
+table.itb th{text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;padding:5px 6px;border-bottom:1px solid var(--border);font-weight:700}
+table.itb td{padding:6px 6px;border-bottom:1px solid rgba(105,212,115,.06);color:var(--txt)}
+table.itb tr:last-child td{border-bottom:none}
+.pedido-actions{display:flex;gap:7px;margin-top:10px}
+.entrega-box{margin-top:10px;background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.9}
+.entrega-box strong{color:var(--txt)}
+
+/* CUSTOS */
+.custo-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.custo-list{display:flex;flex-direction:column;gap:8px;margin-top:1rem}
+.custo-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.custo-info{flex:1}
+.custo-desc{font-weight:700;font-size:14px}
+.custo-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.custo-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red);white-space:nowrap}
+.cat-badge{font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:rgba(255,77,77,.1);color:var(--red);border:1px solid rgba(255,77,77,.2)}
+
+/* FINANCEIRO */
+.fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1.5rem}
+.fin-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.1rem}
+.fin-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.85rem}
+.fin-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.fin-row:last-child{border-bottom:none}
+.fin-lbl{color:var(--muted)}
+.fin-val{font-weight:700}
+.fin-val.vd{color:var(--verde)}.fin-val.rd{color:var(--red)}.fin-val.or{color:var(--orange)}.fin-val.am{color:var(--amarelo)}.fin-val.bl{color:var(--blue)}
+
+/* PROJECAO */
+.proj-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem}
+.proj-result{background:var(--surface2);border-radius:12px;padding:1.25rem;margin-top:1.25rem}
+.proj-result-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px}
+.proj-result-row:last-child{border-bottom:none;font-size:17px;font-weight:800;padding-top:12px}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:1.75rem;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;margin-bottom:1.25rem}
+.modal-title span{color:var(--verde)}
+.modal-actions{display:flex;gap:8px;margin-top:1.25rem;flex-wrap:wrap}
+
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 18px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.4);transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--verde)}.toast.error{border-color:var(--red)}
+.empty{text-align:center;padding:3rem;color:var(--muted);font-size:14px}
+
+@media(max-width:640px){
+  header{padding:0 .75rem;height:auto;padding-top:.5rem;padding-bottom:.5rem;flex-wrap:wrap;gap:6px}
+  .container{padding:1rem .9rem 4rem}
+  .fin-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="loading-bar" id="loadingBar"></div>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">MRD Sports</div>
+    <div class="login-sub">Painel Administrativo</div>
+    <input class="login-input" type="password" id="senhaInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')tryLogin()">
+    <button class="btn-login" onclick="tryLogin()">Entrar</button>
+    <div class="login-err" id="loginErr">Senha incorreta</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="hdr-logo">MRD <span>Admin</span></div>
+    <div class="hdr-nav">
+      <button class="nav-btn active" onclick="showView('nova',this)">🛒 Nova Venda</button>
+      <button class="nav-btn" onclick="showView('pedidos',this)">📋 Pedidos</button>
+      <button class="nav-btn" onclick="showView('custos',this)">💸 Custos</button>
+      <button class="nav-btn" onclick="showView('fin',this)">📊 Financeiro</button>
+      <button class="nav-btn" onclick="showView('proj',this)">📈 Projeção</button>
+    </div>
+    <button class="btn-logout" onclick="logout()">Sair</button>
+  </header>
+
+  <div class="container">
+
+    <!-- NOVA VENDA -->
+    <div class="view active" id="view-nova">
+      <div class="sec-title">Nova Venda — Pedido <span id="proxNumPedido" style="color:var(--verde)">#001</span></div>
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group"><label>Nome *</label><input type="text" id="v-nome" placeholder="Nome do comprador"></div>
+          <div class="form-group"><label>Telefone</label><input type="text" id="v-tel" placeholder="(42) 99999-9999"></div>
+          <div class="form-group"><label>Pagamento</label>
+            <select id="v-pag" onchange="toggleCartao()">
+              <option>Pix</option><option>Dinheiro</option><option>Cartão</option>
+            </select>
+          </div>
+          <div class="form-group" id="taxaCartaoGroup" style="display:none"><label>Taxa Cartão (%)</label><input type="number" id="v-taxa" placeholder="2.5" min="0" step="0.1" oninput="calcResumo()"></div>
+          <div class="form-group"><label>Status</label>
+            <div class="toggle-row">
+              <button class="toggle-btn active" onclick="tog('v-status','Pago',this)">✅ Pago</button>
+              <button class="toggle-btn" onclick="tog('v-status','Pendente',this)">⏳ Pendente</button>
+            </div>
+            <input type="hidden" id="v-status" value="Pago">
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="form-grid" style="margin-bottom:.9rem">
+          <div class="form-group"><label>Tipo</label>
+            <div class="toggle-row">
+              <button class="toggle-btn active" onclick="tog('v-tipo','Pré-Venda',this)">🔥 Pré-Venda</button>
+              <button class="toggle-btn" onclick="tog('v-tipo','Lançamento',this)">🚀 Lançamento</button>
+            </div>
+            <input type="hidden" id="v-tipo" value="Pré-Venda">
+          </div>
+          <div class="form-group"><label>Lote</label><input type="number" id="v-lote" value="1" min="1"></div>
+          <div class="form-group"><label>Desconto</label>
+            <div style="display:flex;gap:6px">
+              <select id="v-desc-tipo" style="max-width:90px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:8px;color:var(--txt);font-family:'Figtree',sans-serif;outline:none" onchange="calcResumo()">
+                <option value="fixo">R$</option>
+                <option value="pct">%</option>
+              </select>
+              <input type="number" id="v-desc" placeholder="0" min="0" step="0.01" oninput="calcResumo()" style="flex:1">
+            </div>
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="form-group" style="margin-bottom:.9rem"><label>Localidade</label>
+          <div class="toggle-row">
+            <button class="toggle-btn active" onclick="setLoc('PG',this)">📍 Ponta Grossa</button>
+            <button class="toggle-btn" onclick="setLoc('Fora',this)">🚚 Fora</button>
+          </div>
+        </div>
+        <div id="entregaFields" style="display:none">
+          <div class="form-grid" style="margin-bottom:.9rem">
+            <div class="form-group"><label>CPF</label><input type="text" id="v-cpf" placeholder="000.000.000-00"></div>
+            <div class="form-group"><label>CEP</label><input type="text" id="v-cep" placeholder="00000-000" oninput="buscaCEP(this.value)"></div>
+            <div class="form-group"><label>Rua / Número</label><input type="text" id="v-rua" placeholder="Rua, 123"></div>
+            <div class="form-group"><label>Bairro</label><input type="text" id="v-bairro" placeholder="Bairro"></div>
+            <div class="form-group"><label>Cidade</label><input type="text" id="v-cidade" placeholder="Cidade"></div>
+            <div class="form-group"><label>Frete (R$)</label><input type="number" id="v-frete" placeholder="0" min="0" step="0.01" oninput="calcResumo()"></div>
+            <div class="form-group"><label>Embalagem (R$)</label><input type="number" id="v-emb" placeholder="0" min="0" step="0.01" oninput="calcResumo()"></div>
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="form-group" style="margin-bottom:.9rem"><label>Comissionada?</label>
+          <div class="toggle-row">
+            <button class="toggle-btn active" onclick="setCom(false,this)">Não</button>
+            <button class="toggle-btn" onclick="setCom(true,this)">Sim</button>
+          </div>
+        </div>
+        <div id="comFields" style="display:none;margin-bottom:.9rem">
+          <div class="form-group"><label>Comissionado</label>
+            <div class="toggle-row">
+              <button class="toggle-btn" onclick="tog('v-com','Maria',this)">Maria</button>
+              <button class="toggle-btn" onclick="tog('v-com','Zuken',this)">Zuken</button>
+              <button class="toggle-btn" onclick="tog('v-com','Helton',this)">Helton</button>
+            </div>
+            <input type="hidden" id="v-com" value="">
+          </div>
+        </div>
+        <hr class="divider">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
+          <label style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Itens do Pedido</label>
+          <button class="btn btn-ol" onclick="addItem()" style="padding:5px 11px;font-size:12px">+ Item</button>
+        </div>
+        <div class="itens-list" id="itensList"></div>
+        <div class="resumo-box">
+          <div class="resumo-row"><span>Subtotal</span><span id="r-sub">R$ 0,00</span></div>
+          <div class="resumo-row" id="r-desc-row" style="display:none"><span>Desconto</span><span id="r-desc" style="color:var(--orange)">—</span></div>
+          <div class="resumo-row" id="r-taxa-row" style="display:none"><span>Taxa Cartão</span><span id="r-taxa" style="color:var(--orange)">—</span></div>
+          <div class="resumo-row" id="r-com-row" style="display:none"><span>Comissão (10%)</span><span id="r-com" style="color:var(--orange)">—</span></div>
+          <div class="resumo-row" id="r-frete-row" style="display:none"><span>Frete + Embalagem</span><span id="r-frete">—</span></div>
+          <div class="resumo-row total"><span>💰 Total Líquido</span><span id="r-liq" class="vd">R$ 0,00</span></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap">
+          <button class="btn btn-vd" id="btnConf" onclick="confirmar()">✅ Confirmar Venda</button>
+          <button class="btn btn-ol" onclick="resetForm()">🔄 Limpar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PEDIDOS -->
+    <div class="view" id="view-pedidos">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px">
+        <div class="sec-title" style="margin-bottom:0">Pedidos</div>
+        <button class="btn btn-ol" onclick="carregarPedidos()" style="font-size:12px;padding:6px 12px">🔄 Atualizar</button>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="searchQ" placeholder="Buscar por nome ou #pedido…" oninput="renderPedidos()">
+        <div class="chips">
+          <button class="chip active" onclick="setChip('todos',this)">Todos</button>
+          <button class="chip" onclick="setChip('Pago',this)">Pagos</button>
+          <button class="chip" onclick="setChip('Pendente',this)">Pendentes</button>
+          <button class="chip" onclick="setChip('PG',this)">PG</button>
+          <button class="chip" onclick="setChip('Fora',this)">Fora</button>
+        </div>
+      </div>
+      <div class="pedidos-list" id="pedidosList"><div class="empty">Carregando pedidos…</div></div>
+    </div>
+
+    <!-- CUSTOS -->
+    <div class="view" id="view-custos">
+      <div class="sec-title">Custos</div>
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group"><label>Descrição *</label><input type="text" id="c-desc" placeholder="Ex: Embalagens lote 1"></div>
+          <div class="form-group"><label>Categoria</label>
+            <select id="c-cat">
+              <option>Custo Camisa</option>
+              <option>Embalagem</option>
+              <option>Transporte</option>
+              <option>Imposto</option>
+              <option>Fornecedor</option>
+              <option>Outros</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Valor (R$) *</label><input type="number" id="c-val" placeholder="0,00" min="0" step="0.01"></div>
+          <div class="form-group"><label>Data</label><input type="date" id="c-data"></div>
+        </div>
+        <div style="margin-top:.9rem;display:flex;gap:8px">
+          <button class="btn btn-vd" onclick="addCusto()">+ Adicionar Custo</button>
+          <button class="btn btn-ol" onclick="carregarCustos()" style="font-size:12px">🔄 Atualizar</button>
+        </div>
+      </div>
+      <div class="custo-list" id="custoList"><div class="empty">Carregando custos…</div></div>
+    </div>
+
+    <!-- FINANCEIRO -->
+    <div class="view" id="view-fin">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px">
+        <div class="sec-title" style="margin-bottom:0">Financeiro</div>
+        <button class="btn btn-ol" onclick="carregarTudo();renderFin()" style="font-size:12px;padding:6px 12px">🔄 Atualizar</button>
+      </div>
+      <div class="stats-grid" id="finStats"></div>
+      <div class="fin-grid">
+        <div class="fin-card"><div class="fin-title">📍 Por Localidade</div><div id="finLoc"></div></div>
+        <div class="fin-card"><div class="fin-title">🤝 Comissionados</div><div id="finCom"></div></div>
+        <div class="fin-card"><div class="fin-title">💳 Pagamento</div><div id="finPag"></div></div>
+        <div class="fin-card"><div class="fin-title">👕 Por Modelo</div><div id="finMod"></div></div>
+        <div class="fin-card"><div class="fin-title">📦 A Pagar</div><div id="finAPagar"></div></div>
+        <div class="fin-card"><div class="fin-title">💰 A Receber</div><div id="finAReceber"></div></div>
+      </div>
+    </div>
+
+    <!-- PROJECAO -->
+    <div class="view" id="view-proj">
+      <div class="sec-title">Projeção de Resultados</div>
+      <div class="proj-box">
+        <div class="form-grid">
+          <div class="form-group"><label>Preço Médio por Camisa (R$)</label><input type="number" id="p-preco" placeholder="159" min="0" step="0.01" oninput="calcProj()"></div>
+          <div class="form-group"><label>Total de Camisas em Estoque</label><input type="number" id="p-estoque" placeholder="148" min="0" oninput="calcProj()"></div>
+          <div class="form-group"><label>% Comissão Média</label><input type="number" id="p-compct" placeholder="10" min="0" step="0.1" oninput="calcProj()"></div>
+          <div class="form-group"><label>% Vendas Comissionadas</label><input type="number" id="p-compctvendas" placeholder="30" min="0" step="1" oninput="calcProj()"></div>
+        </div>
+        <div class="proj-result" id="projResult"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal-overlay" id="modalEdit" onclick="closeModalOutside(event,'modalEdit')">
+  <div class="modal">
+    <div class="modal-title">✏️ Editar <span>Pedido</span></div>
+    <div id="editFormContent"></div>
+    <div class="modal-actions">
+      <button class="btn btn-vd" id="btnSalvarEdit" onclick="salvarEdicao()">💾 Salvar</button>
+      <button class="btn btn-ol" onclick="closeModal('modalEdit')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+const SENHA = "MRD@123";
+const COM_PCT = 0.10;
+const APPS_URL = "https://script.google.com/macros/s/AKfycbyKQTC4DSkYxOa0Kbc9VA7GevQbF-9e3vi7GWrw3L-GJYXiO9xjmkqnnLd6ozN7o61IjQ/exec";
+
+const ESTOQUE = {
+  Torcedor:{cores:["Amarela","Azul","Preta","Verde"],tamanhos:["P","M","G","GG","XGG"],preco:149,custo:65},
+  Jogador: {cores:["Amarela","Azul"],tamanhos:["P","M","G","GG"],preco:169,custo:67},
+  Feminina:{cores:["Amarela","Azul"],tamanhos:["P","M","G","GG"],preco:149,custo:65},
+  Retro:   {cores:["94","98","2002"],tamanhos:["M","G","GG"],preco:199,custo:65},
+};
+
+// Contas fixas Bruno/Leo
+const CONTAS_PAGAR = [
+  {desc:"Bruno Barbearia — 2ª parcela fornecedor",val:2275},
+  {desc:"Leo Floripa — 2ª parcela fornecedor",val:432.50},
+];
+const CONTAS_RECEBER = [
+  {desc:"Bruno Barbearia — 2ª parcela venda",val:2800},
+  {desc:"Leo Floripa — 2ª parcela venda",val:0},
+];
+
+let pedidos=[], custos=[], itemN=0, loc="PG", comisionada=false, chipAtual="todos", editando=null;
+
+// ── AUTH ──
+function tryLogin(){
+  if(document.getElementById("senhaInput").value===SENHA){
+    document.getElementById("loginScreen").style.display="none";
+    document.getElementById("app").style.display="block";
+    init();
+  } else {
+    document.getElementById("loginErr").style.display="block";
+    document.getElementById("senhaInput").value="";
+  }
+}
+function logout(){
+  document.getElementById("loginScreen").style.display="flex";
+  document.getElementById("app").style.display="none";
+}
+
+// ── NAV ──
+function showView(id,btn){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById("view-"+id).classList.add("active");
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  if(id==="pedidos") renderPedidos();
+  if(id==="fin") renderFin();
+  if(id==="custos") renderCustos();
+  if(id==="proj") calcProj();
+}
+
+// ── LOADING ──
+function setLoading(on){
+  const bar=document.getElementById("loadingBar");
+  bar.style.width=on?"60%":"100%";
+  if(!on) setTimeout(()=>bar.style.width="0",400);
+}
+
+// ── API ──
+async function api(action,data={}){
+  const body=JSON.stringify({action,...data});
+  await fetch(APPS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body});
+}
+
+async function apiGet(action){
+  try{
+    const r=await fetch(APPS_URL+"?action="+action);
+    return await r.json();
+  }catch(e){return null;}
+}
+
+// ── CARREGAR DADOS ──
+async function carregarPedidos(){
+  setLoading(true);
+  const res=await apiGet("readVendas");
+  if(res&&res.rows&&res.rows.length>1){
+    const rows=res.rows.slice(1); // pula header
+    // Agrupa por número de pedido (col 27 = índice 26)
+    const map={};
+    rows.forEach(r=>{
+      const num=String(r[26]||"");
+      if(!num) return;
+      if(!map[num]) map[num]={
+        numeroPedido:num, data:r[0], hora:r[1], nome:r[2], tel:r[3],
+        pagamento:r[10], status:r[11], loc:r[12],
+        comisionada:r[13]==="Sim", comisionado:r[14],
+        frete:parseFloat(r[16])||0, emb:parseFloat(r[17])||0,
+        tipo:r[24], lote:r[25],
+        itens:[]
+      };
+      map[num].itens.push({
+        modelo:r[4],cor:r[5],tamanho:r[6],
+        qtd:parseInt(r[7])||1,preco:parseFloat(r[8])||0
+      });
+    });
+    // Recalcula valores
+    pedidos=Object.values(map).map(p=>{
+      const sub=p.itens.reduce((s,i)=>s+i.preco*i.qtd,0);
+      const com=p.comisionada?sub*COM_PCT:0;
+      const custosFrete=p.frete+p.emb;
+      return {...p,sub,com,custos:custosFrete,liq:sub-com-custosFrete};
+    }).sort((a,b)=>parseInt(b.numeroPedido)-parseInt(a.numeroPedido));
+  }
+  setLoading(false);
+  renderPedidos();
+  atualizaProxNum();
+}
+
+async function carregarCustos(){
+  setLoading(true);
+  const res=await apiGet("readCustos");
+  if(res&&res.rows&&res.rows.length>1){
+    custos=res.rows.slice(1).map((r,i)=>({
+      id:r[0]||i, data:r[0], desc:r[1], cat:r[2], val:parseFloat(r[3])||0
+    })).filter(c=>c.desc);
+  }
+  setLoading(false);
+  renderCustos();
+}
+
+async function carregarTudo(){
+  await Promise.all([carregarPedidos(),carregarCustos()]);
+}
+
+// ── TOGGLES ──
+function tog(id,val,btn){
+  document.getElementById(id).value=val;
+  btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  calcResumo();
+}
+function setLoc(l,btn){
+  loc=l;
+  btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("entregaFields").style.display=l==="Fora"?"block":"none";
+  calcResumo();
+}
+function setCom(v,btn){
+  comisionada=v;
+  btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("comFields").style.display=v?"block":"none";
+  if(!v) document.getElementById("v-com").value="";
+  calcResumo();
+}
+function toggleCartao(){
+  const isPix=document.getElementById("v-pag").value==="Cartão";
+  document.getElementById("taxaCartaoGroup").style.display=isPix?"block":"none";
+  calcResumo();
+}
+
+// ── CEP ──
+async function buscaCEP(cep){
+  const c=cep.replace(/\D/g,"");
+  if(c.length!==8) return;
+  try{
+    const r=await fetch("https://viacep.com.br/ws/"+c+"/json/");
+    const d=await r.json();
+    if(!d.erro){
+      document.getElementById("v-rua").value=d.logradouro||"";
+      document.getElementById("v-bairro").value=d.bairro||"";
+      document.getElementById("v-cidade").value=d.localidade||"";
+    }
+  }catch(e){}
+}
+
+// ── ITENS ──
+function addItem(item=null){
+  itemN++;
+  const n=itemN;
+  const div=document.createElement("div");
+  div.className="item-row"; div.id="item-"+n;
+  const modOpts=Object.keys(ESTOQUE).map(m=>`<option${item&&item.modelo===m?" selected":""}>${m}</option>`).join("");
+  div.innerHTML=`
+    <select onchange="updCores(${n})" id="im-${n}">${modOpts}</select>
+    <select id="ic-${n}" onchange="calcResumo()"></select>
+    <select id="it-${n}" onchange="calcResumo()"></select>
+    <input type="number" id="iq-${n}" value="${item?item.qtd:1}" min="1" style="max-width:60px" oninput="calcResumo()">
+    <input type="number" id="ip-${n}" placeholder="Preço" min="0" step="0.01" style="max-width:80px" oninput="calcResumo()">
+    <button class="btn-del" onclick="delItem(${n})">✕</button>`;
+  document.getElementById("itensList").appendChild(div);
+  updCores(n, item?.cor, item?.tamanho);
+  if(item) setTimeout(()=>{document.getElementById("ip-"+n).value=item.preco;calcResumo();},50);
+}
+function updCores(n,selCor=null,selTam=null){
+  const m=document.getElementById("im-"+n).value;
+  const e=ESTOQUE[m];
+  document.getElementById("ic-"+n).innerHTML=e.cores.map(c=>`<option${selCor===c?" selected":""}>${c}</option>`).join("");
+  document.getElementById("it-"+n).innerHTML=e.tamanhos.map(t=>`<option${selTam===t?" selected":""}>${t}</option>`).join("");
+  if(!selCor) document.getElementById("ip-"+n).value=e.preco;
+  calcResumo();
+}
+function delItem(n){document.getElementById("item-"+n)?.remove();calcResumo();}
+function getItens(){
+  const itens=[];
+  document.querySelectorAll(".item-row").forEach(row=>{
+    const n=row.id.replace("item-","");
+    const modelo=document.getElementById("im-"+n)?.value;
+    if(!modelo) return;
+    itens.push({modelo,cor:document.getElementById("ic-"+n)?.value,tamanho:document.getElementById("it-"+n)?.value,qtd:parseInt(document.getElementById("iq-"+n)?.value)||1,preco:parseFloat(document.getElementById("ip-"+n)?.value)||0});
+  });
+  return itens;
+}
+
+const fmt=v=>"R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+function calcResumo(){
+  const itens=getItens();
+  const sub=itens.reduce((s,i)=>s+i.preco*i.qtd,0);
+  const descTipo=document.getElementById("v-desc-tipo")?.value||"fixo";
+  const descVal=parseFloat(document.getElementById("v-desc")?.value)||0;
+  const desc=descTipo==="pct"?sub*(descVal/100):descVal;
+  const subComDesc=sub-desc;
+  const taxaPct=parseFloat(document.getElementById("v-taxa")?.value)||0;
+  const taxa=document.getElementById("v-pag")?.value==="Cartão"?subComDesc*(taxaPct/100):0;
+  const frete=parseFloat(document.getElementById("v-frete")?.value)||0;
+  const emb=parseFloat(document.getElementById("v-emb")?.value)||0;
+  const custosFrete=frete+emb;
+  const com=comisionada?subComDesc*COM_PCT:0;
+  const liq=subComDesc-taxa-com-custosFrete;
+
+  document.getElementById("r-sub").textContent=fmt(sub);
+  const rd=document.getElementById("r-desc-row"); rd.style.display=desc>0?"flex":"none";
+  document.getElementById("r-desc").textContent="— "+fmt(desc);
+  const rt=document.getElementById("r-taxa-row"); rt.style.display=taxa>0?"flex":"none";
+  document.getElementById("r-taxa").textContent="— "+fmt(taxa);
+  const rc=document.getElementById("r-com-row"); rc.style.display=comisionada?"flex":"none";
+  document.getElementById("r-com").textContent="— "+fmt(com);
+  const rf=document.getElementById("r-frete-row"); rf.style.display=custosFrete>0?"flex":"none";
+  document.getElementById("r-frete").textContent="— "+fmt(custosFrete);
+  document.getElementById("r-liq").textContent=fmt(liq);
+}
+
+function atualizaProxNum(){
+  const nums=pedidos.map(p=>parseInt(p.numeroPedido)||0);
+  const prox=nums.length?Math.max(...nums)+1:1;
+  document.getElementById("proxNumPedido").textContent="#"+String(prox).padStart(3,"0");
+}
+
+// ── CONFIRMAR ──
+async function confirmar(){
+  const nome=document.getElementById("v-nome").value.trim();
+  if(!nome){toast("⚠ Informe o nome","error");return;}
+  const itens=getItens();
+  if(!itens.length){toast("⚠ Adicione um item","error");return;}
+  if(comisionada&&!document.getElementById("v-com").value){toast("⚠ Selecione o comissionado","error");return;}
+
+  const nums=pedidos.map(p=>parseInt(p.numeroPedido)||0);
+  const numPedido=nums.length?Math.max(...nums)+1:1;
+  const numStr=String(numPedido).padStart(3,"0");
+
+  const sub=itens.reduce((s,i)=>s+i.preco*i.qtd,0);
+  const descTipo=document.getElementById("v-desc-tipo").value;
+  const descVal=parseFloat(document.getElementById("v-desc").value)||0;
+  const desc=descTipo==="pct"?sub*(descVal/100):descVal;
+  const subComDesc=sub-desc;
+  const taxaPct=parseFloat(document.getElementById("v-taxa")?.value)||0;
+  const taxa=document.getElementById("v-pag").value==="Cartão"?subComDesc*(taxaPct/100):0;
+  const frete=parseFloat(document.getElementById("v-frete")?.value)||0;
+  const emb=parseFloat(document.getElementById("v-emb")?.value)||0;
+  const com=comisionada?subComDesc*COM_PCT:0;
+  const liq=subComDesc-taxa-com-frete-emb;
+
+  const entrega=loc==="Fora"?{
+    cpf:document.getElementById("v-cpf").value.trim(),
+    cep:document.getElementById("v-cep").value.trim(),
+    rua:document.getElementById("v-rua").value.trim(),
+    bairro:document.getElementById("v-bairro").value.trim(),
+    cidade:document.getElementById("v-cidade").value.trim()
+  }:null;
+
+  const data=new Date().toLocaleDateString("pt-BR");
+  const hora=new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  const pagamento=document.getElementById("v-pag").value;
+  const status=document.getElementById("v-status").value;
+  const comisionado=document.getElementById("v-com").value;
+  const tipo=document.getElementById("v-tipo").value;
+  const lote=document.getElementById("v-lote").value;
+  const tel=document.getElementById("v-tel").value.trim();
+
+  const rows=itens.map(item=>[
+    data,hora,nome,tel,
+    item.modelo,item.cor,item.tamanho,item.qtd,item.preco,item.preco*item.qtd,
+    pagamento,status,loc,
+    comisionada?"Sim":"Não",comisionado||"",
+    comisionada?parseFloat((item.preco*item.qtd*COM_PCT).toFixed(2)):0,
+    frete,emb,parseFloat(liq.toFixed(2)),
+    entrega?entrega.cpf:"",entrega?entrega.cep:"",entrega?entrega.rua:"",entrega?entrega.bairro:"",entrega?entrega.cidade:"",
+    tipo,lote,numStr
+  ]);
+
+  const btn=document.getElementById("btnConf");
+  btn.disabled=true; btn.textContent="Salvando…";
+
+  try{
+    await fetch(APPS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"addVenda",rows})});
+    // Adiciona localmente
+    pedidos.unshift({numeroPedido:numStr,data,hora,nome,tel,pagamento,status,loc,comisionada,comisionado,frete,emb,tipo,lote,itens,sub,com,custos:frete+emb,liq});
+    toast("✅ Pedido #"+numStr+" salvo!","success");
+    resetForm();
+  }catch(e){
+    toast("⚠ Erro ao salvar","error");
+  }
+  btn.disabled=false; btn.textContent="✅ Confirmar Venda";
+}
+
+// ── RESET ──
+function resetForm(){
+  ["v-nome","v-tel","v-cpf","v-cep","v-rua","v-bairro","v-cidade","v-frete","v-emb","v-taxa","v-desc"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  document.getElementById("v-com").value="";
+  document.getElementById("v-status").value="Pago";
+  document.getElementById("v-tipo").value="Pré-Venda";
+  document.getElementById("v-lote").value="1";
+  document.getElementById("itensList").innerHTML="";
+  itemN=0; loc="PG"; comisionada=false;
+  document.getElementById("entregaFields").style.display="none";
+  document.getElementById("comFields").style.display="none";
+  document.getElementById("taxaCartaoGroup").style.display="none";
+  document.querySelectorAll(".toggle-row").forEach(row=>{
+    row.querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
+    const first=row.querySelector(".toggle-btn");
+    if(first) first.classList.add("active");
+  });
+  atualizaProxNum();
+  addItem(); calcResumo();
+}
+
+// ── PEDIDOS ──
+let chipAtual2="todos";
+function setChip(f,btn){chipAtual2=f;document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));btn.classList.add("active");renderPedidos();}
+
+function renderPedidos(){
+  const q=(document.getElementById("searchQ")?.value||"").toLowerCase();
+  const lista=document.getElementById("pedidosList");
+  let filtered=pedidos.filter(p=>{
+    const ms=!q||p.nome.toLowerCase().includes(q)||p.numeroPedido.includes(q);
+    const mc=chipAtual2==="todos"||p.status===chipAtual2||p.loc===chipAtual2;
+    return ms&&mc;
+  });
+  if(!filtered.length){lista.innerHTML='<div class="empty">Nenhum pedido encontrado.</div>';return;}
+  lista.innerHTML=filtered.map(p=>`
+    <div class="pedido-card">
+      <div class="pedido-hdr" onclick="togPed(${p.numeroPedido})">
+        <div>
+          <div class="pedido-num">#${p.numeroPedido}</div>
+          <div class="pedido-nome">${p.nome}</div>
+          <div class="pedido-meta">${p.data} ${p.hora} · ${p.tel||"—"} · ${p.pagamento}</div>
+        </div>
+        <div class="pdg-badges">
+          <span class="badge ${p.status==="Pago"?"b-pago":"b-pend"}">${p.status}</span>
+          <span class="badge ${p.loc==="PG"?"b-pg":"b-fora"}">${p.loc}</span>
+          ${p.comisionada?`<span class="badge b-com">🤝 ${p.comisionado}</span>`:""}
+          <span class="badge b-pre">${p.tipo||"Pré-Venda"} L${p.lote||1}</span>
+        </div>
+        <div class="pedido-val">${fmt(p.liq)}</div>
+      </div>
+      <div class="pedido-body" id="pb-${p.numeroPedido}">
+        <table class="itb">
+          <thead><tr><th>Modelo</th><th>Cor</th><th>Tam.</th><th>Qtd</th><th>Unit.</th><th>Total</th></tr></thead>
+          <tbody>${p.itens.map(i=>`<tr><td>${i.modelo}</td><td>${i.cor}</td><td>${i.tamanho}</td><td>${i.qtd}</td><td>${fmt(i.preco)}</td><td>${fmt(i.preco*i.qtd)}</td></tr>`).join("")}</tbody>
+        </table>
+        ${p.comisionada?`<div style="font-size:12px;color:var(--orange);margin-top:8px">🤝 Comissão ${p.comisionado}: ${fmt(p.com)}</div>`:""}
+        ${p.custos>0?`<div style="font-size:12px;color:var(--muted);margin-top:4px">📦 Frete+Emb: ${fmt(p.custos)}</div>`:""}
+        ${p.entrega?`<div class="entrega-box">🚚 <strong>Entrega:</strong> ${p.entrega.rua}, ${p.entrega.bairro} — ${p.entrega.cidade} · CEP ${p.entrega.cep} · CPF ${p.entrega.cpf}</div>`:""}
+        <div class="pedido-actions">
+          <button class="btn btn-ol" onclick="editarPedido('${p.numeroPedido}')" style="font-size:12px;padding:6px 12px">✏️ Editar</button>
+          <button class="btn btn-rd" onclick="deletarPedido('${p.numeroPedido}')" style="font-size:12px;padding:6px 12px">🗑️ Deletar</button>
+        </div>
+      </div>
+    </div>`).join("");
+}
+function togPed(id){document.getElementById("pb-"+id)?.classList.toggle("open");}
+
+// ── DELETAR ──
+async function deletarPedido(num){
+  if(!confirm("Deletar pedido #"+num+"? Isso também remove da planilha.")) return;
+  setLoading(true);
+  await fetch(APPS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"deleteVenda",numeroPedido:num})});
+  pedidos=pedidos.filter(p=>p.numeroPedido!==num);
+  setLoading(false);
+  toast("🗑️ Pedido #"+num+" deletado","");
+  renderPedidos();
+}
+
+// ── EDITAR ──
+function editarPedido(num){
+  const p=pedidos.find(p=>p.numeroPedido===num);
+  if(!p) return;
+  editando=p;
+  document.getElementById("modalEdit").classList.add("open");
+  const content=document.getElementById("editFormContent");
+  content.innerHTML=`
+    <div class="form-grid" style="margin-bottom:.9rem">
+      <div class="form-group"><label>Nome</label><input id="e-nome" value="${p.nome}"></div>
+      <div class="form-group"><label>Telefone</label><input id="e-tel" value="${p.tel||""}"></div>
+      <div class="form-group"><label>Pagamento</label>
+        <select id="e-pag">
+          <option${p.pagamento==="Pix"?" selected":""}>Pix</option>
+          <option${p.pagamento==="Dinheiro"?" selected":""}>Dinheiro</option>
+          <option${p.pagamento==="Cartão"?" selected":""}>Cartão</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Status</label>
+        <select id="e-status">
+          <option${p.status==="Pago"?" selected":""}>Pago</option>
+          <option${p.status==="Pendente"?" selected":""}>Pendente</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Tipo</label>
+        <select id="e-tipo">
+          <option${p.tipo==="Pré-Venda"?" selected":""}>Pré-Venda</option>
+          <option${p.tipo==="Lançamento"?" selected":""}>Lançamento</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Lote</label><input type="number" id="e-lote" value="${p.lote||1}"></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem">Itens</div>
+    <div id="editItensList">
+      ${p.itens.map((item,i)=>`
+        <div class="item-row" id="eitem-${i}">
+          <select id="eim-${i}" onchange="eUpdCores(${i},'${item.cor}','${item.tamanho}')">
+            ${Object.keys(ESTOQUE).map(m=>`<option${m===item.modelo?" selected":""}>${m}</option>`).join("")}
+          </select>
+          <select id="eic-${i}">
+            ${ESTOQUE[item.modelo].cores.map(c=>`<option${c===item.cor?" selected":""}>${c}</option>`).join("")}
+          </select>
+          <select id="eit-${i}">
+            ${ESTOQUE[item.modelo].tamanhos.map(t=>`<option${t===item.tamanho?" selected":""}>${t}</option>`).join("")}
+          </select>
+          <input type="number" id="eiq-${i}" value="${item.qtd}" min="1" style="max-width:60px">
+          <input type="number" id="eip-${i}" value="${item.preco}" style="max-width:80px">
+          <button class="btn-del" onclick="document.getElementById('eitem-${i}').remove()">✕</button>
+        </div>`).join("")}
+    </div>
+    <button class="btn btn-ol" onclick="addEditItem()" style="margin-top:.5rem;font-size:12px;padding:5px 11px">+ Item</button>`;
+}
+function eUpdCores(i,selCor,selTam){
+  const m=document.getElementById("eim-"+i).value;
+  document.getElementById("eic-"+i).innerHTML=ESTOQUE[m].cores.map(c=>`<option${c===selCor?" selected":""}>${c}</option>`).join("");
+  document.getElementById("eit-"+i).innerHTML=ESTOQUE[m].tamanhos.map(t=>`<option${t===selTam?" selected":""}>${t}</option>`).join("");
+}
+let editItemN=100;
+function addEditItem(){
+  editItemN++;
+  const n=editItemN;
+  const div=document.createElement("div");
+  div.className="item-row"; div.id="eitem-"+n;
+  div.innerHTML=`
+    <select id="eim-${n}" onchange="eUpdCores(${n},null,null)">${Object.keys(ESTOQUE).map(m=>`<option>${m}</option>`).join("")}</select>
+    <select id="eic-${n}"></select><select id="eit-${n}"></select>
+    <input type="number" id="eiq-${n}" value="1" min="1" style="max-width:60px">
+    <input type="number" id="eip-${n}" style="max-width:80px">
+    <button class="btn-del" onclick="document.getElementById('eitem-${n}').remove()">✕</button>`;
+  document.getElementById("editItensList").appendChild(div);
+  eUpdCores(n,null,null);
+  const m=document.getElementById("eim-"+n).value;
+  document.getElementById("eip-"+n).value=ESTOQUE[m].preco;
+}
+
+async function salvarEdicao(){
+  if(!editando) return;
+  const p=editando;
+  const itens=[];
+  document.querySelectorAll("#editItensList .item-row").forEach(row=>{
+    const i=row.id.replace("eitem-","");
+    const modelo=document.getElementById("eim-"+i)?.value;
+    if(!modelo) return;
+    itens.push({modelo,cor:document.getElementById("eic-"+i)?.value,tamanho:document.getElementById("eit-"+i)?.value,qtd:parseInt(document.getElementById("eiq-"+i)?.value)||1,preco:parseFloat(document.getElementById("eip-"+i)?.value)||0});
+  });
+
+  const nome=document.getElementById("e-nome").value.trim();
+  const tel=document.getElementById("e-tel").value.trim();
+  const pagamento=document.getElementById("e-pag").value;
+  const status=document.getElementById("e-status").value;
+  const tipo=document.getElementById("e-tipo").value;
+  const lote=document.getElementById("e-lote").value;
+
+  const sub=itens.reduce((s,i)=>s+i.preco*i.qtd,0);
+  const com=p.comisionada?sub*COM_PCT:0;
+  const liq=sub-com-p.frete-p.emb;
+
+  const rows=itens.map(item=>[
+    p.data,p.hora,nome,tel,
+    item.modelo,item.cor,item.tamanho,item.qtd,item.preco,item.preco*item.qtd,
+    pagamento,status,p.loc,
+    p.comisionada?"Sim":"Não",p.comisionado||"",
+    p.comisionada?parseFloat((item.preco*item.qtd*COM_PCT).toFixed(2)):0,
+    p.frete,p.emb,parseFloat(liq.toFixed(2)),
+    "","","","","",
+    tipo,lote,p.numeroPedido
+  ]);
+
+  setLoading(true);
+  await fetch(APPS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"editVenda",numeroPedido:p.numeroPedido,rows})});
+
+  // Atualiza local
+  const idx=pedidos.findIndex(x=>x.numeroPedido===p.numeroPedido);
+  if(idx>=0) pedidos[idx]={...p,nome,tel,pagamento,status,tipo,lote,itens,sub,com,custos:p.frete+p.emb,liq};
+
+  setLoading(false);
+  closeModal("modalEdit");
+  toast("✅ Pedido #"+p.numeroPedido+" atualizado","success");
+  renderPedidos();
+  editando=null;
+}
+
+// ── CUSTOS ──
+async function addCusto(){
+  const desc=document.getElementById("c-desc").value.trim();
+  const val=parseFloat(document.getElementById("c-val").value)||0;
+  if(!desc||!val){toast("⚠ Preencha descrição e valor","error");return;}
+  const cat=document.getElementById("c-cat").value;
+  const data=document.getElementById("c-data").value||new Date().toLocaleDateString("pt-BR");
+  const id=Date.now();
+  const row=[data,desc,cat,val,id];
+  setLoading(true);
+  await fetch(APPS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"addCusto",row})});
+  custos.unshift({id,data,desc,cat,val});
+  document.getElementById("c-desc").value="";
+  document.getElementById("c-val").value="";
+  setLoading(false);
+  toast("✅ Custo adicionado","success");
+  renderCustos();
+}
+
+async function deletarCusto(id){
+  if(!confirm("Deletar este custo?")) return;
+  await fetch(APPS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"deleteCusto",custoId:id})});
+  custos=custos.filter(c=>c.id!==id);
+  toast("🗑️ Custo removido","");
+  renderCustos();
+}
+
+function renderCustos(){
+  const lista=document.getElementById("custoList");
+  if(!custos.length){lista.innerHTML='<div class="empty">Nenhum custo registrado.</div>';return;}
+  const total=custos.reduce((s,c)=>s+c.val,0);
+  lista.innerHTML=`<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--red);margin-bottom:1rem">Total: ${fmt(total)}</div>`+
+    custos.map(c=>`
+    <div class="custo-row">
+      <div class="custo-info">
+        <div class="custo-desc">${c.desc}</div>
+        <div class="custo-meta">${c.data} · <span class="cat-badge">${c.cat}</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="custo-val">— ${fmt(c.val)}</div>
+        <button class="btn btn-rd" onclick="deletarCusto(${c.id})" style="padding:5px 10px;font-size:12px">✕</button>
+      </div>
+    </div>`).join("");
+}
+
+// ── FINANCEIRO ──
+function renderFin(){
+  const fat=pedidos.reduce((s,p)=>s+p.sub,0);
+  const comT=pedidos.reduce((s,p)=>s+(p.com||0),0);
+  const custoT=custos.reduce((s,c)=>s+c.val,0);
+  const liqT=pedidos.reduce((s,p)=>s+p.liq,0)-custoT+comT; // liq já desconta comissão
+  const liqReal=pedidos.reduce((s,p)=>s+p.liq,0)-custoT;
+  const pendT=pedidos.filter(p=>p.status==="Pendente").reduce((s,p)=>s+p.liq,0);
+  const camsT=pedidos.reduce((s,p)=>s+p.itens.reduce((ss,i)=>ss+i.qtd,0),0);
+
+  document.getElementById("finStats").innerHTML=`
+    <div class="stat-card am"><div class="stat-lbl">Faturamento Bruto</div><div class="stat-val am">${fmt(fat)}</div></div>
+    <div class="stat-card"><div class="stat-lbl">Custos Totais</div><div class="stat-val rd">${fmt(custoT+comT)}</div><div class="stat-sub">custos + comissões</div></div>
+    <div class="stat-card"><div class="stat-lbl">Lucro Líquido</div><div class="stat-val vd">${fmt(liqReal)}</div></div>
+    <div class="stat-card rd"><div class="stat-lbl">A Receber (pendente)</div><div class="stat-val rd">${fmt(pendT)}</div><div class="stat-sub">${pedidos.filter(p=>p.status==="Pendente").length} pedidos</div></div>
+    <div class="stat-card bl"><div class="stat-lbl">Camisas Vendidas</div><div class="stat-val bl">${camsT}</div></div>
+    <div class="stat-card"><div class="stat-lbl">Pedidos</div><div class="stat-val">${pedidos.length}</div></div>`;
+
+  const pg=pedidos.filter(p=>p.loc==="PG"),fora=pedidos.filter(p=>p.loc==="Fora");
+  document.getElementById("finLoc").innerHTML=`
+    <div class="fin-row"><span class="fin-lbl">📍 Ponta Grossa</span><div style="text-align:right"><span class="fin-val bl">${fmt(pg.reduce((s,p)=>s+p.liq,0))}</span><div style="font-size:11px;color:var(--muted)">${pg.length} pedidos</div></div></div>
+    <div class="fin-row"><span class="fin-lbl">🚚 Fora</span><div style="text-align:right"><span class="fin-val am">${fmt(fora.reduce((s,p)=>s+p.liq,0))}</span><div style="font-size:11px;color:var(--muted)">${fora.length} pedidos</div></div></div>`;
+
+  const comMap={};
+  pedidos.filter(p=>p.comisionada).forEach(p=>{
+    if(!comMap[p.comisionado])comMap[p.comisionado]={n:0,v:0};
+    comMap[p.comisionado].n++;comMap[p.comisionado].v+=p.com||0;
+  });
+  document.getElementById("finCom").innerHTML=Object.entries(comMap).length
+    ?Object.entries(comMap).map(([k,d])=>`<div class="fin-row"><span class="fin-lbl">🤝 ${k}</span><div style="text-align:right"><span class="fin-val or">${fmt(d.v)}</span><div style="font-size:11px;color:var(--muted)">${d.n} venda(s)</div></div></div>`).join("")
+    :`<div style="color:var(--muted);font-size:13px;padding:8px 0">Nenhuma venda comissionada</div>`;
+
+  const pagMap={};
+  pedidos.forEach(p=>{pagMap[p.pagamento]=(pagMap[p.pagamento]||0)+p.liq;});
+  document.getElementById("finPag").innerHTML=Object.entries(pagMap).map(([k,v])=>
+    `<div class="fin-row"><span class="fin-lbl">${k}</span><span class="fin-val vd">${fmt(v)}</span></div>`).join("")||`<div style="color:var(--muted);font-size:13px">Sem dados</div>`;
+
+  const modMap={};
+  pedidos.forEach(p=>p.itens.forEach(i=>{
+    if(!modMap[i.modelo])modMap[i.modelo]={q:0,v:0};
+    modMap[i.modelo].q+=i.qtd;modMap[i.modelo].v+=i.preco*i.qtd;
+  }));
+  document.getElementById("finMod").innerHTML=Object.entries(modMap).map(([k,d])=>
+    `<div class="fin-row"><span class="fin-lbl">${k}</span><div style="text-align:right"><span class="fin-val vd">${fmt(d.v)}</span><div style="font-size:11px;color:var(--muted)">${d.q} unid.</div></div></div>`).join("")||`<div style="color:var(--muted);font-size:13px">Sem dados</div>`;
+
+  // A Pagar
+  const comPagar=Object.entries(comMap).map(([k,d])=>({desc:"Comissão — "+k,val:d.v}));
+  const tPagar=[...CONTAS_PAGAR,...comPagar];
+  document.getElementById("finAPagar").innerHTML=tPagar.map(c=>
+    `<div class="fin-row"><span class="fin-lbl">${c.desc}</span><span class="fin-val rd">${fmt(c.val)}</span></div>`
+  ).join("")+`<div class="fin-row" style="font-weight:800"><span>Total</span><span class="fin-val rd">${fmt(tPagar.reduce((s,c)=>s+c.val,0))}</span></div>`;
+
+  // A Receber
+  const clientesPend=pendT;
+  const tReceber=[...CONTAS_RECEBER,{desc:"Clientes pendentes",val:clientesPend}];
+  document.getElementById("finAReceber").innerHTML=tReceber.map(c=>
+    `<div class="fin-row"><span class="fin-lbl">${c.desc}</span><span class="fin-val vd">${fmt(c.val)}</span></div>`
+  ).join("")+`<div class="fin-row" style="font-weight:800"><span>Total</span><span class="fin-val vd">${fmt(tReceber.reduce((s,c)=>s+c.val,0))}</span></div>`;
+}
+
+// ── PROJEÇÃO ──
+function calcProj(){
+  const preco=parseFloat(document.getElementById("p-preco")?.value)||0;
+  const estoque=parseInt(document.getElementById("p-estoque")?.value)||0;
+  const comPct=parseFloat(document.getElementById("p-compct")?.value)||10;
+  const comVendasPct=parseFloat(document.getElementById("p-compctvendas")?.value)||0;
+
+  const custoT=custos.reduce((s,c)=>s+c.val,0);
+  const fatAtual=pedidos.reduce((s,p)=>s+p.sub,0);
+  const liqAtual=pedidos.reduce((s,p)=>s+p.liq,0);
+  const comAtual=pedidos.reduce((s,p)=>s+p.com,0);
+
+  const margemUnit=preco*(1-comVendasPct/100*comPct/100);
+  const breakeven=custoT>0&&margemUnit>0?Math.ceil(custoT/margemUnit):0;
+  const fatProj=fatAtual+(estoque*preco);
+  const liqProj=liqAtual+(estoque*margemUnit)-custoT;
+
+  const box=document.getElementById("projResult");
+  box.innerHTML=`
+    <div class="proj-result-row"><span style="color:var(--muted)">Custos totais registrados</span><span style="color:var(--red)">${fmt(custoT)}</span></div>
+    <div class="proj-result-row"><span style="color:var(--muted)">Faturamento atual</span><span style="color:var(--amarelo)">${fmt(fatAtual)}</span></div>
+    <div class="proj-result-row"><span style="color:var(--muted)">Lucro atual</span><span style="color:var(--verde)">${fmt(liqAtual)}</span></div>
+    <div class="proj-result-row"><span style="color:var(--muted)">Break-even (camisas)</span><span style="color:var(--orange)">${breakeven} camisas</span></div>
+    <div class="proj-result-row"><span style="color:var(--muted)">Faturamento projetado (total)</span><span style="color:var(--amarelo)">${fmt(fatProj)}</span></div>
+    <div class="proj-result-row"><span>💰 Lucro projetado (total)</span><span style="color:var(--verde)">${fmt(liqProj)}</span></div>`;
+}
+
+// ── MODAL ──
+function closeModal(id){document.getElementById(id).classList.remove("open");editando=null;}
+function closeModalOutside(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+
+// ── TOAST ──
+function toast(msg,type=""){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove("show"),3500);
+}
+
+// ── INIT ──
+async function init(){
+  // Seta data de hoje no campo custo
+  document.getElementById("c-data").value=new Date().toISOString().split("T")[0];
+  addItem(); calcResumo();
+  await carregarTudo();
+}
+</script>
+</body>
+</html>
