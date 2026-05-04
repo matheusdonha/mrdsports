@@ -184,6 +184,7 @@ table.itb tr:last-child td{border-bottom:none}
       <button class="nav-btn active" onclick="showView('nova',this)">🛒 Nova Venda</button>
       <button class="nav-btn" onclick="showView('pedidos',this)">📋 Pedidos</button>
       <button class="nav-btn" onclick="showView('custos',this)">💸 Custos</button>
+      <button class="nav-btn" onclick="showView('contas',this)">🏦 Contas</button>
       <button class="nav-btn" onclick="showView('fin',this)">📊 Financeiro</button>
       <button class="nav-btn" onclick="showView('proj',this)">📈 Projeção</button>
     </div>
@@ -335,6 +336,44 @@ table.itb tr:last-child td{border-bottom:none}
       <div class="custo-list" id="custoList"><div class="empty">Carregando custos…</div></div>
     </div>
 
+    <!-- CONTAS -->
+    <div class="view" id="view-contas">
+      <div class="sec-title">Contas</div>
+
+      <!-- A PAGAR -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:1.5rem">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red);border-left:3px solid var(--red);padding-left:10px;margin-bottom:1rem">A Pagar</div>
+          <div class="form-card" style="margin-bottom:.75rem">
+            <div class="form-grid">
+              <div class="form-group"><label>Descrição</label><input id="cp-desc" placeholder="Ex: Fornecedor X"></div>
+              <div class="form-group"><label>Valor (R$)</label><input type="number" id="cp-val" placeholder="0,00" min="0" step="0.01"></div>
+              <div class="form-group"><label>Categoria</label>
+                <select id="cp-cat">
+                  <option>Fornecedor</option><option>Custo Camisa</option><option>Embalagem</option><option>Imposto</option><option>Outros</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-rd" onclick="addContaPagar()" style="margin-top:.75rem">+ Adicionar</button>
+          </div>
+          <div id="listContasPagar"><div class="empty">Nenhuma conta a pagar.</div></div>
+        </div>
+
+        <!-- A RECEBER -->
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--verde);border-left:3px solid var(--verde);padding-left:10px;margin-bottom:1rem">A Receber</div>
+          <div class="form-card" style="margin-bottom:.75rem">
+            <div class="form-grid">
+              <div class="form-group"><label>Descrição</label><input id="cr-desc" placeholder="Ex: Cliente X"></div>
+              <div class="form-group"><label>Valor (R$)</label><input type="number" id="cr-val" placeholder="0,00" min="0" step="0.01"></div>
+            </div>
+            <button class="btn btn-vd" onclick="addContaReceber()" style="margin-top:.75rem">+ Adicionar</button>
+          </div>
+          <div id="listContasReceber"><div class="empty">Nenhuma conta a receber.</div></div>
+        </div>
+      </div>
+    </div>
+
     <!-- FINANCEIRO -->
     <div class="view" id="view-fin">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px">
@@ -387,7 +426,7 @@ table.itb tr:last-child td{border-bottom:none}
 // ══════════════════════════════════════════
 const SENHA = "MRD@123";
 const COM_PCT = 0.10;
-const APPS_URL = "https://script.google.com/macros/s/AKfycbx8U0capDjrh-1Ue9j5Gut4cd3Csg99paAYw7tdlCiAPBjcXGbbLP1wzJPdIOAi2Z_4dQ/exec";
+const APPS_URL = "https://script.google.com/macros/s/AKfycbzGhE3Chmofc4Vfxwe1IXtmyGtbQ5F-o_lCrjJ_ojYWUG1ZvZQJeNPOJT-iaTn1bU4XEA/exec";
 
 const ESTOQUE = {
   Torcedor:{cores:["Amarela","Azul","Preta","Verde"],tamanhos:["P","M","G","GG","XGG"],preco:149,custo:65},
@@ -396,15 +435,9 @@ const ESTOQUE = {
   Retro:   {cores:["94","98","2002"],tamanhos:["M","G","GG"],preco:199,custo:65},
 };
 
-// Contas fixas Bruno/Leo
-const CONTAS_PAGAR = [
-  {desc:"Bruno Barbearia — 2ª parcela fornecedor",val:2275},
-  {desc:"Leo Floripa — 2ª parcela fornecedor",val:432.50},
-];
-const CONTAS_RECEBER = [
-  {desc:"Bruno Barbearia — 2ª parcela venda",val:2800},
-  {desc:"Leo Floripa — 2ª parcela venda",val:0},
-];
+// Contas dinâmicas — carregadas da planilha
+let contasPagar = [];
+let contasReceber = [];
 
 let pedidos=[], custos=[], itemN=0, loc="PG", comisionada=false, chipAtual="todos", editando=null;
 
@@ -433,6 +466,7 @@ function showView(id,btn){
   if(id==="pedidos") renderPedidos();
   if(id==="fin") renderFin();
   if(id==="custos") renderCustos();
+  if(id==="contas"){carregarContas();}
   if(id==="proj") calcProj();
 }
 
@@ -797,6 +831,32 @@ function editarPedido(num){
   editando=p;
   document.getElementById("modalEdit").classList.add("open");
   const content=document.getElementById("editFormContent");
+
+  const entregaHtml = `
+    <div id="e-entregaFields" style="display:${p.loc==="Fora"?"block":"none"}">
+      <div class="form-grid" style="margin-bottom:.9rem;margin-top:.75rem">
+        <div class="form-group"><label>CPF</label><input id="e-cpf" value="${p.entrega?.cpf||""}"></div>
+        <div class="form-group"><label>CEP</label><input id="e-cep" value="${p.entrega?.cep||""}"></div>
+        <div class="form-group"><label>Rua / Número</label><input id="e-rua" value="${p.entrega?.rua||""}"></div>
+        <div class="form-group"><label>Bairro</label><input id="e-bairro" value="${p.entrega?.bairro||""}"></div>
+        <div class="form-group"><label>Cidade</label><input id="e-cidade" value="${p.entrega?.cidade||""}"></div>
+        <div class="form-group"><label>Frete (R$)</label><input type="number" id="e-frete" value="${p.frete||0}"></div>
+        <div class="form-group"><label>Embalagem (R$)</label><input type="number" id="e-emb" value="${p.emb||0}"></div>
+      </div>
+    </div>`;
+
+  const comHtml = `
+    <div id="e-comFields" style="display:${p.comisionada?"block":"none"};margin-bottom:.9rem">
+      <div class="form-group"><label>Comissionado</label>
+        <div class="toggle-row">
+          <button class="toggle-btn${p.comisionado==="Maria"?" active":""}" onclick="eTog('e-com','Maria',this)">Maria</button>
+          <button class="toggle-btn${p.comisionado==="Zuken"?" active":""}" onclick="eTog('e-com','Zuken',this)">Zuken</button>
+          <button class="toggle-btn${p.comisionado==="Helton"?" active":""}" onclick="eTog('e-com','Helton',this)">Helton</button>
+        </div>
+        <input type="hidden" id="e-com" value="${p.comisionado||""}">
+      </div>
+    </div>`;
+
   content.innerHTML=`
     <div class="form-grid" style="margin-bottom:.9rem">
       <div class="form-group"><label>Nome</label><input id="e-nome" value="${p.nome}"></div>
@@ -822,7 +882,28 @@ function editarPedido(num){
       </div>
       <div class="form-group"><label>Lote</label><input type="number" id="e-lote" value="${p.lote||1}"></div>
     </div>
-    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem">Itens</div>
+    <hr class="divider">
+    <div class="form-group" style="margin-bottom:.9rem"><label>Localidade</label>
+      <div class="toggle-row">
+        <button class="toggle-btn${p.loc==="PG"?" active":""}" onclick="eSetLoc('PG',this)">📍 Ponta Grossa</button>
+        <button class="toggle-btn${p.loc==="Fora"?" active":""}" onclick="eSetLoc('Fora',this)">🚚 Fora</button>
+      </div>
+      <input type="hidden" id="e-loc" value="${p.loc||"PG"}">
+    </div>
+    ${entregaHtml}
+    <hr class="divider">
+    <div class="form-group" style="margin-bottom:.9rem"><label>Comissionada?</label>
+      <div class="toggle-row">
+        <button class="toggle-btn${!p.comisionada?" active":""}" onclick="eSetCom(false,this)">Não</button>
+        <button class="toggle-btn${p.comisionada?" active":""}" onclick="eSetCom(true,this)">Sim</button>
+      </div>
+    </div>
+    ${comHtml}
+    <hr class="divider">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+      <label style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Itens</label>
+      <button class="btn btn-ol" onclick="addEditItem()" style="padding:5px 11px;font-size:12px">+ Item</button>
+    </div>
     <div id="editItensList">
       ${p.itens.map((item,i)=>`
         <div class="item-row" id="eitem-${i}">
@@ -839,8 +920,25 @@ function editarPedido(num){
           <input type="number" id="eip-${i}" value="${item.preco}" style="max-width:80px">
           <button class="btn-del" onclick="document.getElementById('eitem-${i}').remove()">✕</button>
         </div>`).join("")}
-    </div>
-    <button class="btn btn-ol" onclick="addEditItem()" style="margin-top:.5rem;font-size:12px;padding:5px 11px">+ Item</button>`;
+    </div>`;
+}
+
+function eTog(id,val,btn){
+  document.getElementById(id).value=val;
+  btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+}
+function eSetLoc(l,btn){
+  document.getElementById("e-loc").value=l;
+  btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("e-entregaFields").style.display=l==="Fora"?"block":"none";
+}
+function eSetCom(v,btn){
+  btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("e-comFields").style.display=v?"block":"none";
+  if(!v&&document.getElementById("e-com")) document.getElementById("e-com").value="";
 }
 function eUpdCores(i,selCor,selTam){
   const m=document.getElementById("eim-"+i).value;
@@ -882,28 +980,40 @@ async function salvarEdicao(){
   const status=document.getElementById("e-status").value;
   const tipo=document.getElementById("e-tipo").value;
   const lote=document.getElementById("e-lote").value;
+  const newLoc=document.getElementById("e-loc")?.value||p.loc;
+  const newCom=document.getElementById("e-com")?.value||p.comisionado||"";
+  const comisionadaEl=document.getElementById("e-comFields");
+  const newComisionada=comisionadaEl?.style.display!=="none"&&newCom!=="";
+  const newFrete=parseFloat(document.getElementById("e-frete")?.value)||p.frete||0;
+  const newEmb=parseFloat(document.getElementById("e-emb")?.value)||p.emb||0;
+  const newEntrega=newLoc==="Fora"?{
+    cpf:document.getElementById("e-cpf")?.value||"",
+    cep:document.getElementById("e-cep")?.value||"",
+    rua:document.getElementById("e-rua")?.value||"",
+    bairro:document.getElementById("e-bairro")?.value||"",
+    cidade:document.getElementById("e-cidade")?.value||""
+  }:null;
 
   const sub=itens.reduce((s,i)=>s+i.preco*i.qtd,0);
-  const com=p.comisionada?sub*COM_PCT:0;
-  const liq=sub-com-p.frete-p.emb;
+  const com=newComisionada?sub*COM_PCT:0;
+  const liq=sub-com-newFrete-newEmb;
 
   const rows=itens.map(item=>[
     p.data,p.hora,nome,tel,
     item.modelo,item.cor,item.tamanho,item.qtd,item.preco,item.preco*item.qtd,
-    pagamento,status,p.loc,
-    p.comisionada?"Sim":"Não",p.comisionado||"",
-    p.comisionada?parseFloat((item.preco*item.qtd*COM_PCT).toFixed(2)):0,
-    p.frete,p.emb,parseFloat(liq.toFixed(2)),
-    "","","","","",
+    pagamento,status,newLoc,
+    newComisionada?"Sim":"Não",newCom,
+    newComisionada?parseFloat((item.preco*item.qtd*COM_PCT).toFixed(2)):0,
+    newFrete,newEmb,parseFloat(liq.toFixed(2)),
+    newEntrega?.cpf||"",newEntrega?.cep||"",newEntrega?.rua||"",newEntrega?.bairro||"",newEntrega?.cidade||"",
     tipo,lote,p.numeroPedido
   ]);
 
   setLoading(true);
   await api("editVenda", {numeroPedido: p.numeroPedido, rows});
 
-  // Atualiza local
   const idx=pedidos.findIndex(x=>x.numeroPedido===p.numeroPedido);
-  if(idx>=0) pedidos[idx]={...p,nome,tel,pagamento,status,tipo,lote,itens,sub,com,custos:p.frete+p.emb,liq};
+  if(idx>=0) pedidos[idx]={...p,nome,tel,pagamento,status,tipo,lote,loc:newLoc,comisionada:newComisionada,comisionado:newCom,frete:newFrete,emb:newEmb,entrega:newEntrega,itens,sub,com,custos:newFrete+newEmb,liq};
 
   setLoading(false);
   closeModal("modalEdit");
@@ -1002,19 +1112,18 @@ function renderFin(){
   document.getElementById("finMod").innerHTML=Object.entries(modMap).map(([k,d])=>
     `<div class="fin-row"><span class="fin-lbl">${k}</span><div style="text-align:right"><span class="fin-val vd">${fmt(d.v)}</span><div style="font-size:11px;color:var(--muted)">${d.q} unid.</div></div></div>`).join("")||`<div style="color:var(--muted);font-size:13px">Sem dados</div>`;
 
-  // A Pagar
-  const comPagar=Object.entries(comMap).map(([k,d])=>({desc:"Comissão — "+k,val:d.v}));
-  const tPagar=[...CONTAS_PAGAR,...comPagar];
+  // A Pagar — contas dinâmicas + comissões
+  const comPagar=Object.entries(comMap).map(([k,d])=>({desc:"Comissão — "+k,val:d.v,status:"Pendente"}));
+  const tPagar=[...contasPagar.filter(c=>c.status==="Pendente"),...comPagar];
   document.getElementById("finAPagar").innerHTML=tPagar.map(c=>
     `<div class="fin-row"><span class="fin-lbl">${c.desc}</span><span class="fin-val rd">${fmt(c.val)}</span></div>`
-  ).join("")+`<div class="fin-row" style="font-weight:800"><span>Total</span><span class="fin-val rd">${fmt(tPagar.reduce((s,c)=>s+c.val,0))}</span></div>`;
+  ).join("")+(tPagar.length?`<div class="fin-row" style="font-weight:800"><span>Total</span><span class="fin-val rd">${fmt(tPagar.reduce((s,c)=>s+c.val,0))}</span></div>`:"<div style='color:var(--muted);font-size:13px'>Nenhuma conta pendente</div>");
 
-  // A Receber
-  const clientesPend=pendT;
-  const tReceber=[...CONTAS_RECEBER,{desc:"Clientes pendentes",val:clientesPend}];
+  // A Receber — contas dinâmicas + clientes pendentes
+  const tReceber=[...contasReceber,{desc:"Clientes com pedido pendente",val:pendT,status:pendT>0?"Pendente":"Recebido"}];
   document.getElementById("finAReceber").innerHTML=tReceber.map(c=>
-    `<div class="fin-row"><span class="fin-lbl">${c.desc}</span><span class="fin-val vd">${fmt(c.val)}</span></div>`
-  ).join("")+`<div class="fin-row" style="font-weight:800"><span>Total</span><span class="fin-val vd">${fmt(tReceber.reduce((s,c)=>s+c.val,0))}</span></div>`;
+    `<div class="fin-row"><span class="fin-lbl">${c.desc}</span><span class="fin-val ${c.status==="Recebido"?"muted":"vd"}">${fmt(c.val)}</span></div>`
+  ).join("")+(tReceber.length?`<div class="fin-row" style="font-weight:800"><span>Pendente</span><span class="fin-val vd">${fmt(tReceber.filter(c=>c.status!=="Recebido").reduce((s,c)=>s+c.val,0))}</span></div>`:"");
 }
 
 // ── PROJEÇÃO ──
@@ -1055,12 +1164,123 @@ function toast(msg,type=""){
   setTimeout(()=>t.classList.remove("show"),3500);
 }
 
+// ── CONTAS A PAGAR / A RECEBER ──
+async function carregarContas(){
+  setLoading(true);
+  const resPagar   = await apiGet("readContasPagar");
+  const resReceber = await apiGet("readContasReceber");
+  if(resPagar?.rows?.length>1)   contasPagar   = resPagar.rows.slice(1).map(r=>({id:String(r[0]),desc:r[1],val:parseFloat(r[2])||0,cat:r[3],status:r[4]||"Pendente"})).filter(r=>r.desc);
+  if(resReceber?.rows?.length>1) contasReceber = resReceber.rows.slice(1).map(r=>({id:String(r[0]),desc:r[1],val:parseFloat(r[2])||0,status:r[3]||"Pendente"})).filter(r=>r.desc);
+  setLoading(false);
+  renderContas();
+}
+
+async function addContaPagar(){
+  const desc=document.getElementById("cp-desc").value.trim();
+  const val=parseFloat(document.getElementById("cp-val").value)||0;
+  const cat=document.getElementById("cp-cat").value;
+  if(!desc||!val){toast("⚠ Preencha descrição e valor","error");return;}
+  const id=String(Date.now());
+  const row=[id,desc,val,cat,"Pendente"];
+  await api("addContaPagar",{row});
+  contasPagar.unshift({id,desc,val,cat,status:"Pendente"});
+  document.getElementById("cp-desc").value="";
+  document.getElementById("cp-val").value="";
+  toast("✅ Conta adicionada","success");
+  renderContas();
+}
+
+async function addContaReceber(){
+  const desc=document.getElementById("cr-desc").value.trim();
+  const val=parseFloat(document.getElementById("cr-val").value)||0;
+  if(!desc||!val){toast("⚠ Preencha descrição e valor","error");return;}
+  const id=String(Date.now());
+  const row=[id,desc,val,"Pendente"];
+  await api("addContaReceber",{row});
+  contasReceber.unshift({id,desc,val,status:"Pendente"});
+  document.getElementById("cr-desc").value="";
+  document.getElementById("cr-val").value="";
+  toast("✅ Conta adicionada","success");
+  renderContas();
+}
+
+async function pagarConta(id){
+  const c=contasPagar.find(x=>x.id===id);
+  if(!c) return;
+  // Marca como pago e lança nos custos
+  await api("updateContaPagar",{id,status:"Pago"});
+  await api("addCusto",{row:[new Date().toLocaleDateString("pt-BR"),c.desc,c.cat||"Fornecedor",c.val,Date.now()]});
+  c.status="Pago";
+  custos.unshift({id:Date.now(),data:new Date().toLocaleDateString("pt-BR"),desc:c.desc,cat:c.cat||"Fornecedor",val:c.val});
+  toast("✅ Pago e lançado nos custos","success");
+  renderContas();
+}
+
+async function receberConta(id){
+  const c=contasReceber.find(x=>x.id===id);
+  if(!c) return;
+  await api("updateContaReceber",{id,status:"Recebido"});
+  c.status="Recebido";
+  toast("✅ Marcado como recebido","success");
+  renderContas();
+}
+
+async function delContaPagar(id){
+  if(!confirm("Remover esta conta?")) return;
+  await api("deleteContaPagar",{id});
+  contasPagar=contasPagar.filter(c=>c.id!==id);
+  renderContas();
+}
+
+async function delContaReceber(id){
+  if(!confirm("Remover esta conta?")) return;
+  await api("deleteContaReceber",{id});
+  contasReceber=contasReceber.filter(c=>c.id!==id);
+  renderContas();
+}
+
+function renderContas(){
+  // A PAGAR
+  const lp=document.getElementById("listContasPagar");
+  const totalPagar=contasPagar.filter(c=>c.status==="Pendente").reduce((s,c)=>s+c.val,0);
+  lp.innerHTML=(contasPagar.length?`<div style="font-size:13px;color:var(--red);font-weight:700;margin-bottom:.75rem">Total pendente: ${fmt(totalPagar)}</div>`:"")+
+    (contasPagar.length?contasPagar.map(c=>`
+    <div class="custo-row" style="margin-bottom:8px;${c.status==="Pago"?"opacity:.5":""}">
+      <div class="custo-info">
+        <div class="custo-desc">${c.desc}</div>
+        <div class="custo-meta"><span class="cat-badge">${c.cat||"Fornecedor"}</span> · <span style="color:${c.status==="Pago"?"var(--verde)":"var(--orange)"}">● ${c.status}</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red)">${fmt(c.val)}</div>
+        ${c.status==="Pendente"?`<button class="btn btn-vd" onclick="pagarConta('${c.id}')" style="padding:5px 10px;font-size:11px">✅ Pagar</button>`:""}
+        <button class="btn btn-rd" onclick="delContaPagar('${c.id}')" style="padding:5px 9px;font-size:12px">✕</button>
+      </div>
+    </div>`).join(""):'<div class="empty">Nenhuma conta a pagar.</div>');
+
+  // A RECEBER
+  const lr=document.getElementById("listContasReceber");
+  const totalReceber=contasReceber.filter(c=>c.status==="Pendente").reduce((s,c)=>s+c.val,0);
+  const totalRecebido=contasReceber.filter(c=>c.status==="Recebido").reduce((s,c)=>s+c.val,0);
+  lr.innerHTML=(contasReceber.length?`<div style="font-size:13px;color:var(--verde);font-weight:700;margin-bottom:4px">Pendente: ${fmt(totalReceber)}</div><div style="font-size:12px;color:var(--muted);margin-bottom:.75rem">Recebido: ${fmt(totalRecebido)}</div>`:"")+
+    (contasReceber.length?contasReceber.map(c=>`
+    <div class="custo-row" style="margin-bottom:8px;${c.status==="Recebido"?"opacity:.5":""}">
+      <div class="custo-info">
+        <div class="custo-desc">${c.desc}</div>
+        <div class="custo-meta"><span style="color:${c.status==="Recebido"?"var(--verde)":"var(--orange)"}">● ${c.status}</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--verde)">${fmt(c.val)}</div>
+        ${c.status==="Pendente"?`<button class="btn btn-vd" onclick="receberConta('${c.id}')" style="padding:5px 10px;font-size:11px">✅ Receber</button>`:""}
+        <button class="btn btn-rd" onclick="delContaReceber('${c.id}')" style="padding:5px 9px;font-size:12px">✕</button>
+      </div>
+    </div>`).join(""):'<div class="empty">Nenhuma conta a receber.</div>');
+}
+
 // ── INIT ──
 async function init(){
-  // Seta data de hoje no campo custo
   document.getElementById("c-data").value=new Date().toISOString().split("T")[0];
   addItem(); calcResumo();
-  await carregarTudo();
+  await Promise.all([carregarTudo(), carregarContas()]);
 }
 </script>
 </body>
