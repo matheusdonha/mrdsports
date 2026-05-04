@@ -449,7 +449,11 @@ async function api(action, data={}){
     const body = {action, ...data};
     const json = JSON.stringify(body);
     console.log("API →", action, json.substring(0, 200));
-    const payload = btoa(unescape(encodeURIComponent(json)));
+    // Codifica corretamente UTF-8 com acentos
+    const bytes = new TextEncoder().encode(json);
+    let binary = "";
+    bytes.forEach(b => binary += String.fromCharCode(b));
+    const payload = btoa(binary);
     const url = APPS_URL + "?method=post&payload=" + encodeURIComponent(payload);
     console.log("URL length:", url.length);
     const r = await fetch(url, {mode:"cors"});
