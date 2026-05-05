@@ -143,7 +143,8 @@ table.itb tr:last-child td{border-bottom:none}
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:1rem}
 .modal-overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:1.75rem;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;animation:slideUp .25s ease}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:0;padding:1.75rem;width:100%;height:100vh;max-height:100vh;overflow-y:auto;animation:slideUp .25s ease}
+.modal-overlay.open{align-items:flex-start}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 .modal-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;margin-bottom:1.25rem}
 .modal-title span{color:var(--verde)}
@@ -370,6 +371,10 @@ table.itb tr:last-child td{border-bottom:none}
             <button class="btn btn-vd" onclick="addContaReceber()" style="margin-top:.75rem">+ Adicionar</button>
           </div>
           <div id="listContasReceber"><div class="empty">Nenhuma conta a receber.</div></div>
+          <div style="margin-top:1.25rem">
+            <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;border-top:1px solid var(--border);padding-top:.75rem">✅ Recebidos</div>
+            <div id="listRecebidos"><div class="empty" style="padding:1rem">Nenhum recebimento registrado.</div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -386,6 +391,7 @@ table.itb tr:last-child td{border-bottom:none}
         <div class="fin-card"><div class="fin-title">🤝 Comissionados</div><div id="finCom"></div></div>
         <div class="fin-card"><div class="fin-title">💳 Pagamento</div><div id="finPag"></div></div>
         <div class="fin-card"><div class="fin-title">👕 Por Modelo</div><div id="finMod"></div></div>
+        <div class="fin-card" style="grid-column:span 2"><div class="fin-title">💸 Detalhamento de Custos</div><div id="finCustosDetalhe"></div></div>
         <div class="fin-card"><div class="fin-title">📦 A Pagar</div><div id="finAPagar"></div></div>
         <div class="fin-card"><div class="fin-title">💰 A Receber</div><div id="finAReceber"></div></div>
       </div>
@@ -426,7 +432,7 @@ table.itb tr:last-child td{border-bottom:none}
 // ══════════════════════════════════════════
 const SENHA = "MRD@123";
 const COM_PCT = 0.10;
-const APPS_URL = "https://script.google.com/macros/s/AKfycbzGhE3Chmofc4Vfxwe1IXtmyGtbQ5F-o_lCrjJ_ojYWUG1ZvZQJeNPOJT-iaTn1bU4XEA/exec";
+const APPS_URL = "https://script.google.com/macros/s/AKfycbzK9Nazh_4PBQc_Bm27bgrARdC68pkCwbWvEKdeayF_Q9RotI4Q410x_jYLnF6YKPSDZQ/exec";
 
 const ESTOQUE = {
   Torcedor:{cores:["Amarela","Azul","Preta","Verde"],tamanhos:["P","M","G","GG","XGG"],preco:149,custo:65},
@@ -1069,7 +1075,8 @@ function renderCustos(){
 
 // ── FINANCEIRO ──
 function renderFin(){
-  const fat=pedidos.reduce((s,p)=>s+p.sub,0);
+  const recebidosExtra=contasReceber.filter(c=>c.status==="Recebido").reduce((s,c)=>s+c.val,0);
+  const fat=pedidos.reduce((s,p)=>s+p.sub,0)+recebidosExtra;
   const comT=pedidos.reduce((s,p)=>s+(p.com||0),0);
   const custoT=custos.reduce((s,c)=>s+c.val,0);
   const liqT=pedidos.reduce((s,p)=>s+p.liq,0)-custoT+comT; // liq já desconta comissão
@@ -1078,7 +1085,7 @@ function renderFin(){
   const camsT=pedidos.reduce((s,p)=>s+p.itens.reduce((ss,i)=>ss+i.qtd,0),0);
 
   document.getElementById("finStats").innerHTML=`
-    <div class="stat-card am"><div class="stat-lbl">Faturamento Bruto</div><div class="stat-val am">${fmt(fat)}</div></div>
+    <div class="stat-card am"><div class="stat-lbl">Faturamento Bruto</div><div class="stat-val am">${fmt(fat)}</div><div class="stat-sub">vendas + recebimentos</div></div>
     <div class="stat-card"><div class="stat-lbl">Custos Totais</div><div class="stat-val rd">${fmt(custoT+comT)}</div><div class="stat-sub">custos + comissões</div></div>
     <div class="stat-card"><div class="stat-lbl">Lucro Líquido</div><div class="stat-val vd">${fmt(liqReal)}</div></div>
     <div class="stat-card rd"><div class="stat-lbl">A Receber (pendente)</div><div class="stat-val rd">${fmt(pendT)}</div><div class="stat-sub">${pedidos.filter(p=>p.status==="Pendente").length} pedidos</div></div>
@@ -1112,6 +1119,34 @@ function renderFin(){
   document.getElementById("finMod").innerHTML=Object.entries(modMap).map(([k,d])=>
     `<div class="fin-row"><span class="fin-lbl">${k}</span><div style="text-align:right"><span class="fin-val vd">${fmt(d.v)}</span><div style="font-size:11px;color:var(--muted)">${d.q} unid.</div></div></div>`).join("")||`<div style="color:var(--muted);font-size:13px">Sem dados</div>`;
 
+  // Custos detalhados
+  const custosPorCat = {};
+  custos.forEach(c => {
+    if(!custosPorCat[c.cat]) custosPorCat[c.cat] = [];
+    custosPorCat[c.cat].push(c);
+  });
+  const comissoesList = Object.entries(comMap).map(([k,d]) => ({desc:"Comissão — "+k, val:d.v, cat:"Comissão"}));
+  
+  let custosHtml = "";
+  // Custos da planilha agrupados por categoria
+  Object.entries(custosPorCat).forEach(([cat, items]) => {
+    const total = items.reduce((s,c) => s+c.val, 0);
+    custosHtml += `<div style="margin-bottom:.5rem">
+      <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${cat}</div>
+      ${items.map(c => `<div class="fin-row" style="padding:4px 0"><span class="fin-lbl" style="font-size:12px">${c.desc} <span style="font-size:10px;color:var(--muted)">(${c.data})</span></span><span class="fin-val rd" style="font-size:13px">${fmt(c.val)}</span></div>`).join("")}
+      <div class="fin-row" style="padding:3px 0;border-top:none"><span class="fin-lbl" style="font-size:11px">Subtotal ${cat}</span><span class="fin-val rd" style="font-size:12px">${fmt(total)}</span></div>
+    </div>`;
+  });
+  // Comissões
+  if(comissoesList.length) {
+    custosHtml += `<div style="margin-bottom:.5rem">
+      <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Comissões</div>
+      ${comissoesList.map(c => `<div class="fin-row" style="padding:4px 0"><span class="fin-lbl" style="font-size:12px">${c.desc}</span><span class="fin-val or" style="font-size:13px">${fmt(c.val)}</span></div>`).join("")}
+    </div>`;
+  }
+  custosHtml += `<div class="fin-row" style="font-weight:800;margin-top:4px"><span>Total Custos</span><span class="fin-val rd">${fmt(custoT+comT)}</span></div>`;
+  document.getElementById("finCustosDetalhe").innerHTML = custosHtml || `<div style="color:var(--muted);font-size:13px">Nenhum custo registrado</div>`;
+
   // A Pagar — contas dinâmicas + comissões
   const comPagar=Object.entries(comMap).map(([k,d])=>({desc:"Comissão — "+k,val:d.v,status:"Pendente"}));
   const tPagar=[...contasPagar.filter(c=>c.status==="Pendente"),...comPagar];
@@ -1120,10 +1155,24 @@ function renderFin(){
   ).join("")+(tPagar.length?`<div class="fin-row" style="font-weight:800"><span>Total</span><span class="fin-val rd">${fmt(tPagar.reduce((s,c)=>s+c.val,0))}</span></div>`:"<div style='color:var(--muted);font-size:13px'>Nenhuma conta pendente</div>");
 
   // A Receber — contas dinâmicas + clientes pendentes
-  const tReceber=[...contasReceber,{desc:"Clientes com pedido pendente",val:pendT,status:pendT>0?"Pendente":"Recebido"}];
-  document.getElementById("finAReceber").innerHTML=tReceber.map(c=>
-    `<div class="fin-row"><span class="fin-lbl">${c.desc}</span><span class="fin-val ${c.status==="Recebido"?"muted":"vd"}">${fmt(c.val)}</span></div>`
-  ).join("")+(tReceber.length?`<div class="fin-row" style="font-weight:800"><span>Pendente</span><span class="fin-val vd">${fmt(tReceber.filter(c=>c.status!=="Recebido").reduce((s,c)=>s+c.val,0))}</span></div>`:"");
+  const recebidosList=contasReceber.filter(c=>c.status==="Recebido");
+  const pendentesList=contasReceber.filter(c=>c.status==="Pendente");
+  const totalRecebidoExtra=recebidosList.reduce((s,c)=>s+c.val,0);
+  const totalPendenteExtra=pendentesList.reduce((s,c)=>s+c.val,0);
+
+  let recHtml="";
+  if(pendentesList.length){
+    recHtml+=`<div style="font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;margin-bottom:4px">Pendentes</div>`;
+    recHtml+=pendentesList.map(c=>`<div class="fin-row"><span class="fin-lbl">${c.desc}</span><span class="fin-val or">${fmt(c.val)}</span></div>`).join("");
+  }
+  if(pendT>0) recHtml+=`<div class="fin-row"><span class="fin-lbl">Clientes com pedido pendente</span><span class="fin-val or">${fmt(pendT)}</span></div>`;
+  if(recebidosList.length){
+    recHtml+=`<div style="font-size:10px;font-weight:800;color:var(--verde);text-transform:uppercase;margin:8px 0 4px">Recebidos</div>`;
+    recHtml+=recebidosList.map(c=>`<div class="fin-row"><span class="fin-lbl">${c.desc} ${c.dataRecebido?"<span style='font-size:10px;color:var(--muted)'>("+c.dataRecebido+")</span>":""}</span><span class="fin-val vd">${fmt(c.val)}</span></div>`).join("");
+  }
+  recHtml+=`<div class="fin-row" style="font-weight:800;margin-top:4px"><span>Total recebido extra</span><span class="fin-val vd">${fmt(totalRecebidoExtra)}</span></div>`;
+  recHtml+=`<div class="fin-row" style="font-weight:800"><span>Total pendente</span><span class="fin-val or">${fmt(totalPendenteExtra+pendT)}</span></div>`;
+  document.getElementById("finAReceber").innerHTML=recHtml||`<div style="color:var(--muted);font-size:13px">Sem contas</div>`;
 }
 
 // ── PROJEÇÃO ──
@@ -1170,7 +1219,7 @@ async function carregarContas(){
   const resPagar   = await apiGet("readContasPagar");
   const resReceber = await apiGet("readContasReceber");
   if(resPagar?.rows?.length>1)   contasPagar   = resPagar.rows.slice(1).map(r=>({id:String(r[0]),desc:r[1],val:parseFloat(r[2])||0,cat:r[3],status:r[4]||"Pendente"})).filter(r=>r.desc);
-  if(resReceber?.rows?.length>1) contasReceber = resReceber.rows.slice(1).map(r=>({id:String(r[0]),desc:r[1],val:parseFloat(r[2])||0,status:r[3]||"Pendente"})).filter(r=>r.desc);
+  if(resReceber?.rows?.length>1) contasReceber = resReceber.rows.slice(1).map(r=>({id:String(r[0]),desc:r[1],val:parseFloat(r[2])||0,status:r[3]||"Pendente",dataRecebido:r[4]||""})).filter(r=>r.desc);
   setLoading(false);
   renderContas();
 }
@@ -1219,9 +1268,11 @@ async function pagarConta(id){
 async function receberConta(id){
   const c=contasReceber.find(x=>x.id===id);
   if(!c) return;
-  await api("updateContaReceber",{id,status:"Recebido"});
+  const dataHoje=new Date().toLocaleDateString("pt-BR");
+  await api("updateContaReceber",{id,status:"Recebido",dataRecebido:dataHoje});
   c.status="Recebido";
-  toast("✅ Marcado como recebido","success");
+  c.dataRecebido=dataHoje;
+  toast("✅ Marcado como recebido — faturamento atualizado","success");
   renderContas();
 }
 
@@ -1257,23 +1308,45 @@ function renderContas(){
       </div>
     </div>`).join(""):'<div class="empty">Nenhuma conta a pagar.</div>');
 
-  // A RECEBER
+  // A RECEBER — só pendentes
   const lr=document.getElementById("listContasReceber");
-  const totalReceber=contasReceber.filter(c=>c.status==="Pendente").reduce((s,c)=>s+c.val,0);
-  const totalRecebido=contasReceber.filter(c=>c.status==="Recebido").reduce((s,c)=>s+c.val,0);
-  lr.innerHTML=(contasReceber.length?`<div style="font-size:13px;color:var(--verde);font-weight:700;margin-bottom:4px">Pendente: ${fmt(totalReceber)}</div><div style="font-size:12px;color:var(--muted);margin-bottom:.75rem">Recebido: ${fmt(totalRecebido)}</div>`:"")+
-    (contasReceber.length?contasReceber.map(c=>`
-    <div class="custo-row" style="margin-bottom:8px;${c.status==="Recebido"?"opacity:.5":""}">
-      <div class="custo-info">
-        <div class="custo-desc">${c.desc}</div>
-        <div class="custo-meta"><span style="color:${c.status==="Recebido"?"var(--verde)":"var(--orange)"}">● ${c.status}</span></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--verde)">${fmt(c.val)}</div>
-        ${c.status==="Pendente"?`<button class="btn btn-vd" onclick="receberConta('${c.id}')" style="padding:5px 10px;font-size:11px">✅ Receber</button>`:""}
-        <button class="btn btn-rd" onclick="delContaReceber('${c.id}')" style="padding:5px 9px;font-size:12px">✕</button>
-      </div>
-    </div>`).join(""):'<div class="empty">Nenhuma conta a receber.</div>');
+  const pendentes=contasReceber.filter(c=>c.status==="Pendente");
+  const recebidos=contasReceber.filter(c=>c.status==="Recebido");
+  const totalReceber=pendentes.reduce((s,c)=>s+c.val,0);
+  const totalRecebido=recebidos.reduce((s,c)=>s+c.val,0);
+
+  lr.innerHTML=(pendentes.length
+    ?`<div style="font-size:13px;color:var(--verde);font-weight:700;margin-bottom:.75rem">Total pendente: ${fmt(totalReceber)}</div>`+
+      pendentes.map(c=>`
+      <div class="custo-row" style="margin-bottom:8px">
+        <div class="custo-info">
+          <div class="custo-desc">${c.desc}</div>
+          <div class="custo-meta"><span style="color:var(--orange)">● Pendente</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--verde)">${fmt(c.val)}</div>
+          <button class="btn btn-vd" onclick="receberConta('${c.id}')" style="padding:5px 10px;font-size:11px">✅ Receber</button>
+          <button class="btn btn-rd" onclick="delContaReceber('${c.id}')" style="padding:5px 9px;font-size:12px">✕</button>
+        </div>
+      </div>`).join("")
+    :'<div class="empty" style="padding:1rem">Nenhuma conta pendente.</div>');
+
+  // RECEBIDOS
+  const lr2=document.getElementById("listRecebidos");
+  lr2.innerHTML=(recebidos.length
+    ?`<div style="font-size:13px;color:var(--verde);font-weight:700;margin-bottom:.75rem">Total recebido: ${fmt(totalRecebido)}</div>`+
+      recebidos.map(c=>`
+      <div class="custo-row" style="margin-bottom:8px;opacity:.85">
+        <div class="custo-info">
+          <div class="custo-desc">${c.desc}</div>
+          <div class="custo-meta">${c.dataRecebido||""} · <span style="color:var(--verde)">● Recebido</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--verde)">${fmt(c.val)}</div>
+          <button class="btn btn-rd" onclick="delContaReceber('${c.id}')" style="padding:5px 9px;font-size:12px">✕</button>
+        </div>
+      </div>`).join("")
+    :'<div class="empty" style="padding:1rem">Nenhum recebimento ainda.</div>');
 }
 
 // ── INIT ──
