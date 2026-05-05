@@ -400,14 +400,42 @@ table.itb tr:last-child td{border-bottom:none}
     <!-- PROJECAO -->
     <div class="view" id="view-proj">
       <div class="sec-title">Projeção de Resultados</div>
-      <div class="proj-box">
-        <div class="form-grid">
-          <div class="form-group"><label>Preço Médio por Camisa (R$)</label><input type="number" id="p-preco" placeholder="159" min="0" step="0.01" oninput="calcProj()"></div>
-          <div class="form-group"><label>Total de Camisas em Estoque</label><input type="number" id="p-estoque" placeholder="148" min="0" oninput="calcProj()"></div>
-          <div class="form-group"><label>% Comissão Média</label><input type="number" id="p-compct" placeholder="10" min="0" step="0.1" oninput="calcProj()"></div>
-          <div class="form-group"><label>% Vendas Comissionadas</label><input type="number" id="p-compctvendas" placeholder="30" min="0" step="1" oninput="calcProj()"></div>
+
+      <!-- SIMULADOR POR MODELO -->
+      <div class="proj-box" style="margin-bottom:1.5rem">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">Preço médio por modelo</div>
+        <div class="form-grid" style="margin-bottom:1rem">
+          <div class="form-group"><label>Torcedor (R$)</label><input type="number" id="p-preco-t" value="149" min="0" step="1" oninput="calcProj()"></div>
+          <div class="form-group"><label>Jogador (R$)</label><input type="number" id="p-preco-j" value="169" min="0" step="1" oninput="calcProj()"></div>
+          <div class="form-group"><label>Feminina (R$)</label><input type="number" id="p-preco-f" value="149" min="0" step="1" oninput="calcProj()"></div>
+          <div class="form-group"><label>Retrô (R$)</label><input type="number" id="p-preco-r" value="199" min="0" step="1" oninput="calcProj()"></div>
+          <div class="form-group"><label>% Vendas Comissionadas</label><input type="number" id="p-compctvendas" value="30" min="0" step="1" oninput="calcProj()"></div>
         </div>
-        <div class="proj-result" id="projResult"></div>
+
+        <!-- SLIDER -->
+        <div style="margin-bottom:1.25rem">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+            <label style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Simulador de preço (todos os modelos)</label>
+            <span id="sliderVal" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--verde)">R$ 159</span>
+          </div>
+          <input type="range" id="p-slider" min="100" max="250" value="159" step="5" oninput="onSlider()" style="width:100%;accent-color:var(--verde)">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px"><span>R$ 100</span><span>R$ 250</span></div>
+        </div>
+
+        <!-- RESULTADOS CARDS -->
+        <div id="projCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:1.25rem"></div>
+
+        <!-- GRÁFICO DE BARRAS -->
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem">Projeção de lucro por preço</div>
+        <div id="projChart" style="position:relative;height:220px;display:flex;align-items:flex-end;gap:8px;padding:0 4px"></div>
+        <div style="display:flex;gap:16px;margin-top:1rem;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><div style="width:12px;height:12px;border-radius:3px;background:var(--verde)"></div>Torcedor</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><div style="width:12px;height:12px;border-radius:3px;background:var(--blue)"></div>Jogador</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><div style="width:12px;height:12px;border-radius:3px;background:var(--orange)"></div>Feminina</div>
+        </div>
+
+        <!-- TOTALIZADOR -->
+        <div class="proj-result" id="projResult" style="margin-top:1.25rem"></div>
       </div>
     </div>
 
@@ -432,7 +460,7 @@ table.itb tr:last-child td{border-bottom:none}
 // ══════════════════════════════════════════
 const SENHA = "MRD@123";
 const COM_PCT = 0.10;
-const APPS_URL = "https://script.google.com/macros/s/AKfycbzK9Nazh_4PBQc_Bm27bgrARdC68pkCwbWvEKdeayF_Q9RotI4Q410x_jYLnF6YKPSDZQ/exec";
+const APPS_URL = "https://script.google.com/macros/s/AKfycbyF8piBI1h4jSXwDF1mgEYTQP9NS6nLIleXs_eCPQ18cN8FalwkiXwFi9O1lujjRqL9xQ/exec";
 
 const ESTOQUE = {
   Torcedor:{cores:["Amarela","Azul","Preta","Verde"],tamanhos:["P","M","G","GG","XGG"],preco:149,custo:65},
@@ -473,7 +501,7 @@ function showView(id,btn){
   if(id==="fin") renderFin();
   if(id==="custos") renderCustos();
   if(id==="contas"){carregarContas();}
-  if(id==="proj") calcProj();
+  if(id==="proj"){carregarEstoque().then(calcProj);}
 }
 
 // ── LOADING ──
@@ -566,7 +594,26 @@ async function carregarCustos(){
 }
 
 async function carregarTudo(){
-  await Promise.all([carregarPedidos(),carregarCustos()]);
+  await Promise.all([carregarPedidos(),carregarCustos(),carregarEstoque()]);
+}
+
+// Estoque por modelo para projeção
+let estoquePorModelo = {Torcedor:0, Jogador:0, Feminina:0, Retro:0};
+
+async function carregarEstoque(){
+  const res = await apiGet("readVendas");
+  // Lê da aba Camisas Restante via sheets
+  const res2 = await apiGet("readCamisas");
+  if(res2?.rows?.length>1){
+    const rows = res2.rows.slice(1);
+    const map = {Torcedor:0, Jogador:0, Feminina:0, Retro:0};
+    rows.forEach(r=>{
+      const modelo = String(r[1]||"");
+      const sobram = parseInt(r[5])||0;
+      if(map[modelo]!==undefined) map[modelo]+=sobram;
+    });
+    estoquePorModelo = map;
+  }
 }
 
 // ── TOGGLES ──
@@ -1080,7 +1127,7 @@ function renderFin(){
   const comT=pedidos.reduce((s,p)=>s+(p.com||0),0);
   const custoT=custos.reduce((s,c)=>s+c.val,0);
   const liqT=pedidos.reduce((s,p)=>s+p.liq,0)-custoT+comT; // liq já desconta comissão
-  const liqReal=pedidos.reduce((s,p)=>s+p.liq,0)-custoT;
+  const liqReal=pedidos.reduce((s,p)=>s+p.liq,0)-custoT+recebidosExtra;
   const pendT=pedidos.filter(p=>p.status==="Pendente").reduce((s,p)=>s+p.liq,0);
   const camsT=pedidos.reduce((s,p)=>s+p.itens.reduce((ss,i)=>ss+i.qtd,0),0);
 
@@ -1176,30 +1223,104 @@ function renderFin(){
 }
 
 // ── PROJEÇÃO ──
+const CUSTO_MODELO = {Torcedor:65, Jogador:67, Feminina:65, Retro:65};
+const CORES_MODELO = {Torcedor:"var(--verde)", Jogador:"var(--blue)", Feminina:"var(--orange)", Retro:"var(--purple)"};
+
+function onSlider(){
+  const v = document.getElementById("p-slider").value;
+  document.getElementById("sliderVal").textContent = "R$ "+v;
+  ["p-preco-t","p-preco-j","p-preco-f","p-preco-r"].forEach(id=>{
+    document.getElementById(id).value = v;
+  });
+  calcProj();
+}
+
 function calcProj(){
-  const preco=parseFloat(document.getElementById("p-preco")?.value)||0;
-  const estoque=parseInt(document.getElementById("p-estoque")?.value)||0;
-  const comPct=parseFloat(document.getElementById("p-compct")?.value)||10;
-  const comVendasPct=parseFloat(document.getElementById("p-compctvendas")?.value)||0;
+  const precoT  = parseFloat(document.getElementById("p-preco-t")?.value)||149;
+  const precoJ  = parseFloat(document.getElementById("p-preco-j")?.value)||169;
+  const precoF  = parseFloat(document.getElementById("p-preco-f")?.value)||149;
+  const precoR  = parseFloat(document.getElementById("p-preco-r")?.value)||199;
+  const comVPct = parseFloat(document.getElementById("p-compctvendas")?.value)||30;
 
-  const custoT=custos.reduce((s,c)=>s+c.val,0);
-  const fatAtual=pedidos.reduce((s,p)=>s+p.sub,0);
-  const liqAtual=pedidos.reduce((s,p)=>s+p.liq,0);
-  const comAtual=pedidos.reduce((s,p)=>s+p.com,0);
+  const precos  = {Torcedor:precoT, Jogador:precoJ, Feminina:precoF, Retro:precoR};
+  const custoT2 = custos.reduce((s,c)=>s+c.val,0);
+  const recebidosE = contasReceber.filter(c=>c.status==="Recebido").reduce((s,c)=>s+c.val,0);
+  const liqAtual = pedidos.reduce((s,p)=>s+p.liq,0) - custoT2 + recebidosE;
 
-  const margemUnit=preco*(1-comVendasPct/100*comPct/100);
-  const breakeven=custoT>0&&margemUnit>0?Math.ceil(custoT/margemUnit):0;
-  const fatProj=fatAtual+(estoque*preco);
-  const liqProj=liqAtual+(estoque*margemUnit)-custoT;
+  // Por modelo
+  const modelos = ["Torcedor","Jogador","Feminina"];
+  let totalFatProj=0, totalLiqProj=0, totalEstoque=0;
 
-  const box=document.getElementById("projResult");
-  box.innerHTML=`
-    <div class="proj-result-row"><span style="color:var(--muted)">Custos totais registrados</span><span style="color:var(--red)">${fmt(custoT)}</span></div>
-    <div class="proj-result-row"><span style="color:var(--muted)">Faturamento atual</span><span style="color:var(--amarelo)">${fmt(fatAtual)}</span></div>
+  const cardsEl = document.getElementById("projCards");
+  cardsEl.innerHTML = modelos.map(m=>{
+    const preco  = precos[m];
+    const custo  = CUSTO_MODELO[m];
+    const estq   = estoquePorModelo[m]||0;
+    const comDesc= preco * (comVPct/100) * 0.10;
+    const margem = preco - custo - comDesc;
+    const fatMod = estq * preco;
+    const liqMod = estq * margem;
+    totalFatProj += fatMod;
+    totalLiqProj += liqMod;
+    totalEstoque += estq;
+    return `<div class="stat-card" style="border-top:3px solid ${CORES_MODELO[m]}">
+      <div class="stat-lbl">${m}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">${estq} un. · custo R$${custo}</div>
+      <div style="font-size:13px;color:var(--amarelo);font-weight:700">${fmt(fatMod)}</div>
+      <div style="font-size:12px;color:var(--verde)">Lucro: ${fmt(liqMod)}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">Margem: ${fmt(margem)}/un.</div>
+    </div>`;
+  }).join("");
+
+  // Retrô separado (menor)
+  const estqR  = estoquePorModelo["Retro"]||0;
+  const margemR= precoR - 65 - precoR*(comVPct/100)*0.10;
+  totalFatProj += estqR*precoR;
+  totalLiqProj += estqR*margemR;
+  totalEstoque += estqR;
+
+  // Gráfico de barras por preço (R$130 a R$200)
+  const chartEl = document.getElementById("projChart");
+  const precos_range = [130,140,150,160,170,180,190,200];
+  const lucros_range = precos_range.map(p=>{
+    let l=0;
+    ["Torcedor","Jogador","Feminina","Retro"].forEach(m=>{
+      const c=CUSTO_MODELO[m];
+      const e=estoquePorModelo[m]||0;
+      const com=p*(comVPct/100)*0.10;
+      l+=e*(p-c-com);
+    });
+    return l;
+  });
+  const maxL = Math.max(...lucros_range, 1);
+
+  // 3 barras por preço: T, J, F
+  chartEl.innerHTML = precos_range.map((p,pi)=>{
+    const bars = modelos.map(m=>{
+      const c=CUSTO_MODELO[m];
+      const e=estoquePorModelo[m]||0;
+      const com=p*(comVPct/100)*0.10;
+      const l=Math.max(0,e*(p-c-com));
+      const h=Math.round((l/maxL)*180);
+      return `<div style="width:100%;background:${CORES_MODELO[m]};height:${h}px;border-radius:3px 3px 0 0;opacity:.9" title="${m}: ${fmt(l)}"></div>`;
+    }).join("");
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+      <div style="width:100%;display:flex;gap:2px;align-items:flex-end;height:180px">${bars}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px">R$${p}</div>
+    </div>`;
+  }).join("");
+
+  // Breakeven
+  const margemMedia = totalEstoque>0?totalLiqProj/totalEstoque:0;
+  const breakeven   = margemMedia>0?Math.ceil(custoT2/margemMedia):0;
+
+  document.getElementById("projResult").innerHTML=`
+    <div class="proj-result-row"><span style="color:var(--muted)">Custos totais</span><span style="color:var(--red)">${fmt(custoT2)}</span></div>
     <div class="proj-result-row"><span style="color:var(--muted)">Lucro atual</span><span style="color:var(--verde)">${fmt(liqAtual)}</span></div>
-    <div class="proj-result-row"><span style="color:var(--muted)">Break-even (camisas)</span><span style="color:var(--orange)">${breakeven} camisas</span></div>
-    <div class="proj-result-row"><span style="color:var(--muted)">Faturamento projetado (total)</span><span style="color:var(--amarelo)">${fmt(fatProj)}</span></div>
-    <div class="proj-result-row"><span>💰 Lucro projetado (total)</span><span style="color:var(--verde)">${fmt(liqProj)}</span></div>`;
+    <div class="proj-result-row"><span style="color:var(--muted)">Estoque restante</span><span>${totalEstoque} camisas</span></div>
+    <div class="proj-result-row"><span style="color:var(--muted)">Break-even (restante)</span><span style="color:var(--orange)">${breakeven} camisas</span></div>
+    <div class="proj-result-row"><span style="color:var(--muted)">Faturamento projetado (restante)</span><span style="color:var(--amarelo)">${fmt(totalFatProj)}</span></div>
+    <div class="proj-result-row"><span>💰 Lucro projetado total</span><span style="color:var(--verde)">${fmt(liqAtual+totalLiqProj)}</span></div>`;
 }
 
 // ── MODAL ──
