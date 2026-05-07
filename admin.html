@@ -143,7 +143,8 @@ table.itb tr:last-child td{border-bottom:none}
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:1rem}
 .modal-overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:1.75rem;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;animation:slideUp .25s ease}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:0;padding:1.75rem;width:100%;height:100vh;max-height:100vh;overflow-y:auto;animation:slideUp .25s ease}
+.modal-overlay.open{align-items:flex-start}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 .modal-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;margin-bottom:1.25rem}
 .modal-title span{color:var(--verde)}
@@ -184,6 +185,7 @@ table.itb tr:last-child td{border-bottom:none}
       <button class="nav-btn active" onclick="showView('nova',this)">🛒 Nova Venda</button>
       <button class="nav-btn" onclick="showView('pedidos',this)">📋 Pedidos</button>
       <button class="nav-btn" onclick="showView('custos',this)">💸 Custos</button>
+      <button class="nav-btn" onclick="showView('contas',this)">🏦 Contas</button>
       <button class="nav-btn" onclick="showView('fin',this)">📊 Financeiro</button>
       <button class="nav-btn" onclick="showView('proj',this)">📈 Projeção</button>
     </div>
@@ -335,6 +337,48 @@ table.itb tr:last-child td{border-bottom:none}
       <div class="custo-list" id="custoList"><div class="empty">Carregando custos…</div></div>
     </div>
 
+    <!-- CONTAS -->
+    <div class="view" id="view-contas">
+      <div class="sec-title">Contas</div>
+
+      <!-- A PAGAR -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:1.5rem">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red);border-left:3px solid var(--red);padding-left:10px;margin-bottom:1rem">A Pagar</div>
+          <div class="form-card" style="margin-bottom:.75rem">
+            <div class="form-grid">
+              <div class="form-group"><label>Descrição</label><input id="cp-desc" placeholder="Ex: Fornecedor X"></div>
+              <div class="form-group"><label>Valor (R$)</label><input type="number" id="cp-val" placeholder="0,00" min="0" step="0.01"></div>
+              <div class="form-group"><label>Categoria</label>
+                <select id="cp-cat">
+                  <option>Fornecedor</option><option>Custo Camisa</option><option>Embalagem</option><option>Imposto</option><option>Outros</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-rd" onclick="addContaPagar()" style="margin-top:.75rem">+ Adicionar</button>
+          </div>
+          <div id="listContasPagar"><div class="empty">Nenhuma conta a pagar.</div></div>
+        </div>
+
+        <!-- A RECEBER -->
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--verde);border-left:3px solid var(--verde);padding-left:10px;margin-bottom:1rem">A Receber</div>
+          <div class="form-card" style="margin-bottom:.75rem">
+            <div class="form-grid">
+              <div class="form-group"><label>Descrição</label><input id="cr-desc" placeholder="Ex: Cliente X"></div>
+              <div class="form-group"><label>Valor (R$)</label><input type="number" id="cr-val" placeholder="0,00" min="0" step="0.01"></div>
+            </div>
+            <button class="btn btn-vd" onclick="addContaReceber()" style="margin-top:.75rem">+ Adicionar</button>
+          </div>
+          <div id="listContasReceber"><div class="empty">Nenhuma conta a receber.</div></div>
+          <div style="margin-top:1.25rem">
+            <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;border-top:1px solid var(--border);padding-top:.75rem">✅ Recebidos</div>
+            <div id="listRecebidos"><div class="empty" style="padding:1rem">Nenhum recebimento registrado.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- FINANCEIRO -->
     <div class="view" id="view-fin">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px">
@@ -347,6 +391,7 @@ table.itb tr:last-child td{border-bottom:none}
         <div class="fin-card"><div class="fin-title">🤝 Comissionados</div><div id="finCom"></div></div>
         <div class="fin-card"><div class="fin-title">💳 Pagamento</div><div id="finPag"></div></div>
         <div class="fin-card"><div class="fin-title">👕 Por Modelo</div><div id="finMod"></div></div>
+        <div class="fin-card" style="grid-column:span 2"><div class="fin-title">💸 Detalhamento de Custos</div><div id="finCustosDetalhe"></div></div>
         <div class="fin-card"><div class="fin-title">📦 A Pagar</div><div id="finAPagar"></div></div>
         <div class="fin-card"><div class="fin-title">💰 A Receber</div><div id="finAReceber"></div></div>
       </div>
@@ -355,14 +400,42 @@ table.itb tr:last-child td{border-bottom:none}
     <!-- PROJECAO -->
     <div class="view" id="view-proj">
       <div class="sec-title">Projeção de Resultados</div>
-      <div class="proj-box">
-        <div class="form-grid">
-          <div class="form-group"><label>Preço Médio por Camisa (R$)</label><input type="number" id="p-preco" placeholder="159" min="0" step="0.01" oninput="calcProj()"></div>
-          <div class="form-group"><label>Total de Camisas em Estoque</label><input type="number" id="p-estoque" placeholder="148" min="0" oninput="calcProj()"></div>
-          <div class="form-group"><label>% Comissão Média</label><input type="number" id="p-compct" placeholder="10" min="0" step="0.1" oninput="calcProj()"></div>
-          <div class="form-group"><label>% Vendas Comissionadas</label><input type="number" id="p-compctvendas" placeholder="30" min="0" step="1" oninput="calcProj()"></div>
+
+      <!-- SIMULADOR POR MODELO -->
+      <div class="proj-box" style="margin-bottom:1.5rem">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">Preço médio por modelo</div>
+        <div class="form-grid" style="margin-bottom:1rem">
+          <div class="form-group"><label>Torcedor (R$)</label><input type="number" id="p-preco-t" value="149" min="0" step="1" oninput="calcProj()"></div>
+          <div class="form-group"><label>Jogador (R$)</label><input type="number" id="p-preco-j" value="169" min="0" step="1" oninput="calcProj()"></div>
+          <div class="form-group"><label>Feminina (R$)</label><input type="number" id="p-preco-f" value="149" min="0" step="1" oninput="calcProj()"></div>
+          <div class="form-group"><label>Retrô (R$)</label><input type="number" id="p-preco-r" value="199" min="0" step="1" oninput="calcProj()"></div>
+          <div class="form-group"><label>% Vendas Comissionadas</label><input type="number" id="p-compctvendas" value="30" min="0" step="1" oninput="calcProj()"></div>
         </div>
-        <div class="proj-result" id="projResult"></div>
+
+        <!-- SLIDER -->
+        <div style="margin-bottom:1.25rem">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+            <label style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Simulador de preço (todos os modelos)</label>
+            <span id="sliderVal" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--verde)">R$ 159</span>
+          </div>
+          <input type="range" id="p-slider" min="100" max="250" value="159" step="5" oninput="onSlider()" style="width:100%;accent-color:var(--verde)">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px"><span>R$ 100</span><span>R$ 250</span></div>
+        </div>
+
+        <!-- RESULTADOS CARDS -->
+        <div id="projCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:1.25rem"></div>
+
+        <!-- GRÁFICO DE BARRAS -->
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem">Projeção de lucro por preço</div>
+        <div id="projChart" style="position:relative;height:220px;display:flex;align-items:flex-end;gap:8px;padding:0 4px"></div>
+        <div style="display:flex;gap:16px;margin-top:1rem;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><div style="width:12px;height:12px;border-radius:3px;background:var(--verde)"></div>Torcedor</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><div style="width:12px;height:12px;border-radius:3px;background:var(--blue)"></div>Jogador</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><div style="width:12px;height:12px;border-radius:3px;background:var(--orange)"></div>Feminina</div>
+        </div>
+
+        <!-- TOTALIZADOR -->
+        <div class="proj-result" id="projResult" style="margin-top:1.25rem"></div>
       </div>
     </div>
 
@@ -387,7 +460,7 @@ table.itb tr:last-child td{border-bottom:none}
 // ══════════════════════════════════════════
 const SENHA = "MRD@123";
 const COM_PCT = 0.10;
-const APPS_URL = "https://script.google.com/macros/s/AKfycbwxP7c4GW-_J6OTwuYm_HNLcjQp6XnnWzrh2PLhp3_ZAwT7bdECI6eA8ZYkTy5CgDm60g/exec";
+const APPS_URL = "https://script.google.com/macros/s/AKfycbyF8piBI1h4jSXwDF1mgEYTQP9NS6nLIleXs_eCPQ18cN8FalwkiXwFi9O1lujjRqL9xQ/exec";
 
 const ESTOQUE = {
   Torcedor:{cores:["Amarela","Azul","Preta","Verde"],tamanhos:["P","M","G","GG","XGG"],preco:149,custo:65},
@@ -396,15 +469,9 @@ const ESTOQUE = {
   Retro:   {cores:["94","98","2002"],tamanhos:["M","G","GG"],preco:199,custo:65},
 };
 
-// Contas fixas Bruno/Leo
-const CONTAS_PAGAR = [
-  {desc:"Bruno Barbearia — 2ª parcela fornecedor",val:2275},
-  {desc:"Leo Floripa — 2ª parcela fornecedor",val:432.50},
-];
-const CONTAS_RECEBER = [
-  {desc:"Bruno Barbearia — 2ª parcela venda",val:2800},
-  {desc:"Leo Floripa — 2ª parcela venda",val:0},
-];
+// Contas dinâmicas — carregadas da planilha
+let contasPagar = [];
+let contasReceber = [];
 
 let pedidos=[], custos=[], itemN=0, loc="PG", comisionada=false, chipAtual="todos", editando=null;
 
@@ -433,7 +500,8 @@ function showView(id,btn){
   if(id==="pedidos") renderPedidos();
   if(id==="fin") renderFin();
   if(id==="custos") renderCustos();
-  if(id==="proj") calcProj();
+  if(id==="contas"){carregarContas();}
+  if(id==="proj"){carregarEstoque().then(calcProj);}
 }
 
 // ── LOADING ──
@@ -444,16 +512,25 @@ function setLoading(on){
 }
 
 // ── API ──
-// Usa GET com dados em base64 para evitar CORS
 async function api(action, data={}){
   try {
-    const payload = btoa(unescape(encodeURIComponent(JSON.stringify({action,...data}))));
+    const body = {action, ...data};
+    const json = JSON.stringify(body);
+    console.log("API →", action, json.substring(0, 200));
+    // Codifica corretamente UTF-8 com acentos
+    const bytes = new TextEncoder().encode(json);
+    let binary = "";
+    bytes.forEach(b => binary += String.fromCharCode(b));
+    const payload = btoa(binary);
     const url = APPS_URL + "?method=post&payload=" + encodeURIComponent(payload);
+    console.log("URL length:", url.length);
     const r = await fetch(url, {mode:"cors"});
-    return await r.json();
+    const result = await r.json();
+    console.log("API ←", JSON.stringify(result));
+    return result;
   } catch(e) {
-    console.warn("API error:", e);
-    return {ok: false};
+    console.error("API error:", e.message, e);
+    return {ok: false, error: e.message};
   }
 }
 
@@ -517,7 +594,26 @@ async function carregarCustos(){
 }
 
 async function carregarTudo(){
-  await Promise.all([carregarPedidos(),carregarCustos()]);
+  await Promise.all([carregarPedidos(),carregarCustos(),carregarEstoque()]);
+}
+
+// Estoque por modelo para projeção
+let estoquePorModelo = {Torcedor:0, Jogador:0, Feminina:0, Retro:0};
+
+async function carregarEstoque(){
+  const res = await apiGet("readVendas");
+  // Lê da aba Camisas Restante via sheets
+  const res2 = await apiGet("readCamisas");
+  if(res2?.rows?.length>1){
+    const rows = res2.rows.slice(1);
+    const map = {Torcedor:0, Jogador:0, Feminina:0, Retro:0};
+    rows.forEach(r=>{
+      const modelo = String(r[1]||"");
+      const sobram = parseInt(r[5])||0;
+      if(map[modelo]!==undefined) map[modelo]+=sobram;
+    });
+    estoquePorModelo = map;
+  }
 }
 
 // ── TOGGLES ──
@@ -788,6 +884,32 @@ function editarPedido(num){
   editando=p;
   document.getElementById("modalEdit").classList.add("open");
   const content=document.getElementById("editFormContent");
+
+  const entregaHtml = `
+    <div id="e-entregaFields" style="display:${p.loc==="Fora"?"block":"none"}">
+      <div class="form-grid" style="margin-bottom:.9rem;margin-top:.75rem">
+        <div class="form-group"><label>CPF</label><input id="e-cpf" value="${p.entrega?.cpf||""}"></div>
+        <div class="form-group"><label>CEP</label><input id="e-cep" value="${p.entrega?.cep||""}"></div>
+        <div class="form-group"><label>Rua / Número</label><input id="e-rua" value="${p.entrega?.rua||""}"></div>
+        <div class="form-group"><label>Bairro</label><input id="e-bairro" value="${p.entrega?.bairro||""}"></div>
+        <div class="form-group"><label>Cidade</label><input id="e-cidade" value="${p.entrega?.cidade||""}"></div>
+        <div class="form-group"><label>Frete (R$)</label><input type="number" id="e-frete" value="${p.frete||0}"></div>
+        <div class="form-group"><label>Embalagem (R$)</label><input type="number" id="e-emb" value="${p.emb||0}"></div>
+      </div>
+    </div>`;
+
+  const comHtml = `
+    <div id="e-comFields" style="display:${p.comisionada?"block":"none"};margin-bottom:.9rem">
+      <div class="form-group"><label>Comissionado</label>
+        <div class="toggle-row">
+          <button class="toggle-btn${p.comisionado==="Maria"?" active":""}" onclick="eTog('e-com','Maria',this)">Maria</button>
+          <button class="toggle-btn${p.comisionado==="Zuken"?" active":""}" onclick="eTog('e-com','Zuken',this)">Zuken</button>
+          <button class="toggle-btn${p.comisionado==="Helton"?" active":""}" onclick="eTog('e-com','Helton',this)">Helton</button>
+        </div>
+        <input type="hidden" id="e-com" value="${p.comisionado||""}">
+      </div>
+    </div>`;
+
   content.innerHTML=`
     <div class="form-grid" style="margin-bottom:.9rem">
       <div class="form-group"><label>Nome</label><input id="e-nome" value="${p.nome}"></div>
@@ -813,7 +935,28 @@ function editarPedido(num){
       </div>
       <div class="form-group"><label>Lote</label><input type="number" id="e-lote" value="${p.lote||1}"></div>
     </div>
-    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem">Itens</div>
+    <hr class="divider">
+    <div class="form-group" style="margin-bottom:.9rem"><label>Localidade</label>
+      <div class="toggle-row">
+        <button class="toggle-btn${p.loc==="PG"?" active":""}" onclick="eSetLoc('PG',this)">📍 Ponta Grossa</button>
+        <button class="toggle-btn${p.loc==="Fora"?" active":""}" onclick="eSetLoc('Fora',this)">🚚 Fora</button>
+      </div>
+      <input type="hidden" id="e-loc" value="${p.loc||"PG"}">
+    </div>
+    ${entregaHtml}
+    <hr class="divider">
+    <div class="form-group" style="margin-bottom:.9rem"><label>Comissionada?</label>
+      <div class="toggle-row">
+        <button class="toggle-btn${!p.comisionada?" active":""}" onclick="eSetCom(false,this)">Não</button>
+        <button class="toggle-btn${p.comisionada?" active":""}" onclick="eSetCom(true,this)">Sim</button>
+      </div>
+    </div>
+    ${comHtml}
+    <hr class="divider">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+      <label style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Itens</label>
+      <button class="btn btn-ol" onclick="addEditItem()" style="padding:5px 11px;font-size:12px">+ Item</button>
+    </div>
     <div id="editItensList">
       ${p.itens.map((item,i)=>`
         <div class="item-row" id="eitem-${i}">
@@ -830,8 +973,25 @@ function editarPedido(num){
           <input type="number" id="eip-${i}" value="${item.preco}" style="max-width:80px">
           <button class="btn-del" onclick="document.getElementById('eitem-${i}').remove()">✕</button>
         </div>`).join("")}
-    </div>
-    <button class="btn btn-ol" onclick="addEditItem()" style="margin-top:.5rem;font-size:12px;padding:5px 11px">+ Item</button>`;
+    </div>`;
+}
+
+function eTog(id,val,btn){
+  document.getElementById(id).value=val;
+  btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+}
+function eSetLoc(l,btn){
+  document.getElementById("e-loc").value=l;
+  btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("e-entregaFields").style.display=l==="Fora"?"block":"none";
+}
+function eSetCom(v,btn){
+  btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("e-comFields").style.display=v?"block":"none";
+  if(!v&&document.getElementById("e-com")) document.getElementById("e-com").value="";
 }
 function eUpdCores(i,selCor,selTam){
   const m=document.getElementById("eim-"+i).value;
@@ -873,28 +1033,40 @@ async function salvarEdicao(){
   const status=document.getElementById("e-status").value;
   const tipo=document.getElementById("e-tipo").value;
   const lote=document.getElementById("e-lote").value;
+  const newLoc=document.getElementById("e-loc")?.value||p.loc;
+  const newCom=document.getElementById("e-com")?.value||p.comisionado||"";
+  const comisionadaEl=document.getElementById("e-comFields");
+  const newComisionada=comisionadaEl?.style.display!=="none"&&newCom!=="";
+  const newFrete=parseFloat(document.getElementById("e-frete")?.value)||p.frete||0;
+  const newEmb=parseFloat(document.getElementById("e-emb")?.value)||p.emb||0;
+  const newEntrega=newLoc==="Fora"?{
+    cpf:document.getElementById("e-cpf")?.value||"",
+    cep:document.getElementById("e-cep")?.value||"",
+    rua:document.getElementById("e-rua")?.value||"",
+    bairro:document.getElementById("e-bairro")?.value||"",
+    cidade:document.getElementById("e-cidade")?.value||""
+  }:null;
 
   const sub=itens.reduce((s,i)=>s+i.preco*i.qtd,0);
-  const com=p.comisionada?sub*COM_PCT:0;
-  const liq=sub-com-p.frete-p.emb;
+  const com=newComisionada?sub*COM_PCT:0;
+  const liq=sub-com-newFrete-newEmb;
 
   const rows=itens.map(item=>[
     p.data,p.hora,nome,tel,
     item.modelo,item.cor,item.tamanho,item.qtd,item.preco,item.preco*item.qtd,
-    pagamento,status,p.loc,
-    p.comisionada?"Sim":"Não",p.comisionado||"",
-    p.comisionada?parseFloat((item.preco*item.qtd*COM_PCT).toFixed(2)):0,
-    p.frete,p.emb,parseFloat(liq.toFixed(2)),
-    "","","","","",
+    pagamento,status,newLoc,
+    newComisionada?"Sim":"Não",newCom,
+    newComisionada?parseFloat((item.preco*item.qtd*COM_PCT).toFixed(2)):0,
+    newFrete,newEmb,parseFloat(liq.toFixed(2)),
+    newEntrega?.cpf||"",newEntrega?.cep||"",newEntrega?.rua||"",newEntrega?.bairro||"",newEntrega?.cidade||"",
     tipo,lote,p.numeroPedido
   ]);
 
   setLoading(true);
   await api("editVenda", {numeroPedido: p.numeroPedido, rows});
 
-  // Atualiza local
   const idx=pedidos.findIndex(x=>x.numeroPedido===p.numeroPedido);
-  if(idx>=0) pedidos[idx]={...p,nome,tel,pagamento,status,tipo,lote,itens,sub,com,custos:p.frete+p.emb,liq};
+  if(idx>=0) pedidos[idx]={...p,nome,tel,pagamento,status,tipo,lote,loc:newLoc,comisionada:newComisionada,comisionado:newCom,frete:newFrete,emb:newEmb,entrega:newEntrega,itens,sub,com,custos:newFrete+newEmb,liq};
 
   setLoading(false);
   closeModal("modalEdit");
@@ -950,16 +1122,17 @@ function renderCustos(){
 
 // ── FINANCEIRO ──
 function renderFin(){
-  const fat=pedidos.reduce((s,p)=>s+p.sub,0);
+  const recebidosExtra=contasReceber.filter(c=>c.status==="Recebido").reduce((s,c)=>s+c.val,0);
+  const fat=pedidos.reduce((s,p)=>s+p.sub,0)+recebidosExtra;
   const comT=pedidos.reduce((s,p)=>s+(p.com||0),0);
   const custoT=custos.reduce((s,c)=>s+c.val,0);
   const liqT=pedidos.reduce((s,p)=>s+p.liq,0)-custoT+comT; // liq já desconta comissão
-  const liqReal=pedidos.reduce((s,p)=>s+p.liq,0)-custoT;
+  const liqReal=pedidos.reduce((s,p)=>s+p.liq,0)-custoT+recebidosExtra;
   const pendT=pedidos.filter(p=>p.status==="Pendente").reduce((s,p)=>s+p.liq,0);
   const camsT=pedidos.reduce((s,p)=>s+p.itens.reduce((ss,i)=>ss+i.qtd,0),0);
 
   document.getElementById("finStats").innerHTML=`
-    <div class="stat-card am"><div class="stat-lbl">Faturamento Bruto</div><div class="stat-val am">${fmt(fat)}</div></div>
+    <div class="stat-card am"><div class="stat-lbl">Faturamento Bruto</div><div class="stat-val am">${fmt(fat)}</div><div class="stat-sub">vendas + recebimentos</div></div>
     <div class="stat-card"><div class="stat-lbl">Custos Totais</div><div class="stat-val rd">${fmt(custoT+comT)}</div><div class="stat-sub">custos + comissões</div></div>
     <div class="stat-card"><div class="stat-lbl">Lucro Líquido</div><div class="stat-val vd">${fmt(liqReal)}</div></div>
     <div class="stat-card rd"><div class="stat-lbl">A Receber (pendente)</div><div class="stat-val rd">${fmt(pendT)}</div><div class="stat-sub">${pedidos.filter(p=>p.status==="Pendente").length} pedidos</div></div>
@@ -993,46 +1166,161 @@ function renderFin(){
   document.getElementById("finMod").innerHTML=Object.entries(modMap).map(([k,d])=>
     `<div class="fin-row"><span class="fin-lbl">${k}</span><div style="text-align:right"><span class="fin-val vd">${fmt(d.v)}</span><div style="font-size:11px;color:var(--muted)">${d.q} unid.</div></div></div>`).join("")||`<div style="color:var(--muted);font-size:13px">Sem dados</div>`;
 
-  // A Pagar
-  const comPagar=Object.entries(comMap).map(([k,d])=>({desc:"Comissão — "+k,val:d.v}));
-  const tPagar=[...CONTAS_PAGAR,...comPagar];
+  // Custos detalhados
+  const custosPorCat = {};
+  custos.forEach(c => {
+    if(!custosPorCat[c.cat]) custosPorCat[c.cat] = [];
+    custosPorCat[c.cat].push(c);
+  });
+  const comissoesList = Object.entries(comMap).map(([k,d]) => ({desc:"Comissão — "+k, val:d.v, cat:"Comissão"}));
+  
+  let custosHtml = "";
+  // Custos da planilha agrupados por categoria
+  Object.entries(custosPorCat).forEach(([cat, items]) => {
+    const total = items.reduce((s,c) => s+c.val, 0);
+    custosHtml += `<div style="margin-bottom:.5rem">
+      <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${cat}</div>
+      ${items.map(c => `<div class="fin-row" style="padding:4px 0"><span class="fin-lbl" style="font-size:12px">${c.desc} <span style="font-size:10px;color:var(--muted)">(${c.data})</span></span><span class="fin-val rd" style="font-size:13px">${fmt(c.val)}</span></div>`).join("")}
+      <div class="fin-row" style="padding:3px 0;border-top:none"><span class="fin-lbl" style="font-size:11px">Subtotal ${cat}</span><span class="fin-val rd" style="font-size:12px">${fmt(total)}</span></div>
+    </div>`;
+  });
+  // Comissões
+  if(comissoesList.length) {
+    custosHtml += `<div style="margin-bottom:.5rem">
+      <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Comissões</div>
+      ${comissoesList.map(c => `<div class="fin-row" style="padding:4px 0"><span class="fin-lbl" style="font-size:12px">${c.desc}</span><span class="fin-val or" style="font-size:13px">${fmt(c.val)}</span></div>`).join("")}
+    </div>`;
+  }
+  custosHtml += `<div class="fin-row" style="font-weight:800;margin-top:4px"><span>Total Custos</span><span class="fin-val rd">${fmt(custoT+comT)}</span></div>`;
+  document.getElementById("finCustosDetalhe").innerHTML = custosHtml || `<div style="color:var(--muted);font-size:13px">Nenhum custo registrado</div>`;
+
+  // A Pagar — contas dinâmicas + comissões
+  const comPagar=Object.entries(comMap).map(([k,d])=>({desc:"Comissão — "+k,val:d.v,status:"Pendente"}));
+  const tPagar=[...contasPagar.filter(c=>c.status==="Pendente"),...comPagar];
   document.getElementById("finAPagar").innerHTML=tPagar.map(c=>
     `<div class="fin-row"><span class="fin-lbl">${c.desc}</span><span class="fin-val rd">${fmt(c.val)}</span></div>`
-  ).join("")+`<div class="fin-row" style="font-weight:800"><span>Total</span><span class="fin-val rd">${fmt(tPagar.reduce((s,c)=>s+c.val,0))}</span></div>`;
+  ).join("")+(tPagar.length?`<div class="fin-row" style="font-weight:800"><span>Total</span><span class="fin-val rd">${fmt(tPagar.reduce((s,c)=>s+c.val,0))}</span></div>`:"<div style='color:var(--muted);font-size:13px'>Nenhuma conta pendente</div>");
 
-  // A Receber
-  const clientesPend=pendT;
-  const tReceber=[...CONTAS_RECEBER,{desc:"Clientes pendentes",val:clientesPend}];
-  document.getElementById("finAReceber").innerHTML=tReceber.map(c=>
-    `<div class="fin-row"><span class="fin-lbl">${c.desc}</span><span class="fin-val vd">${fmt(c.val)}</span></div>`
-  ).join("")+`<div class="fin-row" style="font-weight:800"><span>Total</span><span class="fin-val vd">${fmt(tReceber.reduce((s,c)=>s+c.val,0))}</span></div>`;
+  // A Receber — contas dinâmicas + clientes pendentes
+  const recebidosList=contasReceber.filter(c=>c.status==="Recebido");
+  const pendentesList=contasReceber.filter(c=>c.status==="Pendente");
+  const totalRecebidoExtra=recebidosList.reduce((s,c)=>s+c.val,0);
+  const totalPendenteExtra=pendentesList.reduce((s,c)=>s+c.val,0);
+
+  let recHtml="";
+  if(pendentesList.length){
+    recHtml+=`<div style="font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;margin-bottom:4px">Pendentes</div>`;
+    recHtml+=pendentesList.map(c=>`<div class="fin-row"><span class="fin-lbl">${c.desc}</span><span class="fin-val or">${fmt(c.val)}</span></div>`).join("");
+  }
+  if(pendT>0) recHtml+=`<div class="fin-row"><span class="fin-lbl">Clientes com pedido pendente</span><span class="fin-val or">${fmt(pendT)}</span></div>`;
+  if(recebidosList.length){
+    recHtml+=`<div style="font-size:10px;font-weight:800;color:var(--verde);text-transform:uppercase;margin:8px 0 4px">Recebidos</div>`;
+    recHtml+=recebidosList.map(c=>`<div class="fin-row"><span class="fin-lbl">${c.desc} ${c.dataRecebido?"<span style='font-size:10px;color:var(--muted)'>("+c.dataRecebido+")</span>":""}</span><span class="fin-val vd">${fmt(c.val)}</span></div>`).join("");
+  }
+  recHtml+=`<div class="fin-row" style="font-weight:800;margin-top:4px"><span>Total recebido extra</span><span class="fin-val vd">${fmt(totalRecebidoExtra)}</span></div>`;
+  recHtml+=`<div class="fin-row" style="font-weight:800"><span>Total pendente</span><span class="fin-val or">${fmt(totalPendenteExtra+pendT)}</span></div>`;
+  document.getElementById("finAReceber").innerHTML=recHtml||`<div style="color:var(--muted);font-size:13px">Sem contas</div>`;
 }
 
 // ── PROJEÇÃO ──
+const CUSTO_MODELO = {Torcedor:65, Jogador:67, Feminina:65, Retro:65};
+const CORES_MODELO = {Torcedor:"var(--verde)", Jogador:"var(--blue)", Feminina:"var(--orange)", Retro:"var(--purple)"};
+
+function onSlider(){
+  const v = document.getElementById("p-slider").value;
+  document.getElementById("sliderVal").textContent = "R$ "+v;
+  ["p-preco-t","p-preco-j","p-preco-f","p-preco-r"].forEach(id=>{
+    document.getElementById(id).value = v;
+  });
+  calcProj();
+}
+
 function calcProj(){
-  const preco=parseFloat(document.getElementById("p-preco")?.value)||0;
-  const estoque=parseInt(document.getElementById("p-estoque")?.value)||0;
-  const comPct=parseFloat(document.getElementById("p-compct")?.value)||10;
-  const comVendasPct=parseFloat(document.getElementById("p-compctvendas")?.value)||0;
+  const precoT  = parseFloat(document.getElementById("p-preco-t")?.value)||149;
+  const precoJ  = parseFloat(document.getElementById("p-preco-j")?.value)||169;
+  const precoF  = parseFloat(document.getElementById("p-preco-f")?.value)||149;
+  const precoR  = parseFloat(document.getElementById("p-preco-r")?.value)||199;
+  const comVPct = parseFloat(document.getElementById("p-compctvendas")?.value)||30;
 
-  const custoT=custos.reduce((s,c)=>s+c.val,0);
-  const fatAtual=pedidos.reduce((s,p)=>s+p.sub,0);
-  const liqAtual=pedidos.reduce((s,p)=>s+p.liq,0);
-  const comAtual=pedidos.reduce((s,p)=>s+p.com,0);
+  const precos  = {Torcedor:precoT, Jogador:precoJ, Feminina:precoF, Retro:precoR};
+  const custoT2 = custos.reduce((s,c)=>s+c.val,0);
+  const recebidosE = contasReceber.filter(c=>c.status==="Recebido").reduce((s,c)=>s+c.val,0);
+  const liqAtual = pedidos.reduce((s,p)=>s+p.liq,0) - custoT2 + recebidosE;
 
-  const margemUnit=preco*(1-comVendasPct/100*comPct/100);
-  const breakeven=custoT>0&&margemUnit>0?Math.ceil(custoT/margemUnit):0;
-  const fatProj=fatAtual+(estoque*preco);
-  const liqProj=liqAtual+(estoque*margemUnit)-custoT;
+  // Por modelo
+  const modelos = ["Torcedor","Jogador","Feminina"];
+  let totalFatProj=0, totalLiqProj=0, totalEstoque=0;
 
-  const box=document.getElementById("projResult");
-  box.innerHTML=`
-    <div class="proj-result-row"><span style="color:var(--muted)">Custos totais registrados</span><span style="color:var(--red)">${fmt(custoT)}</span></div>
-    <div class="proj-result-row"><span style="color:var(--muted)">Faturamento atual</span><span style="color:var(--amarelo)">${fmt(fatAtual)}</span></div>
+  const cardsEl = document.getElementById("projCards");
+  cardsEl.innerHTML = modelos.map(m=>{
+    const preco  = precos[m];
+    const custo  = CUSTO_MODELO[m];
+    const estq   = estoquePorModelo[m]||0;
+    const comDesc= preco * (comVPct/100) * 0.10;
+    const margem = preco - custo - comDesc;
+    const fatMod = estq * preco;
+    const liqMod = estq * margem;
+    totalFatProj += fatMod;
+    totalLiqProj += liqMod;
+    totalEstoque += estq;
+    return `<div class="stat-card" style="border-top:3px solid ${CORES_MODELO[m]}">
+      <div class="stat-lbl">${m}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">${estq} un. · custo R$${custo}</div>
+      <div style="font-size:13px;color:var(--amarelo);font-weight:700">${fmt(fatMod)}</div>
+      <div style="font-size:12px;color:var(--verde)">Lucro: ${fmt(liqMod)}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">Margem: ${fmt(margem)}/un.</div>
+    </div>`;
+  }).join("");
+
+  // Retrô separado (menor)
+  const estqR  = estoquePorModelo["Retro"]||0;
+  const margemR= precoR - 65 - precoR*(comVPct/100)*0.10;
+  totalFatProj += estqR*precoR;
+  totalLiqProj += estqR*margemR;
+  totalEstoque += estqR;
+
+  // Gráfico de barras por preço (R$130 a R$200)
+  const chartEl = document.getElementById("projChart");
+  const precos_range = [130,140,150,160,170,180,190,200];
+  const lucros_range = precos_range.map(p=>{
+    let l=0;
+    ["Torcedor","Jogador","Feminina","Retro"].forEach(m=>{
+      const c=CUSTO_MODELO[m];
+      const e=estoquePorModelo[m]||0;
+      const com=p*(comVPct/100)*0.10;
+      l+=e*(p-c-com);
+    });
+    return l;
+  });
+  const maxL = Math.max(...lucros_range, 1);
+
+  // 3 barras por preço: T, J, F
+  chartEl.innerHTML = precos_range.map((p,pi)=>{
+    const bars = modelos.map(m=>{
+      const c=CUSTO_MODELO[m];
+      const e=estoquePorModelo[m]||0;
+      const com=p*(comVPct/100)*0.10;
+      const l=Math.max(0,e*(p-c-com));
+      const h=Math.round((l/maxL)*180);
+      return `<div style="width:100%;background:${CORES_MODELO[m]};height:${h}px;border-radius:3px 3px 0 0;opacity:.9" title="${m}: ${fmt(l)}"></div>`;
+    }).join("");
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+      <div style="width:100%;display:flex;gap:2px;align-items:flex-end;height:180px">${bars}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px">R$${p}</div>
+    </div>`;
+  }).join("");
+
+  // Breakeven
+  const margemMedia = totalEstoque>0?totalLiqProj/totalEstoque:0;
+  const breakeven   = margemMedia>0?Math.ceil(custoT2/margemMedia):0;
+
+  document.getElementById("projResult").innerHTML=`
+    <div class="proj-result-row"><span style="color:var(--muted)">Custos totais</span><span style="color:var(--red)">${fmt(custoT2)}</span></div>
     <div class="proj-result-row"><span style="color:var(--muted)">Lucro atual</span><span style="color:var(--verde)">${fmt(liqAtual)}</span></div>
-    <div class="proj-result-row"><span style="color:var(--muted)">Break-even (camisas)</span><span style="color:var(--orange)">${breakeven} camisas</span></div>
-    <div class="proj-result-row"><span style="color:var(--muted)">Faturamento projetado (total)</span><span style="color:var(--amarelo)">${fmt(fatProj)}</span></div>
-    <div class="proj-result-row"><span>💰 Lucro projetado (total)</span><span style="color:var(--verde)">${fmt(liqProj)}</span></div>`;
+    <div class="proj-result-row"><span style="color:var(--muted)">Estoque restante</span><span>${totalEstoque} camisas</span></div>
+    <div class="proj-result-row"><span style="color:var(--muted)">Break-even (restante)</span><span style="color:var(--orange)">${breakeven} camisas</span></div>
+    <div class="proj-result-row"><span style="color:var(--muted)">Faturamento projetado (restante)</span><span style="color:var(--amarelo)">${fmt(totalFatProj)}</span></div>
+    <div class="proj-result-row"><span>💰 Lucro projetado total</span><span style="color:var(--verde)">${fmt(liqAtual+totalLiqProj)}</span></div>`;
 }
 
 // ── MODAL ──
@@ -1046,12 +1334,147 @@ function toast(msg,type=""){
   setTimeout(()=>t.classList.remove("show"),3500);
 }
 
+// ── CONTAS A PAGAR / A RECEBER ──
+async function carregarContas(){
+  setLoading(true);
+  const resPagar   = await apiGet("readContasPagar");
+  const resReceber = await apiGet("readContasReceber");
+  if(resPagar?.rows?.length>1)   contasPagar   = resPagar.rows.slice(1).map(r=>({id:String(r[0]),desc:r[1],val:parseFloat(r[2])||0,cat:r[3],status:r[4]||"Pendente"})).filter(r=>r.desc);
+  if(resReceber?.rows?.length>1) contasReceber = resReceber.rows.slice(1).map(r=>({id:String(r[0]),desc:r[1],val:parseFloat(r[2])||0,status:r[3]||"Pendente",dataRecebido:r[4]||""})).filter(r=>r.desc);
+  setLoading(false);
+  renderContas();
+}
+
+async function addContaPagar(){
+  const desc=document.getElementById("cp-desc").value.trim();
+  const val=parseFloat(document.getElementById("cp-val").value)||0;
+  const cat=document.getElementById("cp-cat").value;
+  if(!desc||!val){toast("⚠ Preencha descrição e valor","error");return;}
+  const id=String(Date.now());
+  const row=[id,desc,val,cat,"Pendente"];
+  await api("addContaPagar",{row});
+  contasPagar.unshift({id,desc,val,cat,status:"Pendente"});
+  document.getElementById("cp-desc").value="";
+  document.getElementById("cp-val").value="";
+  toast("✅ Conta adicionada","success");
+  renderContas();
+}
+
+async function addContaReceber(){
+  const desc=document.getElementById("cr-desc").value.trim();
+  const val=parseFloat(document.getElementById("cr-val").value)||0;
+  if(!desc||!val){toast("⚠ Preencha descrição e valor","error");return;}
+  const id=String(Date.now());
+  const row=[id,desc,val,"Pendente"];
+  await api("addContaReceber",{row});
+  contasReceber.unshift({id,desc,val,status:"Pendente"});
+  document.getElementById("cr-desc").value="";
+  document.getElementById("cr-val").value="";
+  toast("✅ Conta adicionada","success");
+  renderContas();
+}
+
+async function pagarConta(id){
+  const c=contasPagar.find(x=>x.id===id);
+  if(!c) return;
+  // Marca como pago e lança nos custos
+  await api("updateContaPagar",{id,status:"Pago"});
+  await api("addCusto",{row:[new Date().toLocaleDateString("pt-BR"),c.desc,c.cat||"Fornecedor",c.val,Date.now()]});
+  c.status="Pago";
+  custos.unshift({id:Date.now(),data:new Date().toLocaleDateString("pt-BR"),desc:c.desc,cat:c.cat||"Fornecedor",val:c.val});
+  toast("✅ Pago e lançado nos custos","success");
+  renderContas();
+}
+
+async function receberConta(id){
+  const c=contasReceber.find(x=>x.id===id);
+  if(!c) return;
+  const dataHoje=new Date().toLocaleDateString("pt-BR");
+  await api("updateContaReceber",{id,status:"Recebido",dataRecebido:dataHoje});
+  c.status="Recebido";
+  c.dataRecebido=dataHoje;
+  toast("✅ Marcado como recebido — faturamento atualizado","success");
+  renderContas();
+}
+
+async function delContaPagar(id){
+  if(!confirm("Remover esta conta?")) return;
+  await api("deleteContaPagar",{id});
+  contasPagar=contasPagar.filter(c=>c.id!==id);
+  renderContas();
+}
+
+async function delContaReceber(id){
+  if(!confirm("Remover esta conta?")) return;
+  await api("deleteContaReceber",{id});
+  contasReceber=contasReceber.filter(c=>c.id!==id);
+  renderContas();
+}
+
+function renderContas(){
+  // A PAGAR
+  const lp=document.getElementById("listContasPagar");
+  const totalPagar=contasPagar.filter(c=>c.status==="Pendente").reduce((s,c)=>s+c.val,0);
+  lp.innerHTML=(contasPagar.length?`<div style="font-size:13px;color:var(--red);font-weight:700;margin-bottom:.75rem">Total pendente: ${fmt(totalPagar)}</div>`:"")+
+    (contasPagar.length?contasPagar.map(c=>`
+    <div class="custo-row" style="margin-bottom:8px;${c.status==="Pago"?"opacity:.5":""}">
+      <div class="custo-info">
+        <div class="custo-desc">${c.desc}</div>
+        <div class="custo-meta"><span class="cat-badge">${c.cat||"Fornecedor"}</span> · <span style="color:${c.status==="Pago"?"var(--verde)":"var(--orange)"}">● ${c.status}</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red)">${fmt(c.val)}</div>
+        ${c.status==="Pendente"?`<button class="btn btn-vd" onclick="pagarConta('${c.id}')" style="padding:5px 10px;font-size:11px">✅ Pagar</button>`:""}
+        <button class="btn btn-rd" onclick="delContaPagar('${c.id}')" style="padding:5px 9px;font-size:12px">✕</button>
+      </div>
+    </div>`).join(""):'<div class="empty">Nenhuma conta a pagar.</div>');
+
+  // A RECEBER — só pendentes
+  const lr=document.getElementById("listContasReceber");
+  const pendentes=contasReceber.filter(c=>c.status==="Pendente");
+  const recebidos=contasReceber.filter(c=>c.status==="Recebido");
+  const totalReceber=pendentes.reduce((s,c)=>s+c.val,0);
+  const totalRecebido=recebidos.reduce((s,c)=>s+c.val,0);
+
+  lr.innerHTML=(pendentes.length
+    ?`<div style="font-size:13px;color:var(--verde);font-weight:700;margin-bottom:.75rem">Total pendente: ${fmt(totalReceber)}</div>`+
+      pendentes.map(c=>`
+      <div class="custo-row" style="margin-bottom:8px">
+        <div class="custo-info">
+          <div class="custo-desc">${c.desc}</div>
+          <div class="custo-meta"><span style="color:var(--orange)">● Pendente</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--verde)">${fmt(c.val)}</div>
+          <button class="btn btn-vd" onclick="receberConta('${c.id}')" style="padding:5px 10px;font-size:11px">✅ Receber</button>
+          <button class="btn btn-rd" onclick="delContaReceber('${c.id}')" style="padding:5px 9px;font-size:12px">✕</button>
+        </div>
+      </div>`).join("")
+    :'<div class="empty" style="padding:1rem">Nenhuma conta pendente.</div>');
+
+  // RECEBIDOS
+  const lr2=document.getElementById("listRecebidos");
+  lr2.innerHTML=(recebidos.length
+    ?`<div style="font-size:13px;color:var(--verde);font-weight:700;margin-bottom:.75rem">Total recebido: ${fmt(totalRecebido)}</div>`+
+      recebidos.map(c=>`
+      <div class="custo-row" style="margin-bottom:8px;opacity:.85">
+        <div class="custo-info">
+          <div class="custo-desc">${c.desc}</div>
+          <div class="custo-meta">${c.dataRecebido||""} · <span style="color:var(--verde)">● Recebido</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--verde)">${fmt(c.val)}</div>
+          <button class="btn btn-rd" onclick="delContaReceber('${c.id}')" style="padding:5px 9px;font-size:12px">✕</button>
+        </div>
+      </div>`).join("")
+    :'<div class="empty" style="padding:1rem">Nenhum recebimento ainda.</div>');
+}
+
 // ── INIT ──
 async function init(){
-  // Seta data de hoje no campo custo
   document.getElementById("c-data").value=new Date().toISOString().split("T")[0];
   addItem(); calcResumo();
-  await carregarTudo();
+  await Promise.all([carregarTudo(), carregarContas()]);
 }
 </script>
 </body>
