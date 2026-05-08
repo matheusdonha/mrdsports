@@ -986,13 +986,18 @@ function renderFin(){
   const contasPagarPend=contasPagar.filter(c=>c.status==="Pendente");
   const totalAPagar=contasPagarPend.reduce((s,c)=>s+c.val,0)+comT;
 
-  // Contas a receber pendentes + pedidos pendentes
+  // Contas a receber pendentes/recebidas + pedidos pendentes
   const contasRecPend=contasReceber.filter(c=>c.status==="Pendente");
+  const recebidos=contasReceber.filter(c=>c.status==="Recebido");
+  const totalRecebidoExtra=recebidos.reduce((s,c)=>s+c.val,0);
   const totalAReceber=contasRecPend.reduce((s,c)=>s+c.val,0)+pendT;
+  const faturamentoTotal=fatVendas+totalRecebidoExtra;
 
   // ── STATS ──
   document.getElementById("finStats").innerHTML=`
     <div class="stat-card am"><div class="stat-lbl">Receita Vendas</div><div class="stat-val am">${fmt(fatVendas)}</div><div class="stat-sub">${pedidos.length} pedidos</div></div>
+    <div class="stat-card"><div class="stat-lbl">Faturamento Total</div><div class="stat-val vd">${fmt(faturamentoTotal)}</div><div class="stat-sub">vendas + recebidos extra</div></div>
+    <div class="stat-card or"><div class="stat-lbl">Contas a Receber</div><div class="stat-val or">${fmt(totalAReceber)}</div><div class="stat-sub">contas + pedidos pendentes</div></div>
     <div class="stat-card or"><div class="stat-lbl">Preço Médio / Camisa</div><div class="stat-val or">${fmt(precoMedio)}</div><div class="stat-sub">${totalUnidades} unidades vendidas</div></div>
     <div class="stat-card"><div class="stat-lbl">Custos Totais</div><div class="stat-val rd">${fmt(custoT+comT)}</div><div class="stat-sub">custos + comissões</div></div>
     <div class="stat-card"><div class="stat-lbl">Lucro Líquido</div><div class="stat-val vd">${fmt(liqReal)}</div><div class="stat-sub">receita − custos</div></div>
@@ -1048,8 +1053,6 @@ function renderFin(){
     :`<div style="color:var(--muted);font-size:13px">Nenhuma conta pendente</div>`;
 
   // ── A RECEBER (corrigido — lê contasReceber diretamente) ──
-  const recebidos=contasReceber.filter(c=>c.status==="Recebido");
-  const totalRecebidoExtra=recebidos.reduce((s,c)=>s+c.val,0);
   let recHtml="";
   if(contasRecPend.length){
     recHtml+=`<div style="font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;margin-bottom:4px">Contas Pendentes</div>`;
@@ -1094,9 +1097,15 @@ function calcProj(){
   const comVPct=parseFloat(document.getElementById("p-compctvendas")?.value)||30;
   const custoT=custos.reduce((s,c)=>s+c.val,0);
   const comT=pedidos.reduce((s,p)=>s+(p.com||0),0);
-  const liqAtual=pedidos.reduce((s,p)=>s+p.liq,0)-custoT;
+  const vendasLiquidas=pedidos.reduce((s,p)=>s+p.liq,0);
   const fatAtual=pedidos.reduce((s,p)=>s+p.sub,0);
-  const totalCustos=custoT+comT;
+  const contasRecPend=contasReceber.filter(c=>c.status==="Pendente").reduce((s,c)=>s+c.val,0);
+  const contasRecRecebidas=contasReceber.filter(c=>c.status==="Recebido").reduce((s,c)=>s+c.val,0);
+  const contasPagarPend=contasPagar.filter(c=>c.status==="Pendente").reduce((s,c)=>s+c.val,0);
+  const receitaGarantida=fatAtual+contasRecPend+contasRecRecebidas;
+  const resultadoAtual=vendasLiquidas+contasRecPend+contasRecRecebidas-custoT-contasPagarPend;
+  const totalObrigacoes=custoT+contasPagarPend;
+  const totalCustosExibicao=custoT+comT;
 
   let totalEstoque=0,totalFatProj=0,totalLucroProj=0;
 
@@ -1126,20 +1135,23 @@ function calcProj(){
   }
 
   const margemMedia=totalEstoque>0?totalLucroProj/totalEstoque:0;
-  const deficit=totalCustos-(liqAtual+comT);
-  const beRest=margemMedia>0?Math.max(0,Math.ceil(deficit/margemMedia)):"—";
-  const receitaTotal=fatAtual+totalFatProj;
-  const lucroTotal=liqAtual+totalLucroProj;
+  const deficitAtual=Math.max(0,-resultadoAtual);
+  const beRest=margemMedia>0?Math.ceil(deficitAtual/margemMedia):"—";
+  const receitaTotal=receitaGarantida+totalFatProj;
+  const lucroTotal=resultadoAtual+totalLucroProj;
 
   // Resultado total simulado
   const projResult=document.getElementById("projResult");
   if(projResult){
     projResult.innerHTML=`
       <div class="proj-result-row"><span style="color:var(--muted)">Faturamento atual (vendas)</span><span style="color:var(--amarelo)">${fmt(fatAtual)}</span></div>
+      <div class="proj-result-row"><span style="color:var(--muted)">Contas a receber</span><span style="color:var(--orange)">${fmt(contasRecPend+contasRecRecebidas)}</span></div>
+      <div class="proj-result-row"><span style="color:var(--muted)">Receita garantida</span><span style="color:var(--amarelo)">${fmt(receitaGarantida)}</span></div>
       <div class="proj-result-row"><span style="color:var(--muted)">Faturamento projetado (restante)</span><span style="color:var(--amarelo)">${fmt(totalFatProj)}</span></div>
-      <div class="proj-result-row"><span style="color:var(--muted)">Receita total (atual + projetado)</span><span style="color:var(--amarelo)">${fmt(receitaTotal)}</span></div>
-      <div class="proj-result-row"><span style="color:var(--muted)">Custos totais registrados</span><span style="color:var(--red)">${fmt(totalCustos)}</span></div>
-      <div class="proj-result-row"><span style="color:var(--muted)">Lucro atual</span><span style="color:var(--verde)">${fmt(liqAtual)}</span></div>
+      <div class="proj-result-row"><span style="color:var(--muted)">Receita total (garantida + projetado)</span><span style="color:var(--amarelo)">${fmt(receitaTotal)}</span></div>
+      <div class="proj-result-row"><span style="color:var(--muted)">Custos registrados</span><span style="color:var(--red)">${fmt(totalCustosExibicao)}</span></div>
+      <div class="proj-result-row"><span style="color:var(--muted)">Contas a pagar pendentes</span><span style="color:var(--red)">${fmt(contasPagarPend)}</span></div>
+      <div class="proj-result-row"><span style="color:var(--muted)">Resultado atual</span><span style="color:${resultadoAtual>=0?'var(--verde)':'var(--red)'}">${fmt(resultadoAtual)}</span></div>
       <div class="proj-result-row"><span style="color:var(--muted)">Estoque restante</span><span>${totalEstoque} camisas</span></div>
       <div class="proj-result-row"><span style="color:var(--muted)">Break-even restante</span><span style="color:var(--orange)">${typeof beRest==="number"?beRest+" camisas":beRest}</span></div>
       <div class="proj-result-row"><span>💰 Lucro total simulado</span><span style="color:var(--verde);font-size:20px">${fmt(lucroTotal)}</span></div>`;
@@ -1148,18 +1160,17 @@ function calcProj(){
   // Cards de resumo
   const resumo=document.getElementById("projResumoCards");
   if(resumo){
-    const contasPagarPend=contasPagar.filter(c=>c.status==="Pendente").reduce((s,c)=>s+c.val,0);
     resumo.innerHTML=`
-      <div class="stat-card rd"><div class="stat-lbl">Custos Totais + A Pagar</div><div class="stat-val rd">${fmt(totalCustos+contasPagarPend)}</div><div class="stat-sub">registrados + pendentes</div></div>
-      <div class="stat-card am"><div class="stat-lbl">Receita Garantida</div><div class="stat-val am">${fmt(fatAtual)}</div><div class="stat-sub">já vendido</div></div>
+      <div class="stat-card rd"><div class="stat-lbl">Custos Totais + A Pagar</div><div class="stat-val rd">${fmt(totalObrigacoes)}</div><div class="stat-sub">custos registrados + pendentes</div></div>
+      <div class="stat-card am"><div class="stat-lbl">Receita Garantida</div><div class="stat-val am">${fmt(receitaGarantida)}</div><div class="stat-sub">vendas + contas a receber</div></div>
       <div class="stat-card bl"><div class="stat-lbl">Estoque Restante</div><div class="stat-val bl">${totalEstoque}</div><div class="stat-sub">camisas para vender</div></div>
-      <div class="stat-card"><div class="stat-lbl">Resultado Atual</div><div class="stat-val ${liqAtual>=0?"vd":"rd"}">${fmt(liqAtual)}</div><div class="stat-sub">lucro líquido real</div></div>`;
+      <div class="stat-card"><div class="stat-lbl">Resultado Atual</div><div class="stat-val ${resultadoAtual>=0?"vd":"rd"}">${fmt(resultadoAtual)}</div><div class="stat-sub">sem duplicar contas pagas</div></div>`;
   }
 
-  buildProjTable(comVPct,fatAtual,liqAtual,totalCustos,comT);
+  buildProjTable(comVPct,receitaGarantida,resultadoAtual,totalObrigacoes);
 }
 
-function buildProjTable(comVPct,fatAtual,liqAtual,totalCustos,comT){
+function buildProjTable(comVPct,receitaGarantida,resultadoAtual,totalObrigacoes){
   const tbody=document.getElementById("projTableBody");
   if(!tbody) return;
   let rows="";
@@ -1174,12 +1185,12 @@ function buildProjTable(comVPct,fatAtual,liqAtual,totalCustos,comT){
       estqTotal+=estq;
       custoPonderado+=custo*estq;
     });
-    const receitaTotal=fatAtual+fatRest;
-    const lucroMax=liqAtual+lucroRest;
+    const receitaTotal=receitaGarantida+fatRest;
+    const lucroMax=resultadoAtual+lucroRest;
     const margemMedia=estqTotal>0?lucroRest/estqTotal:0;
-    const beTotal=margemMedia>0?Math.ceil(totalCustos/margemMedia):"∞";
-    const deficit=totalCustos-(liqAtual+comT);
-    const beRest=margemMedia>0?Math.max(0,Math.ceil(deficit/margemMedia)):"∞";
+    const beTotal=margemMedia>0?Math.ceil(totalObrigacoes/margemMedia):"∞";
+    const deficitAtual=Math.max(0,-resultadoAtual);
+    const beRest=margemMedia>0?Math.ceil(deficitAtual/margemMedia):"∞";
     const avgCusto=estqTotal>0?custoPonderado/estqTotal:65;
     const margemPct=preco>0?((preco-avgCusto-preco*(comVPct/100)*COM_PCT)/preco*100):0;
     rows+=`<tr>
