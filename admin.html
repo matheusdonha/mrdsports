@@ -489,7 +489,6 @@ table.itb tr:last-child td{border-bottom:none}
 const SENHA = "MRD@123";
 const COM_PCT = 0.10;
 const APPS_URL = "https://script.google.com/macros/s/AKfycbyF8piBI1h4jSXwDF1mgEYTQP9NS6nLIleXs_eCPQ18cN8FalwkiXwFi9O1lujjRqL9xQ/exec";
-let precosSlider = {Torcedor:149, Jogador:169, Feminina:149, Retro:199};
 
 const ESTOQUE = {
   Torcedor:{cores:["Amarela","Azul","Preta","Verde"],tamanhos:["P","M","G","GG","XGG"],preco:149,custo:65},
@@ -501,6 +500,7 @@ const ESTOQUE = {
 // Contas dinâmicas — carregadas da planilha
 let contasPagar = [];
 let contasReceber = [];
+let precosSlider = {Torcedor:149, Jogador:169, Feminina:149, Retro:199};
 
 let pedidos=[], custos=[], itemN=0, loc="PG", comisionada=false, chipAtual="todos", editando=null;
 
