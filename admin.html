@@ -966,7 +966,6 @@ function renderFin(){
   const fatVendas=pedidos.reduce((s,p)=>s+p.sub,0);
   const comT=pedidos.reduce((s,p)=>s+(p.com||0),0);
   const custoT=custos.reduce((s,c)=>s+c.val,0);
-  const liqReal=pedidos.reduce((s,p)=>s+p.liq,0)-custoT;
   const pendT=pedidos.filter(p=>p.status==="Pendente").reduce((s,p)=>s+p.liq,0);
   const camsT=pedidos.reduce((s,p)=>s+p.itens.reduce((ss,i)=>ss+i.qtd,0),0);
 
@@ -992,6 +991,7 @@ function renderFin(){
   const totalRecebidoExtra=recebidos.reduce((s,c)=>s+c.val,0);
   const totalAReceber=contasRecPend.reduce((s,c)=>s+c.val,0)+pendT;
   const faturamentoTotal=fatVendas+totalRecebidoExtra;
+  const liqReal=pedidos.reduce((s,p)=>s+p.liq,0)+totalRecebidoExtra-custoT;
 
   // ── STATS ──
   document.getElementById("finStats").innerHTML=`
@@ -1138,7 +1138,7 @@ function calcProj(){
   const deficitAtual=Math.max(0,-resultadoAtual);
   const beRest=margemMedia>0?Math.ceil(deficitAtual/margemMedia):"—";
   const receitaTotal=receitaGarantida+totalFatProj;
-  const lucroTotal=resultadoAtual+totalLucroProj;
+  const lucroTotal=totalFatProj+resultadoAtual;
 
   // Resultado total simulado
   const projResult=document.getElementById("projResult");
