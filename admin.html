@@ -5,13 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MRD Sports — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
 <style>
 :root{--verde:#69D473;--amarelo:#FEDD00;--dark:#0D1A0D;--dark2:#111C11;--surface:#1A261A;--surface2:#223022;--border:rgba(105,212,115,.15);--txt:#F0F7F0;--muted:#7A9A7A;--red:#FF4D4D;--orange:#FFB347;--blue:#5B9BD5;--purple:#B57BFF}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Figtree',sans-serif;background:var(--dark);color:var(--txt);min-height:100vh}
-
-/* LOGIN */
 #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 0%,rgba(105,212,115,.12) 0%,transparent 70%)}
 .login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2.5rem;width:100%;max-width:380px;text-align:center}
 .login-logo{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--amarelo);margin-bottom:4px}
@@ -21,8 +18,6 @@ body{font-family:'Figtree',sans-serif;background:var(--dark);color:var(--txt);mi
 .btn-login{width:100%;background:var(--verde);color:var(--dark);border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Figtree',sans-serif;transition:all .18s}
 .btn-login:hover{background:#7de087;transform:translateY(-1px)}
 .login-err{color:var(--red);font-size:13px;margin-top:10px;display:none}
-
-/* APP */
 #app{display:none}
 header{background:var(--dark2);border-bottom:2px solid var(--verde);padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .hdr-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1.5px;color:var(--amarelo)}
@@ -32,12 +27,9 @@ header{background:var(--dark2);border-bottom:2px solid var(--verde);padding:0 1.
 .nav-btn:hover,.nav-btn.active{background:var(--verde);border-color:var(--verde);color:var(--dark)}
 .btn-logout{background:transparent;border:1.5px solid rgba(255,77,77,.3);color:var(--red);padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif}
 .loading-bar{height:3px;background:var(--verde);width:0;position:fixed;top:0;left:0;z-index:9999;transition:width .3s}
-
 .container{max-width:1100px;margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .view{display:none}.view.active{display:block}
 .sec-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--muted);border-left:3px solid var(--verde);padding-left:12px;margin-bottom:1.25rem}
-
-/* STATS */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px;margin-bottom:1.5rem}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1rem;position:relative;overflow:hidden}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--verde)}
@@ -46,8 +38,6 @@ header{background:var(--dark2);border-bottom:2px solid var(--verde);padding:0 1.
 .stat-val{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.5px;line-height:1}
 .stat-sub{font-size:11px;color:var(--muted);margin-top:3px}
 .vd{color:var(--verde)}.am{color:var(--amarelo)}.rd{color:var(--red)}.bl{color:var(--blue)}.or{color:var(--orange)}.pu{color:var(--purple)}
-
-/* FORM */
 .form-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1.25rem}
 .form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:11px}
 .form-group{display:flex;flex-direction:column;gap:5px}
@@ -60,27 +50,21 @@ header{background:var(--dark2);border-bottom:2px solid var(--verde);padding:0 1.
 .toggle-btn:hover{border-color:var(--verde);color:var(--verde)}
 .toggle-btn.active{background:var(--verde);border-color:var(--verde);color:var(--dark)}
 .divider{border:none;border-top:1px solid var(--border);margin:1rem 0}
-
-/* ITEMS */
 .itens-list{display:flex;flex-direction:column;gap:8px;margin-bottom:.75rem}
 .item-row{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 11px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
 .item-row select,.item-row input{background:var(--dark2);border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;color:var(--txt);font-family:'Figtree',sans-serif;outline:none;flex:1;min-width:80px}
 .item-row input[type="number"]{max-width:70px}
 .btn-del{background:rgba(255,77,77,.12);border:1px solid rgba(255,77,77,.2);color:var(--red);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px;flex-shrink:0;transition:all .15s}
 .btn-del:hover{background:rgba(255,77,77,.25)}
-
 .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:'Figtree',sans-serif;transition:all .18s}
 .btn-vd{background:var(--verde);color:var(--dark)}.btn-vd:hover{background:#7de087;transform:translateY(-1px)}
 .btn-ol{background:transparent;border:1.5px solid var(--border);color:var(--muted)}.btn-ol:hover{border-color:var(--verde);color:var(--verde)}
 .btn-rd{background:rgba(255,77,77,.12);border:1.5px solid rgba(255,77,77,.2);color:var(--red)}.btn-rd:hover{background:rgba(255,77,77,.2)}
 .btn-am{background:var(--amarelo);color:var(--dark)}.btn-am:hover{background:#ffe633}
 .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
-
 .resumo-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:.75rem}
 .resumo-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:3px 0;color:var(--muted)}
 .resumo-row.total{font-size:16px;font-weight:800;color:var(--txt);border-top:1px solid var(--border);margin-top:6px;padding-top:6px}
-
-/* PEDIDOS */
 .search-bar{display:flex;gap:8px;margin-bottom:1rem;align-items:center;flex-wrap:wrap}
 .search-bar input{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:8px 13px;font-size:13px;color:var(--txt);font-family:'Figtree',sans-serif;outline:none;flex:1;min-width:160px}
 .search-bar input:focus{border-color:var(--verde)}
@@ -88,7 +72,6 @@ header{background:var(--dark2);border-bottom:2px solid var(--verde);padding:0 1.
 .chip{padding:5px 12px;border-radius:99px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:'Figtree',sans-serif;transition:all .15s}
 .chip:hover{border-color:var(--verde);color:var(--verde)}
 .chip.active{background:var(--verde);border-color:var(--verde);color:var(--dark)}
-
 .pedidos-list{display:flex;flex-direction:column;gap:10px}
 .pedido-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
 .pedido-hdr{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;cursor:pointer}
@@ -114,9 +97,6 @@ table.itb tr:last-child td{border-bottom:none}
 .pedido-actions{display:flex;gap:7px;margin-top:10px}
 .entrega-box{margin-top:10px;background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.9}
 .entrega-box strong{color:var(--txt)}
-
-/* CUSTOS */
-.custo-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 .custo-list{display:flex;flex-direction:column;gap:8px;margin-top:1rem}
 .custo-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .custo-info{flex:1}
@@ -124,8 +104,6 @@ table.itb tr:last-child td{border-bottom:none}
 .custo-meta{font-size:11px;color:var(--muted);margin-top:2px}
 .custo-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red);white-space:nowrap}
 .cat-badge{font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:rgba(255,77,77,.1);color:var(--red);border:1px solid rgba(255,77,77,.2)}
-
-/* FINANCEIRO */
 .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1.5rem}
 .fin-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.1rem}
 .fin-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.85rem}
@@ -134,46 +112,19 @@ table.itb tr:last-child td{border-bottom:none}
 .fin-lbl{color:var(--muted)}
 .fin-val{font-weight:700}
 .fin-val.vd{color:var(--verde)}.fin-val.rd{color:var(--red)}.fin-val.or{color:var(--orange)}.fin-val.am{color:var(--amarelo)}.fin-val.bl{color:var(--blue)}
-
-/* PROJECAO */
 .proj-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem}
 .proj-result{background:var(--surface2);border-radius:12px;padding:1.25rem;margin-top:1.25rem}
 .proj-result-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px}
 .proj-result-row:last-child{border-bottom:none;font-size:17px;font-weight:800;padding-top:12px}
-
-/* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:1rem}
-.modal-overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:0;padding:1.75rem;width:100%;height:100vh;max-height:100vh;overflow-y:auto;animation:slideUp .25s ease}
-.modal-overlay.open{align-items:flex-start}
-@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-.modal-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;margin-bottom:1.25rem}
-.modal-title span{color:var(--verde)}
-.modal-actions{display:flex;gap:8px;margin-top:1.25rem;flex-wrap:wrap}
-
-.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 18px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.4);transform:translateY(100px);opacity:0;transition:all .3s}
-.toast.show{transform:translateY(0);opacity:1}
-.toast.success{border-color:var(--verde)}.toast.error{border-color:var(--red)}
-.empty{text-align:center;padding:3rem;color:var(--muted);font-size:14px}
-
-@media(max-width:640px){
-  header{padding:0 .75rem;height:auto;padding-top:.5rem;padding-bottom:.5rem;flex-wrap:wrap;gap:6px}
-  .container{padding:1rem .9rem 4rem}
-  .fin-grid{grid-template-columns:1fr}
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
-}
-
-  /* TABELA PROJEÇÃO */
+/* TABELA PROJEÇÃO */
 .proj-table-wrap{overflow-x:auto;margin-top:1rem}
-.proj-table{width:100%;border-collapse:collapse;font-size:12px;min-width:600px}
+.proj-table{width:100%;border-collapse:collapse;font-size:12px;min-width:620px}
 .proj-table th{text-align:right;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-bottom:1px solid var(--border);font-weight:700;white-space:nowrap}
 .proj-table th:first-child{text-align:center}
 .proj-table td{padding:7px 10px;border-bottom:1px solid rgba(105,212,115,.06);text-align:right;font-size:12px}
 .proj-table td:first-child{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--amarelo)}
 .proj-table tr:hover td{background:rgba(105,212,115,.04)}
-.proj-table tr.highlight-row td{background:rgba(105,212,115,.08);color:var(--verde);font-weight:700}
-.proj-table .neg{color:var(--red)}.proj-table .pos{color:var(--verde)}.proj-table .neu{color:var(--muted)}
-
+.proj-table .neg{color:var(--red)}.proj-table .pos{color:var(--verde)}
 /* SLIDERS */
 .slider-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:1.25rem}
 .slider-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1rem}
@@ -181,13 +132,29 @@ table.itb tr:last-child td{border-bottom:none}
 .slider-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--verde);margin-bottom:.4rem}
 .slider-card input[type=range]{width:100%;accent-color:var(--verde);margin-bottom:.3rem}
 .slider-info{font-size:11px;color:var(--muted)}
-  
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex;align-items:flex-start}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:0;padding:1.75rem;width:100%;height:100vh;max-height:100vh;overflow-y:auto;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;margin-bottom:1.25rem}
+.modal-title span{color:var(--verde)}
+.modal-actions{display:flex;gap:8px;margin-top:1.25rem;flex-wrap:wrap}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 18px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.4);transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--verde)}.toast.error{border-color:var(--red)}
+.empty{text-align:center;padding:3rem;color:var(--muted);font-size:14px}
+@media(max-width:640px){
+  header{padding:0 .75rem;height:auto;padding-top:.5rem;padding-bottom:.5rem;flex-wrap:wrap;gap:6px}
+  .container{padding:1rem .9rem 4rem}
+  .fin-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .slider-grid{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
 <div class="loading-bar" id="loadingBar"></div>
 
-<!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-logo">MRD Sports</div>
@@ -198,7 +165,6 @@ table.itb tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <header>
     <div class="hdr-logo">MRD <span>Admin</span></div>
@@ -249,8 +215,7 @@ table.itb tr:last-child td{border-bottom:none}
           <div class="form-group"><label>Desconto</label>
             <div style="display:flex;gap:6px">
               <select id="v-desc-tipo" style="max-width:90px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:8px;color:var(--txt);font-family:'Figtree',sans-serif;outline:none" onchange="calcResumo()">
-                <option value="fixo">R$</option>
-                <option value="pct">%</option>
+                <option value="fixo">R$</option><option value="pct">%</option>
               </select>
               <input type="number" id="v-desc" placeholder="0" min="0" step="0.01" oninput="calcResumo()" style="flex:1">
             </div>
@@ -339,12 +304,7 @@ table.itb tr:last-child td{border-bottom:none}
           <div class="form-group"><label>Descrição *</label><input type="text" id="c-desc" placeholder="Ex: Embalagens lote 1"></div>
           <div class="form-group"><label>Categoria</label>
             <select id="c-cat">
-              <option>Custo Camisa</option>
-              <option>Embalagem</option>
-              <option>Transporte</option>
-              <option>Imposto</option>
-              <option>Fornecedor</option>
-              <option>Outros</option>
+              <option>Custo Camisa</option><option>Embalagem</option><option>Transporte</option><option>Imposto</option><option>Fornecedor</option><option>Outros</option>
             </select>
           </div>
           <div class="form-group"><label>Valor (R$) *</label><input type="number" id="c-val" placeholder="0,00" min="0" step="0.01"></div>
@@ -361,8 +321,6 @@ table.itb tr:last-child td{border-bottom:none}
     <!-- CONTAS -->
     <div class="view" id="view-contas">
       <div class="sec-title">Contas</div>
-
-      <!-- A PAGAR -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:1.5rem">
         <div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red);border-left:3px solid var(--red);padding-left:10px;margin-bottom:1rem">A Pagar</div>
@@ -371,17 +329,13 @@ table.itb tr:last-child td{border-bottom:none}
               <div class="form-group"><label>Descrição</label><input id="cp-desc" placeholder="Ex: Fornecedor X"></div>
               <div class="form-group"><label>Valor (R$)</label><input type="number" id="cp-val" placeholder="0,00" min="0" step="0.01"></div>
               <div class="form-group"><label>Categoria</label>
-                <select id="cp-cat">
-                  <option>Fornecedor</option><option>Custo Camisa</option><option>Embalagem</option><option>Imposto</option><option>Outros</option>
-                </select>
+                <select id="cp-cat"><option>Fornecedor</option><option>Custo Camisa</option><option>Embalagem</option><option>Imposto</option><option>Outros</option></select>
               </div>
             </div>
             <button class="btn btn-rd" onclick="addContaPagar()" style="margin-top:.75rem">+ Adicionar</button>
           </div>
           <div id="listContasPagar"><div class="empty">Nenhuma conta a pagar.</div></div>
         </div>
-
-        <!-- A RECEBER -->
         <div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--verde);border-left:3px solid var(--verde);padding-left:10px;margin-bottom:1rem">A Receber</div>
           <div class="form-card" style="margin-bottom:.75rem">
@@ -418,54 +372,44 @@ table.itb tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- PROJECAO -->
-<div class="view" id="view-proj">
-  <div class="sec-title">Projeção de Resultados</div>
-
-  <!-- CARDS DE RESUMO -->
-  <div class="stats-grid" id="projResumoCards" style="margin-bottom:1.5rem"></div>
-
-  <!-- SLIDERS + CARDS POR MODELO -->
-  <div class="proj-box">
-    <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">Preço de venda por modelo</div>
-    <div class="slider-grid" id="slidersGrid"></div>
-
-    <div style="margin-top:.5rem;margin-bottom:1.25rem">
-      <div class="form-group" style="max-width:260px">
-        <label>% Vendas Comissionadas</label>
-        <input type="number" id="p-compctvendas" value="30" min="0" max="100" step="1" oninput="calcProj()"
-          style="background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:9px 11px;font-size:13px;color:var(--txt);font-family:'Figtree',sans-serif;outline:none">
+    <!-- PROJEÇÃO -->
+    <div class="view" id="view-proj">
+      <div class="sec-title">Projeção de Resultados</div>
+      <div class="stats-grid" id="projResumoCards" style="margin-bottom:1.5rem"></div>
+      <div class="proj-box">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">Preço de venda por modelo</div>
+        <div class="slider-grid" id="slidersGrid"></div>
+        <div style="margin-top:.5rem;margin-bottom:1.25rem">
+          <div class="form-group" style="max-width:260px">
+            <label>% Vendas Comissionadas</label>
+            <input type="number" id="p-compctvendas" value="30" min="0" max="100" step="1" oninput="calcProj()">
+          </div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem">Projeção por modelo</div>
+        <div id="projCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:1.5rem"></div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem">Resultado total simulado</div>
+        <div class="proj-result" id="projResult"></div>
+      </div>
+      <div class="proj-box">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem">Tabela de cenários — R$100 a R$250</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:1rem">Cada linha simula vender todo o estoque restante ao preço indicado, mantendo o % de comissão configurado acima</div>
+        <div class="proj-table-wrap">
+          <table class="proj-table">
+            <thead>
+              <tr>
+                <th>Preço</th>
+                <th>Receita Total</th>
+                <th>Lucro Máx.</th>
+                <th>Break-even Total</th>
+                <th>Break-even Rest.</th>
+                <th>Margem %</th>
+              </tr>
+            </thead>
+            <tbody id="projTableBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
-
-    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem">Projeção por modelo</div>
-    <div id="projCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:1.5rem"></div>
-
-    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem">Resultado total simulado</div>
-    <div class="proj-result" id="projResult"></div>
-  </div>
-
-  <!-- TABELA DE CENÁRIOS -->
-  <div class="proj-box">
-    <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem">Tabela de cenários — R$100 a R$250</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:1rem">Cada linha simula vender todo o estoque restante ao preço indicado</div>
-    <div class="proj-table-wrap">
-      <table class="proj-table" id="projTable">
-        <thead>
-          <tr>
-            <th>Preço</th>
-            <th>Receita Total</th>
-            <th>Lucro Máx.</th>
-            <th>Break-even Total</th>
-            <th>Break-even Rest.</th>
-            <th>Margem %</th>
-          </tr>
-        </thead>
-        <tbody id="projTableBody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
 
   </div>
 </div>
@@ -476,7 +420,7 @@ table.itb tr:last-child td{border-bottom:none}
     <div class="modal-title">✏️ Editar <span>Pedido</span></div>
     <div id="editFormContent"></div>
     <div class="modal-actions">
-      <button class="btn btn-vd" id="btnSalvarEdit" onclick="salvarEdicao()">💾 Salvar</button>
+      <button class="btn btn-vd" onclick="salvarEdicao()">💾 Salvar</button>
       <button class="btn btn-ol" onclick="closeModal('modalEdit')">Cancelar</button>
     </div>
   </div>
@@ -485,25 +429,25 @@ table.itb tr:last-child td{border-bottom:none}
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════
-const SENHA = "MRD@123";
-const COM_PCT = 0.10;
-const APPS_URL = "https://script.google.com/macros/s/AKfycbyF8piBI1h4jSXwDF1mgEYTQP9NS6nLIleXs_eCPQ18cN8FalwkiXwFi9O1lujjRqL9xQ/exec";
+const SENHA="MRD@123";
+const COM_PCT=0.10;
+const APPS_URL="https://script.google.com/macros/s/AKfycbyF8piBI1h4jSXwDF1mgEYTQP9NS6nLIleXs_eCPQ18cN8FalwkiXwFi9O1lujjRqL9xQ/exec";
 
-const ESTOQUE = {
+const ESTOQUE={
   Torcedor:{cores:["Amarela","Azul","Preta","Verde"],tamanhos:["P","M","G","GG","XGG"],preco:149,custo:65},
   Jogador: {cores:["Amarela","Azul"],tamanhos:["P","M","G","GG"],preco:169,custo:67},
   Feminina:{cores:["Amarela","Azul"],tamanhos:["P","M","G","GG"],preco:149,custo:65},
   Retro:   {cores:["94","98","2002"],tamanhos:["M","G","GG"],preco:199,custo:65},
 };
+const CUSTO_MODELO={Torcedor:65,Jogador:67,Feminina:65,Retro:65};
+const CORES_MODELO={Torcedor:"var(--verde)",Jogador:"var(--blue)",Feminina:"var(--orange)",Retro:"var(--purple)"};
 
-// Contas dinâmicas — carregadas da planilha
-let contasPagar = [];
-let contasReceber = [];
-let precosSlider = {Torcedor:149, Jogador:169, Feminina:149, Retro:199};
+let precosSlider={Torcedor:149,Jogador:169,Feminina:149,Retro:199};
+let contasPagar=[],contasReceber=[];
+let pedidos=[],custos=[],itemN=0,loc="PG",comisionada=false,chipAtual2="todos",editando=null;
+let estoquePorModelo={Torcedor:0,Jogador:0,Feminina:0,Retro:0};
 
-let pedidos=[], custos=[], itemN=0, loc="PG", comisionada=false, chipAtual="todos", editando=null;
-
+const fmt=v=>"R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
 
 // ── AUTH ──
 function tryLogin(){
@@ -530,11 +474,10 @@ function showView(id,btn){
   if(id==="pedidos") renderPedidos();
   if(id==="fin") renderFin();
   if(id==="custos") renderCustos();
-  if(id==="contas"){carregarContas();}
-  if(id==="proj"){carregarEstoque().then(()=>{buildSliders();calcProj();});}
+  if(id==="contas") carregarContas();
+  if(id==="proj") carregarEstoque().then(()=>{buildSliders();calcProj();});
 }
 
-// ── LOADING ──
 function setLoading(on){
   const bar=document.getElementById("loadingBar");
   bar.style.width=on?"60%":"100%";
@@ -542,68 +485,45 @@ function setLoading(on){
 }
 
 // ── API ──
-async function api(action, data={}){
-  try {
-    const body = {action, ...data};
-    const json = JSON.stringify(body);
-    console.log("API →", action, json.substring(0, 200));
-    // Codifica corretamente UTF-8 com acentos
-    const bytes = new TextEncoder().encode(json);
-    let binary = "";
-    bytes.forEach(b => binary += String.fromCharCode(b));
-    const payload = btoa(binary);
-    const url = APPS_URL + "?method=post&payload=" + encodeURIComponent(payload);
-    console.log("URL length:", url.length);
-    const r = await fetch(url, {mode:"cors"});
-    const result = await r.json();
-    console.log("API ←", JSON.stringify(result));
-    return result;
-  } catch(e) {
-    console.error("API error:", e.message, e);
-    return {ok: false, error: e.message};
-  }
-}
-
-async function apiGet(action){
+async function api(action,data={}){
   try{
-    const r = await fetch(APPS_URL + "?action=" + action);
+    const json=JSON.stringify({action,...data});
+    const bytes=new TextEncoder().encode(json);
+    let binary="";
+    bytes.forEach(b=>binary+=String.fromCharCode(b));
+    const payload=btoa(binary);
+    const r=await fetch(APPS_URL+"?method=post&payload="+encodeURIComponent(payload),{mode:"cors"});
     return await r.json();
-  } catch(e) {
-    console.warn("apiGet error:", e);
-    return null;
-  }
+  }catch(e){return{ok:false,error:e.message};}
+}
+async function apiGet(action){
+  try{return await(await fetch(APPS_URL+"?action="+action)).json();}
+  catch(e){return null;}
 }
 
 // ── CARREGAR DADOS ──
 async function carregarPedidos(){
   setLoading(true);
   const res=await apiGet("readVendas");
-  if(res&&res.rows&&res.rows.length>1){
-    const rows=res.rows.slice(1); // pula header
-    // Agrupa por número de pedido (col 27 = índice 26)
+  if(res?.rows?.length>1){
     const map={};
-    rows.forEach(r=>{
+    res.rows.slice(1).forEach(r=>{
       const num=String(r[26]||"");
       if(!num) return;
       if(!map[num]) map[num]={
-        numeroPedido:num, data:r[0], hora:r[1], nome:r[2], tel:r[3],
-        pagamento:r[10], status:r[11], loc:r[12],
-        comisionada:r[13]==="Sim", comisionado:r[14],
-        frete:parseFloat(r[16])||0, emb:parseFloat(r[17])||0,
-        tipo:r[24], lote:r[25],
-        itens:[]
+        numeroPedido:num,data:r[0],hora:r[1],nome:r[2],tel:r[3],
+        pagamento:r[10],status:r[11],loc:r[12],
+        comisionada:r[13]==="Sim",comisionado:r[14],
+        frete:parseFloat(r[16])||0,emb:parseFloat(r[17])||0,
+        tipo:r[24],lote:r[25],itens:[]
       };
-      map[num].itens.push({
-        modelo:r[4],cor:r[5],tamanho:r[6],
-        qtd:parseInt(r[7])||1,preco:parseFloat(r[8])||0
-      });
+      map[num].itens.push({modelo:r[4],cor:r[5],tamanho:r[6],qtd:parseInt(r[7])||1,preco:parseFloat(r[8])||0});
     });
-    // Recalcula valores
     pedidos=Object.values(map).map(p=>{
       const sub=p.itens.reduce((s,i)=>s+i.preco*i.qtd,0);
       const com=p.comisionada?sub*COM_PCT:0;
       const custosFrete=p.frete+p.emb;
-      return {...p,sub,com,custos:custosFrete,liq:sub-com-custosFrete};
+      return{...p,sub,com,custos:custosFrete,liq:sub-com-custosFrete};
     }).sort((a,b)=>parseInt(b.numeroPedido)-parseInt(a.numeroPedido));
   }
   setLoading(false);
@@ -614,11 +534,8 @@ async function carregarPedidos(){
 async function carregarCustos(){
   setLoading(true);
   const res=await apiGet("readCustos");
-  if(res&&res.rows&&res.rows.length>1){
-    custos=res.rows.slice(1).map((r,i)=>({
-      id:r[0]||i, data:r[0], desc:r[1], cat:r[2], val:parseFloat(r[3])||0
-    })).filter(c=>c.desc);
-  }
+  if(res?.rows?.length>1)
+    custos=res.rows.slice(1).map((r,i)=>({id:r[0]||i,data:r[0],desc:r[1],cat:r[2],val:parseFloat(r[3])||0})).filter(c=>c.desc);
   setLoading(false);
   renderCustos();
 }
@@ -627,23 +544,32 @@ async function carregarTudo(){
   await Promise.all([carregarPedidos(),carregarCustos(),carregarEstoque()]);
 }
 
-// Estoque por modelo para projeção
-let estoquePorModelo = {Torcedor:0, Jogador:0, Feminina:0, Retro:0};
-
 async function carregarEstoque(){
-  const res = await apiGet("readVendas");
-  // Lê da aba Camisas Restante via sheets
-  const res2 = await apiGet("readCamisas");
-  if(res2?.rows?.length>1){
-    const rows = res2.rows.slice(1);
-    const map = {Torcedor:0, Jogador:0, Feminina:0, Retro:0};
-    rows.forEach(r=>{
-      const modelo = String(r[1]||"");
-      const sobram = parseInt(r[5])||0;
-      if(map[modelo]!==undefined) map[modelo]+=sobram;
+  const res=await apiGet("readCamisas");
+  if(res?.rows?.length>1){
+    const map={Torcedor:0,Jogador:0,Feminina:0,Retro:0};
+    res.rows.slice(1).forEach(r=>{
+      const m=String(r[1]||"");
+      if(map[m]!==undefined) map[m]+=parseInt(r[5])||0;
     });
-    estoquePorModelo = map;
+    estoquePorModelo=map;
   }
+}
+
+async function carregarContas(){
+  setLoading(true);
+  const resPagar=await apiGet("readContasPagar");
+  const resReceber=await apiGet("readContasReceber");
+  if(resPagar?.rows?.length>1)
+    contasPagar=resPagar.rows.slice(1)
+      .map(r=>({id:String(r[0]),desc:r[1],val:parseFloat(r[2])||0,cat:r[3],status:r[4]||"Pendente"}))
+      .filter(r=>r.desc);
+  if(resReceber?.rows?.length>1)
+    contasReceber=resReceber.rows.slice(1)
+      .map(r=>({id:String(r[0]),desc:r[1],val:parseFloat(r[2])||0,status:r[3]||"Pendente",dataRecebido:r[4]||""}))
+      .filter(r=>r.desc);
+  setLoading(false);
+  renderContas();
 }
 
 // ── TOGGLES ──
@@ -669,18 +595,15 @@ function setCom(v,btn){
   calcResumo();
 }
 function toggleCartao(){
-  const isPix=document.getElementById("v-pag").value==="Cartão";
-  document.getElementById("taxaCartaoGroup").style.display=isPix?"block":"none";
+  document.getElementById("taxaCartaoGroup").style.display=document.getElementById("v-pag").value==="Cartão"?"block":"none";
   calcResumo();
 }
 
-// ── CEP ──
 async function buscaCEP(cep){
   const c=cep.replace(/\D/g,"");
   if(c.length!==8) return;
   try{
-    const r=await fetch("https://viacep.com.br/ws/"+c+"/json/");
-    const d=await r.json();
+    const d=await(await fetch("https://viacep.com.br/ws/"+c+"/json/")).json();
     if(!d.erro){
       document.getElementById("v-rua").value=d.logradouro||"";
       document.getElementById("v-bairro").value=d.bairro||"";
@@ -694,8 +617,8 @@ function addItem(item=null){
   itemN++;
   const n=itemN;
   const div=document.createElement("div");
-  div.className="item-row"; div.id="item-"+n;
-  const modOpts=Object.keys(ESTOQUE).map(m=>`<option${item&&item.modelo===m?" selected":""}>${m}</option>`).join("");
+  div.className="item-row";div.id="item-"+n;
+  const modOpts=Object.keys(ESTOQUE).map(m=>`<option${item?.modelo===m?" selected":""}>${m}</option>`).join("");
   div.innerHTML=`
     <select onchange="updCores(${n})" id="im-${n}">${modOpts}</select>
     <select id="ic-${n}" onchange="calcResumo()"></select>
@@ -704,7 +627,7 @@ function addItem(item=null){
     <input type="number" id="ip-${n}" placeholder="Preço" min="0" step="0.01" style="max-width:80px" oninput="calcResumo()">
     <button class="btn-del" onclick="delItem(${n})">✕</button>`;
   document.getElementById("itensList").appendChild(div);
-  updCores(n, item?.cor, item?.tamanho);
+  updCores(n,item?.cor,item?.tamanho);
   if(item) setTimeout(()=>{document.getElementById("ip-"+n).value=item.preco;calcResumo();},50);
 }
 function updCores(n,selCor=null,selTam=null){
@@ -727,32 +650,28 @@ function getItens(){
   return itens;
 }
 
-const fmt=v=>"R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
-
 function calcResumo(){
   const itens=getItens();
   const sub=itens.reduce((s,i)=>s+i.preco*i.qtd,0);
   const descTipo=document.getElementById("v-desc-tipo")?.value||"fixo";
   const descVal=parseFloat(document.getElementById("v-desc")?.value)||0;
   const desc=descTipo==="pct"?sub*(descVal/100):descVal;
-  const subComDesc=sub-desc;
+  const subD=sub-desc;
   const taxaPct=parseFloat(document.getElementById("v-taxa")?.value)||0;
-  const taxa=document.getElementById("v-pag")?.value==="Cartão"?subComDesc*(taxaPct/100):0;
+  const taxa=document.getElementById("v-pag")?.value==="Cartão"?subD*(taxaPct/100):0;
   const frete=parseFloat(document.getElementById("v-frete")?.value)||0;
   const emb=parseFloat(document.getElementById("v-emb")?.value)||0;
-  const custosFrete=frete+emb;
-  const com=comisionada?subComDesc*COM_PCT:0;
-  const liq=subComDesc-taxa-com-custosFrete;
-
+  const com=comisionada?subD*COM_PCT:0;
+  const liq=subD-taxa-com-(frete+emb);
   document.getElementById("r-sub").textContent=fmt(sub);
-  const rd=document.getElementById("r-desc-row"); rd.style.display=desc>0?"flex":"none";
+  document.getElementById("r-desc-row").style.display=desc>0?"flex":"none";
   document.getElementById("r-desc").textContent="— "+fmt(desc);
-  const rt=document.getElementById("r-taxa-row"); rt.style.display=taxa>0?"flex":"none";
+  document.getElementById("r-taxa-row").style.display=taxa>0?"flex":"none";
   document.getElementById("r-taxa").textContent="— "+fmt(taxa);
-  const rc=document.getElementById("r-com-row"); rc.style.display=comisionada?"flex":"none";
+  document.getElementById("r-com-row").style.display=comisionada?"flex":"none";
   document.getElementById("r-com").textContent="— "+fmt(com);
-  const rf=document.getElementById("r-frete-row"); rf.style.display=custosFrete>0?"flex":"none";
-  document.getElementById("r-frete").textContent="— "+fmt(custosFrete);
+  document.getElementById("r-frete-row").style.display=(frete+emb)>0?"flex":"none";
+  document.getElementById("r-frete").textContent="— "+fmt(frete+emb);
   document.getElementById("r-liq").textContent=fmt(liq);
 }
 
@@ -769,31 +688,20 @@ async function confirmar(){
   const itens=getItens();
   if(!itens.length){toast("⚠ Adicione um item","error");return;}
   if(comisionada&&!document.getElementById("v-com").value){toast("⚠ Selecione o comissionado","error");return;}
-
   const nums=pedidos.map(p=>parseInt(p.numeroPedido)||0);
-  const numPedido=nums.length?Math.max(...nums)+1:1;
-  const numStr=String(numPedido).padStart(3,"0");
-
+  const numStr=String(nums.length?Math.max(...nums)+1:1).padStart(3,"0");
   const sub=itens.reduce((s,i)=>s+i.preco*i.qtd,0);
   const descTipo=document.getElementById("v-desc-tipo").value;
   const descVal=parseFloat(document.getElementById("v-desc").value)||0;
   const desc=descTipo==="pct"?sub*(descVal/100):descVal;
-  const subComDesc=sub-desc;
+  const subD=sub-desc;
   const taxaPct=parseFloat(document.getElementById("v-taxa")?.value)||0;
-  const taxa=document.getElementById("v-pag").value==="Cartão"?subComDesc*(taxaPct/100):0;
+  const taxa=document.getElementById("v-pag").value==="Cartão"?subD*(taxaPct/100):0;
   const frete=parseFloat(document.getElementById("v-frete")?.value)||0;
   const emb=parseFloat(document.getElementById("v-emb")?.value)||0;
-  const com=comisionada?subComDesc*COM_PCT:0;
-  const liq=subComDesc-taxa-com-frete-emb;
-
-  const entrega=loc==="Fora"?{
-    cpf:document.getElementById("v-cpf").value.trim(),
-    cep:document.getElementById("v-cep").value.trim(),
-    rua:document.getElementById("v-rua").value.trim(),
-    bairro:document.getElementById("v-bairro").value.trim(),
-    cidade:document.getElementById("v-cidade").value.trim()
-  }:null;
-
+  const com=comisionada?subD*COM_PCT:0;
+  const liq=subD-taxa-com-frete-emb;
+  const entrega=loc==="Fora"?{cpf:document.getElementById("v-cpf").value.trim(),cep:document.getElementById("v-cep").value.trim(),rua:document.getElementById("v-rua").value.trim(),bairro:document.getElementById("v-bairro").value.trim(),cidade:document.getElementById("v-cidade").value.trim()}:null;
   const data=new Date().toLocaleDateString("pt-BR");
   const hora=new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
   const pagamento=document.getElementById("v-pag").value;
@@ -802,34 +710,18 @@ async function confirmar(){
   const tipo=document.getElementById("v-tipo").value;
   const lote=document.getElementById("v-lote").value;
   const tel=document.getElementById("v-tel").value.trim();
-
-  const rows=itens.map(item=>[
-    data,hora,nome,tel,
-    item.modelo,item.cor,item.tamanho,item.qtd,item.preco,item.preco*item.qtd,
-    pagamento,status,loc,
-    comisionada?"Sim":"Não",comisionado||"",
-    comisionada?parseFloat((item.preco*item.qtd*COM_PCT).toFixed(2)):0,
-    frete,emb,parseFloat(liq.toFixed(2)),
-    entrega?entrega.cpf:"",entrega?entrega.cep:"",entrega?entrega.rua:"",entrega?entrega.bairro:"",entrega?entrega.cidade:"",
-    tipo,lote,numStr
-  ]);
-
+  const rows=itens.map(item=>[data,hora,nome,tel,item.modelo,item.cor,item.tamanho,item.qtd,item.preco,item.preco*item.qtd,pagamento,status,loc,comisionada?"Sim":"Não",comisionado||"",comisionada?parseFloat((item.preco*item.qtd*COM_PCT).toFixed(2)):0,frete,emb,parseFloat(liq.toFixed(2)),entrega?entrega.cpf:"",entrega?entrega.cep:"",entrega?entrega.rua:"",entrega?entrega.bairro:"",entrega?entrega.cidade:"",tipo,lote,numStr]);
   const btn=document.getElementById("btnConf");
-  btn.disabled=true; btn.textContent="Salvando…";
-
+  btn.disabled=true;btn.textContent="Salvando…";
   try{
-    await api("addVenda", {rows});
-    // Adiciona localmente
+    await api("addVenda",{rows});
     pedidos.unshift({numeroPedido:numStr,data,hora,nome,tel,pagamento,status,loc,comisionada,comisionado,frete,emb,tipo,lote,itens,sub,com,custos:frete+emb,liq});
     toast("✅ Pedido #"+numStr+" salvo!","success");
     resetForm();
-  }catch(e){
-    toast("⚠ Erro ao salvar","error");
-  }
-  btn.disabled=false; btn.textContent="✅ Confirmar Venda";
+  }catch(e){toast("⚠ Erro ao salvar","error");}
+  btn.disabled=false;btn.textContent="✅ Confirmar Venda";
 }
 
-// ── RESET ──
 function resetForm(){
   ["v-nome","v-tel","v-cpf","v-cep","v-rua","v-bairro","v-cidade","v-frete","v-emb","v-taxa","v-desc"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
   document.getElementById("v-com").value="";
@@ -837,27 +729,24 @@ function resetForm(){
   document.getElementById("v-tipo").value="Pré-Venda";
   document.getElementById("v-lote").value="1";
   document.getElementById("itensList").innerHTML="";
-  itemN=0; loc="PG"; comisionada=false;
+  itemN=0;loc="PG";comisionada=false;
   document.getElementById("entregaFields").style.display="none";
   document.getElementById("comFields").style.display="none";
   document.getElementById("taxaCartaoGroup").style.display="none";
   document.querySelectorAll(".toggle-row").forEach(row=>{
     row.querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
-    const first=row.querySelector(".toggle-btn");
-    if(first) first.classList.add("active");
+    const first=row.querySelector(".toggle-btn");if(first)first.classList.add("active");
   });
-  atualizaProxNum();
-  addItem(); calcResumo();
+  atualizaProxNum();addItem();calcResumo();
 }
 
 // ── PEDIDOS ──
-let chipAtual2="todos";
 function setChip(f,btn){chipAtual2=f;document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));btn.classList.add("active");renderPedidos();}
 
 function renderPedidos(){
   const q=(document.getElementById("searchQ")?.value||"").toLowerCase();
   const lista=document.getElementById("pedidosList");
-  let filtered=pedidos.filter(p=>{
+  const filtered=pedidos.filter(p=>{
     const ms=!q||p.nome.toLowerCase().includes(q)||p.numeroPedido.includes(q);
     const mc=chipAtual2==="todos"||p.status===chipAtual2||p.loc===chipAtual2;
     return ms&&mc;
@@ -886,7 +775,6 @@ function renderPedidos(){
         </table>
         ${p.comisionada?`<div style="font-size:12px;color:var(--orange);margin-top:8px">🤝 Comissão ${p.comisionado}: ${fmt(p.com)}</div>`:""}
         ${p.custos>0?`<div style="font-size:12px;color:var(--muted);margin-top:4px">📦 Frete+Emb: ${fmt(p.custos)}</div>`:""}
-        ${p.entrega?`<div class="entrega-box">🚚 <strong>Entrega:</strong> ${p.entrega.rua}, ${p.entrega.bairro} — ${p.entrega.cidade} · CEP ${p.entrega.cep} · CPF ${p.entrega.cpf}</div>`:""}
         <div class="pedido-actions">
           <button class="btn btn-ol" onclick="editarPedido('${p.numeroPedido}')" style="font-size:12px;padding:6px 12px">✏️ Editar</button>
           <button class="btn btn-rd" onclick="deletarPedido('${p.numeroPedido}')" style="font-size:12px;padding:6px 12px">🗑️ Deletar</button>
@@ -896,11 +784,10 @@ function renderPedidos(){
 }
 function togPed(id){document.getElementById("pb-"+id)?.classList.toggle("open");}
 
-// ── DELETAR ──
 async function deletarPedido(num){
-  if(!confirm("Deletar pedido #"+num+"? Isso também remove da planilha.")) return;
+  if(!confirm("Deletar pedido #"+num+"?")) return;
   setLoading(true);
-  await api("deleteVenda", {numeroPedido: num});
+  await api("deleteVenda",{numeroPedido:num});
   pedidos=pedidos.filter(p=>p.numeroPedido!==num);
   setLoading(false);
   toast("🗑️ Pedido #"+num+" deletado","");
@@ -914,32 +801,6 @@ function editarPedido(num){
   editando=p;
   document.getElementById("modalEdit").classList.add("open");
   const content=document.getElementById("editFormContent");
-
-  const entregaHtml = `
-    <div id="e-entregaFields" style="display:${p.loc==="Fora"?"block":"none"}">
-      <div class="form-grid" style="margin-bottom:.9rem;margin-top:.75rem">
-        <div class="form-group"><label>CPF</label><input id="e-cpf" value="${p.entrega?.cpf||""}"></div>
-        <div class="form-group"><label>CEP</label><input id="e-cep" value="${p.entrega?.cep||""}"></div>
-        <div class="form-group"><label>Rua / Número</label><input id="e-rua" value="${p.entrega?.rua||""}"></div>
-        <div class="form-group"><label>Bairro</label><input id="e-bairro" value="${p.entrega?.bairro||""}"></div>
-        <div class="form-group"><label>Cidade</label><input id="e-cidade" value="${p.entrega?.cidade||""}"></div>
-        <div class="form-group"><label>Frete (R$)</label><input type="number" id="e-frete" value="${p.frete||0}"></div>
-        <div class="form-group"><label>Embalagem (R$)</label><input type="number" id="e-emb" value="${p.emb||0}"></div>
-      </div>
-    </div>`;
-
-  const comHtml = `
-    <div id="e-comFields" style="display:${p.comisionada?"block":"none"};margin-bottom:.9rem">
-      <div class="form-group"><label>Comissionado</label>
-        <div class="toggle-row">
-          <button class="toggle-btn${p.comisionado==="Maria"?" active":""}" onclick="eTog('e-com','Maria',this)">Maria</button>
-          <button class="toggle-btn${p.comisionado==="Zuken"?" active":""}" onclick="eTog('e-com','Zuken',this)">Zuken</button>
-          <button class="toggle-btn${p.comisionado==="Helton"?" active":""}" onclick="eTog('e-com','Helton',this)">Helton</button>
-        </div>
-        <input type="hidden" id="e-com" value="${p.comisionado||""}">
-      </div>
-    </div>`;
-
   content.innerHTML=`
     <div class="form-grid" style="margin-bottom:.9rem">
       <div class="form-group"><label>Nome</label><input id="e-nome" value="${p.nome}"></div>
@@ -973,7 +834,17 @@ function editarPedido(num){
       </div>
       <input type="hidden" id="e-loc" value="${p.loc||"PG"}">
     </div>
-    ${entregaHtml}
+    <div id="e-entregaFields" style="display:${p.loc==="Fora"?"block":"none"}">
+      <div class="form-grid" style="margin-bottom:.9rem;margin-top:.75rem">
+        <div class="form-group"><label>CPF</label><input id="e-cpf" value="${p.entrega?.cpf||""}"></div>
+        <div class="form-group"><label>CEP</label><input id="e-cep" value="${p.entrega?.cep||""}"></div>
+        <div class="form-group"><label>Rua / Número</label><input id="e-rua" value="${p.entrega?.rua||""}"></div>
+        <div class="form-group"><label>Bairro</label><input id="e-bairro" value="${p.entrega?.bairro||""}"></div>
+        <div class="form-group"><label>Cidade</label><input id="e-cidade" value="${p.entrega?.cidade||""}"></div>
+        <div class="form-group"><label>Frete (R$)</label><input type="number" id="e-frete" value="${p.frete||0}"></div>
+        <div class="form-group"><label>Embalagem (R$)</label><input type="number" id="e-emb" value="${p.emb||0}"></div>
+      </div>
+    </div>
     <hr class="divider">
     <div class="form-group" style="margin-bottom:.9rem"><label>Comissionada?</label>
       <div class="toggle-row">
@@ -981,7 +852,16 @@ function editarPedido(num){
         <button class="toggle-btn${p.comisionada?" active":""}" onclick="eSetCom(true,this)">Sim</button>
       </div>
     </div>
-    ${comHtml}
+    <div id="e-comFields" style="display:${p.comisionada?"block":"none"};margin-bottom:.9rem">
+      <div class="form-group"><label>Comissionado</label>
+        <div class="toggle-row">
+          <button class="toggle-btn${p.comisionado==="Maria"?" active":""}" onclick="eTog('e-com','Maria',this)">Maria</button>
+          <button class="toggle-btn${p.comisionado==="Zuken"?" active":""}" onclick="eTog('e-com','Zuken',this)">Zuken</button>
+          <button class="toggle-btn${p.comisionado==="Helton"?" active":""}" onclick="eTog('e-com','Helton',this)">Helton</button>
+        </div>
+        <input type="hidden" id="e-com" value="${p.comisionado||""}">
+      </div>
+    </div>
     <hr class="divider">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
       <label style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Itens</label>
@@ -993,57 +873,26 @@ function editarPedido(num){
           <select id="eim-${i}" onchange="eUpdCores(${i},'${item.cor}','${item.tamanho}')">
             ${Object.keys(ESTOQUE).map(m=>`<option${m===item.modelo?" selected":""}>${m}</option>`).join("")}
           </select>
-          <select id="eic-${i}">
-            ${ESTOQUE[item.modelo].cores.map(c=>`<option${c===item.cor?" selected":""}>${c}</option>`).join("")}
-          </select>
-          <select id="eit-${i}">
-            ${ESTOQUE[item.modelo].tamanhos.map(t=>`<option${t===item.tamanho?" selected":""}>${t}</option>`).join("")}
-          </select>
+          <select id="eic-${i}">${ESTOQUE[item.modelo].cores.map(c=>`<option${c===item.cor?" selected":""}>${c}</option>`).join("")}</select>
+          <select id="eit-${i}">${ESTOQUE[item.modelo].tamanhos.map(t=>`<option${t===item.tamanho?" selected":""}>${t}</option>`).join("")}</select>
           <input type="number" id="eiq-${i}" value="${item.qtd}" min="1" style="max-width:60px">
           <input type="number" id="eip-${i}" value="${item.preco}" style="max-width:80px">
           <button class="btn-del" onclick="document.getElementById('eitem-${i}').remove()">✕</button>
         </div>`).join("")}
     </div>`;
 }
-
-function eTog(id,val,btn){
-  document.getElementById(id).value=val;
-  btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-}
-function eSetLoc(l,btn){
-  document.getElementById("e-loc").value=l;
-  btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  document.getElementById("e-entregaFields").style.display=l==="Fora"?"block":"none";
-}
-function eSetCom(v,btn){
-  btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  document.getElementById("e-comFields").style.display=v?"block":"none";
-  if(!v&&document.getElementById("e-com")) document.getElementById("e-com").value="";
-}
-function eUpdCores(i,selCor,selTam){
-  const m=document.getElementById("eim-"+i).value;
-  document.getElementById("eic-"+i).innerHTML=ESTOQUE[m].cores.map(c=>`<option${c===selCor?" selected":""}>${c}</option>`).join("");
-  document.getElementById("eit-"+i).innerHTML=ESTOQUE[m].tamanhos.map(t=>`<option${t===selTam?" selected":""}>${t}</option>`).join("");
-}
+function eTog(id,val,btn){document.getElementById(id).value=val;btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");}
+function eSetLoc(l,btn){document.getElementById("e-loc").value=l;btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");document.getElementById("e-entregaFields").style.display=l==="Fora"?"block":"none";}
+function eSetCom(v,btn){btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");document.getElementById("e-comFields").style.display=v?"block":"none";if(!v&&document.getElementById("e-com"))document.getElementById("e-com").value="";}
+function eUpdCores(i,selCor,selTam){const m=document.getElementById("eim-"+i).value;document.getElementById("eic-"+i).innerHTML=ESTOQUE[m].cores.map(c=>`<option${c===selCor?" selected":""}>${c}</option>`).join("");document.getElementById("eit-"+i).innerHTML=ESTOQUE[m].tamanhos.map(t=>`<option${t===selTam?" selected":""}>${t}</option>`).join("");}
 let editItemN=100;
 function addEditItem(){
-  editItemN++;
-  const n=editItemN;
-  const div=document.createElement("div");
-  div.className="item-row"; div.id="eitem-"+n;
-  div.innerHTML=`
-    <select id="eim-${n}" onchange="eUpdCores(${n},null,null)">${Object.keys(ESTOQUE).map(m=>`<option>${m}</option>`).join("")}</select>
-    <select id="eic-${n}"></select><select id="eit-${n}"></select>
-    <input type="number" id="eiq-${n}" value="1" min="1" style="max-width:60px">
-    <input type="number" id="eip-${n}" style="max-width:80px">
-    <button class="btn-del" onclick="document.getElementById('eitem-${n}').remove()">✕</button>`;
+  editItemN++;const n=editItemN;
+  const div=document.createElement("div");div.className="item-row";div.id="eitem-"+n;
+  div.innerHTML=`<select id="eim-${n}" onchange="eUpdCores(${n},null,null)">${Object.keys(ESTOQUE).map(m=>`<option>${m}</option>`).join("")}</select><select id="eic-${n}"></select><select id="eit-${n}"></select><input type="number" id="eiq-${n}" value="1" min="1" style="max-width:60px"><input type="number" id="eip-${n}" style="max-width:80px"><button class="btn-del" onclick="document.getElementById('eitem-${n}').remove()">✕</button>`;
   document.getElementById("editItensList").appendChild(div);
   eUpdCores(n,null,null);
-  const m=document.getElementById("eim-"+n).value;
-  document.getElementById("eip-"+n).value=ESTOQUE[m].preco;
+  document.getElementById("eip-"+n).value=ESTOQUE[document.getElementById("eim-"+n).value].preco;
 }
 
 async function salvarEdicao(){
@@ -1056,7 +905,6 @@ async function salvarEdicao(){
     if(!modelo) return;
     itens.push({modelo,cor:document.getElementById("eic-"+i)?.value,tamanho:document.getElementById("eit-"+i)?.value,qtd:parseInt(document.getElementById("eiq-"+i)?.value)||1,preco:parseFloat(document.getElementById("eip-"+i)?.value)||0});
   });
-
   const nome=document.getElementById("e-nome").value.trim();
   const tel=document.getElementById("e-tel").value.trim();
   const pagamento=document.getElementById("e-pag").value;
@@ -1064,45 +912,23 @@ async function salvarEdicao(){
   const tipo=document.getElementById("e-tipo").value;
   const lote=document.getElementById("e-lote").value;
   const newLoc=document.getElementById("e-loc")?.value||p.loc;
-  const newCom=document.getElementById("e-com")?.value||p.comisionado||"";
-  const comisionadaEl=document.getElementById("e-comFields");
-  const newComisionada=comisionadaEl?.style.display!=="none"&&newCom!=="";
-  const newFrete=parseFloat(document.getElementById("e-frete")?.value)||p.frete||0;
-  const newEmb=parseFloat(document.getElementById("e-emb")?.value)||p.emb||0;
-  const newEntrega=newLoc==="Fora"?{
-    cpf:document.getElementById("e-cpf")?.value||"",
-    cep:document.getElementById("e-cep")?.value||"",
-    rua:document.getElementById("e-rua")?.value||"",
-    bairro:document.getElementById("e-bairro")?.value||"",
-    cidade:document.getElementById("e-cidade")?.value||""
-  }:null;
-
+  const newCom=document.getElementById("e-com")?.value||"";
+  const newComisionada=document.getElementById("e-comFields")?.style.display!=="none"&&newCom!=="";
+  const newFrete=parseFloat(document.getElementById("e-frete")?.value)||0;
+  const newEmb=parseFloat(document.getElementById("e-emb")?.value)||0;
+  const newEntrega=newLoc==="Fora"?{cpf:document.getElementById("e-cpf")?.value||"",cep:document.getElementById("e-cep")?.value||"",rua:document.getElementById("e-rua")?.value||"",bairro:document.getElementById("e-bairro")?.value||"",cidade:document.getElementById("e-cidade")?.value||""}:null;
   const sub=itens.reduce((s,i)=>s+i.preco*i.qtd,0);
   const com=newComisionada?sub*COM_PCT:0;
   const liq=sub-com-newFrete-newEmb;
-
-  const rows=itens.map(item=>[
-    p.data,p.hora,nome,tel,
-    item.modelo,item.cor,item.tamanho,item.qtd,item.preco,item.preco*item.qtd,
-    pagamento,status,newLoc,
-    newComisionada?"Sim":"Não",newCom,
-    newComisionada?parseFloat((item.preco*item.qtd*COM_PCT).toFixed(2)):0,
-    newFrete,newEmb,parseFloat(liq.toFixed(2)),
-    newEntrega?.cpf||"",newEntrega?.cep||"",newEntrega?.rua||"",newEntrega?.bairro||"",newEntrega?.cidade||"",
-    tipo,lote,p.numeroPedido
-  ]);
-
+  const rows=itens.map(item=>[p.data,p.hora,nome,tel,item.modelo,item.cor,item.tamanho,item.qtd,item.preco,item.preco*item.qtd,pagamento,status,newLoc,newComisionada?"Sim":"Não",newCom,newComisionada?parseFloat((item.preco*item.qtd*COM_PCT).toFixed(2)):0,newFrete,newEmb,parseFloat(liq.toFixed(2)),newEntrega?.cpf||"",newEntrega?.cep||"",newEntrega?.rua||"",newEntrega?.bairro||"",newEntrega?.cidade||"",tipo,lote,p.numeroPedido]);
   setLoading(true);
-  await api("editVenda", {numeroPedido: p.numeroPedido, rows});
-
+  await api("editVenda",{numeroPedido:p.numeroPedido,rows});
   const idx=pedidos.findIndex(x=>x.numeroPedido===p.numeroPedido);
   if(idx>=0) pedidos[idx]={...p,nome,tel,pagamento,status,tipo,lote,loc:newLoc,comisionada:newComisionada,comisionado:newCom,frete:newFrete,emb:newEmb,entrega:newEntrega,itens,sub,com,custos:newFrete+newEmb,liq};
-
   setLoading(false);
   closeModal("modalEdit");
   toast("✅ Pedido #"+p.numeroPedido+" atualizado","success");
-  renderPedidos();
-  editando=null;
+  renderPedidos();editando=null;
 }
 
 // ── CUSTOS ──
@@ -1113,87 +939,86 @@ async function addCusto(){
   const cat=document.getElementById("c-cat").value;
   const data=document.getElementById("c-data").value||new Date().toLocaleDateString("pt-BR");
   const id=Date.now();
-  const row=[data,desc,cat,val,id];
   setLoading(true);
-  await api("addCusto", {row});
+  await api("addCusto",{row:[data,desc,cat,val,id]});
   custos.unshift({id,data,desc,cat,val});
-  document.getElementById("c-desc").value="";
-  document.getElementById("c-val").value="";
-  setLoading(false);
-  toast("✅ Custo adicionado","success");
-  renderCustos();
+  document.getElementById("c-desc").value="";document.getElementById("c-val").value="";
+  setLoading(false);toast("✅ Custo adicionado","success");renderCustos();
 }
-
 async function deletarCusto(id){
   if(!confirm("Deletar este custo?")) return;
-  await api("deleteCusto", {custoId: id});
+  await api("deleteCusto",{custoId:id});
   custos=custos.filter(c=>c.id!==id);
-  toast("🗑️ Custo removido","");
-  renderCustos();
+  toast("🗑️ Custo removido","");renderCustos();
 }
-
 function renderCustos(){
   const lista=document.getElementById("custoList");
   if(!custos.length){lista.innerHTML='<div class="empty">Nenhum custo registrado.</div>';return;}
   const total=custos.reduce((s,c)=>s+c.val,0);
   lista.innerHTML=`<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--red);margin-bottom:1rem">Total: ${fmt(total)}</div>`+
-    custos.map(c=>`
-    <div class="custo-row">
-      <div class="custo-info">
-        <div class="custo-desc">${c.desc}</div>
-        <div class="custo-meta">${c.data} · <span class="cat-badge">${c.cat}</span></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div class="custo-val">— ${fmt(c.val)}</div>
-        <button class="btn btn-rd" onclick="deletarCusto(${c.id})" style="padding:5px 10px;font-size:12px">✕</button>
-      </div>
-    </div>`).join("");
+    custos.map(c=>`<div class="custo-row"><div class="custo-info"><div class="custo-desc">${c.desc}</div><div class="custo-meta">${c.data} · <span class="cat-badge">${c.cat}</span></div></div><div style="display:flex;align-items:center;gap:10px"><div class="custo-val">— ${fmt(c.val)}</div><button class="btn btn-rd" onclick="deletarCusto(${c.id})" style="padding:5px 10px;font-size:12px">✕</button></div></div>`).join("");
 }
 
+// ══════════════════════════════════════════
 // ── FINANCEIRO ──
+// ══════════════════════════════════════════
 function renderFin(){
-  const recebidosExtra=contasReceber.filter(c=>c.status==="Recebido").reduce((s,c)=>s+c.val,0);
-  const fat=pedidos.reduce((s,p)=>s+p.sub,0)+recebidosExtra;
+  const fatVendas=pedidos.reduce((s,p)=>s+p.sub,0);
   const comT=pedidos.reduce((s,p)=>s+(p.com||0),0);
   const custoT=custos.reduce((s,c)=>s+c.val,0);
-  const liqT=pedidos.reduce((s,p)=>s+p.liq,0)-custoT+comT; // liq já desconta comissão
-  const liqReal=pedidos.reduce((s,p)=>s+p.liq,0)-custoT+recebidosExtra;
+  const liqReal=pedidos.reduce((s,p)=>s+p.liq,0)-custoT;
   const pendT=pedidos.filter(p=>p.status==="Pendente").reduce((s,p)=>s+p.liq,0);
   const camsT=pedidos.reduce((s,p)=>s+p.itens.reduce((ss,i)=>ss+i.qtd,0),0);
-  let totalUnidades=0, somaPrecos=0;
-  pedidos.forEach(p=>p.itens.forEach(i=>{somaPrecos+=i.preco*i.qtd; totalUnidades+=i.qtd;}));
-  const precoMedio = totalUnidades>0 ? somaPrecos/totalUnidades : 0;
 
-  document.getElementById("finStats").innerHTML=`
-    <div class="stat-card am"><div class="stat-lbl">Faturamento Bruto</div><div class="stat-val am">${fmt(fat)}</div><div class="stat-sub">vendas + recebimentos</div></div>
-    <div class="stat-card"><div class="stat-lbl">Custos Totais</div><div class="stat-val rd">${fmt(custoT+comT)}</div><div class="stat-sub">custos + comissões</div></div>
-    <div class="stat-card"><div class="stat-lbl">Lucro Líquido</div><div class="stat-val vd">${fmt(liqReal)}</div></div>
-    <div class="stat-card rd"><div class="stat-lbl">A Receber (pendente)</div><div class="stat-val rd">${fmt(pendT)}</div><div class="stat-sub">${pedidos.filter(p=>p.status==="Pendente").length} pedidos</div></div>
-    <div class="stat-card bl"><div class="stat-lbl">Camisas Vendidas</div><div class="stat-val bl">${camsT}</div></div>
-    <div class="stat-card rd"><div class="stat-lbl">Contas a Pagar</div><div class="stat-val rd">${fmt(totalContasPagar+comT)}</div><div class="stat-sub">contas + comissões</div></div>
-    <div class="stat-card or"><div class="stat-lbl">Preço Médio / Camisa</div><div class="stat-val or">${fmt(precoMedio)}</div><div class="stat-sub">${totalUnidades} unidades</div></div>
-    <div class="stat-card"><div class="stat-lbl">Pedidos</div><div class="stat-val">${pedidos.length}</div></div>`;
+  // Preço médio por camisa (apenas vendas)
+  let totalUnidades=0,somaPrecos=0;
+  pedidos.forEach(p=>p.itens.forEach(i=>{somaPrecos+=i.preco*i.qtd;totalUnidades+=i.qtd;}));
+  const precoMedio=totalUnidades>0?somaPrecos/totalUnidades:0;
 
-  const pg=pedidos.filter(p=>p.loc==="PG"),fora=pedidos.filter(p=>p.loc==="Fora");
-  document.getElementById("finLoc").innerHTML=`
-    <div class="fin-row"><span class="fin-lbl">📍 Ponta Grossa</span><div style="text-align:right"><span class="fin-val bl">${fmt(pg.reduce((s,p)=>s+p.liq,0))}</span><div style="font-size:11px;color:var(--muted)">${pg.length} pedidos</div></div></div>
-    <div class="fin-row"><span class="fin-lbl">🚚 Fora</span><div style="text-align:right"><span class="fin-val am">${fmt(fora.reduce((s,p)=>s+p.liq,0))}</span><div style="font-size:11px;color:var(--muted)">${fora.length} pedidos</div></div></div>`
-    <div class="fin-row" style="font-weight:800"><span class="fin-lbl" style="color:var(--txt)">Total Receita Vendas</span><span class="fin-val vd">${fmt(pg.reduce((s,p)=>s+p.liq,0)+fora.reduce((s,p)=>s+p.liq,0))}</span></div>;
-
+  // Comissões por comissionado
   const comMap={};
   pedidos.filter(p=>p.comisionada).forEach(p=>{
     if(!comMap[p.comisionado])comMap[p.comisionado]={n:0,v:0};
     comMap[p.comisionado].n++;comMap[p.comisionado].v+=p.com||0;
   });
+
+  // Contas a pagar pendentes + comissões
+  const contasPagarPend=contasPagar.filter(c=>c.status==="Pendente");
+  const totalAPagar=contasPagarPend.reduce((s,c)=>s+c.val,0)+comT;
+
+  // Contas a receber pendentes + pedidos pendentes
+  const contasRecPend=contasReceber.filter(c=>c.status==="Pendente");
+  const totalAReceber=contasRecPend.reduce((s,c)=>s+c.val,0)+pendT;
+
+  // ── STATS ──
+  document.getElementById("finStats").innerHTML=`
+    <div class="stat-card am"><div class="stat-lbl">Receita Vendas</div><div class="stat-val am">${fmt(fatVendas)}</div><div class="stat-sub">${pedidos.length} pedidos</div></div>
+    <div class="stat-card or"><div class="stat-lbl">Preço Médio / Camisa</div><div class="stat-val or">${fmt(precoMedio)}</div><div class="stat-sub">${totalUnidades} unidades vendidas</div></div>
+    <div class="stat-card"><div class="stat-lbl">Custos Totais</div><div class="stat-val rd">${fmt(custoT+comT)}</div><div class="stat-sub">custos + comissões</div></div>
+    <div class="stat-card"><div class="stat-lbl">Lucro Líquido</div><div class="stat-val vd">${fmt(liqReal)}</div><div class="stat-sub">receita − custos</div></div>
+    <div class="stat-card rd"><div class="stat-lbl">Contas a Pagar</div><div class="stat-val rd">${fmt(totalAPagar)}</div><div class="stat-sub">contas + comissões</div></div>
+    <div class="stat-card bl"><div class="stat-lbl">Camisas Vendidas</div><div class="stat-val bl">${camsT}</div></div>`;
+
+  // ── LOCALIDADE (com total) ──
+  const pg=pedidos.filter(p=>p.loc==="PG"),fora=pedidos.filter(p=>p.loc==="Fora");
+  const liqPG=pg.reduce((s,p)=>s+p.liq,0),liqFora=fora.reduce((s,p)=>s+p.liq,0);
+  document.getElementById("finLoc").innerHTML=`
+    <div class="fin-row"><span class="fin-lbl">📍 Ponta Grossa</span><div style="text-align:right"><span class="fin-val bl">${fmt(liqPG)}</span><div style="font-size:11px;color:var(--muted)">${pg.length} pedidos</div></div></div>
+    <div class="fin-row"><span class="fin-lbl">🚚 Fora</span><div style="text-align:right"><span class="fin-val am">${fmt(liqFora)}</span><div style="font-size:11px;color:var(--muted)">${fora.length} pedidos</div></div></div>
+    <div class="fin-row" style="font-weight:800"><span style="color:var(--txt)">Total Receita Vendas</span><span class="fin-val vd">${fmt(liqPG+liqFora)}</span></div>`;
+
+  // ── COMISSIONADOS ──
   document.getElementById("finCom").innerHTML=Object.entries(comMap).length
     ?Object.entries(comMap).map(([k,d])=>`<div class="fin-row"><span class="fin-lbl">🤝 ${k}</span><div style="text-align:right"><span class="fin-val or">${fmt(d.v)}</span><div style="font-size:11px;color:var(--muted)">${d.n} venda(s)</div></div></div>`).join("")
     :`<div style="color:var(--muted);font-size:13px;padding:8px 0">Nenhuma venda comissionada</div>`;
 
+  // ── PAGAMENTO ──
   const pagMap={};
   pedidos.forEach(p=>{pagMap[p.pagamento]=(pagMap[p.pagamento]||0)+p.liq;});
   document.getElementById("finPag").innerHTML=Object.entries(pagMap).map(([k,v])=>
     `<div class="fin-row"><span class="fin-lbl">${k}</span><span class="fin-val vd">${fmt(v)}</span></div>`).join("")||`<div style="color:var(--muted);font-size:13px">Sem dados</div>`;
 
+  // ── POR MODELO ──
   const modMap={};
   pedidos.forEach(p=>p.itens.forEach(i=>{
     if(!modMap[i.modelo])modMap[i.modelo]={q:0,v:0};
@@ -1202,70 +1027,51 @@ function renderFin(){
   document.getElementById("finMod").innerHTML=Object.entries(modMap).map(([k,d])=>
     `<div class="fin-row"><span class="fin-lbl">${k}</span><div style="text-align:right"><span class="fin-val vd">${fmt(d.v)}</span><div style="font-size:11px;color:var(--muted)">${d.q} unid.</div></div></div>`).join("")||`<div style="color:var(--muted);font-size:13px">Sem dados</div>`;
 
-  // Custos detalhados
-  const custosPorCat = {};
-  custos.forEach(c => {
-    if(!custosPorCat[c.cat]) custosPorCat[c.cat] = [];
-    custosPorCat[c.cat].push(c);
+  // ── CUSTOS DETALHADOS ──
+  const custosPorCat={};
+  custos.forEach(c=>{if(!custosPorCat[c.cat])custosPorCat[c.cat]=[];custosPorCat[c.cat].push(c);});
+  let custosHtml="";
+  Object.entries(custosPorCat).forEach(([cat,items])=>{
+    const t=items.reduce((s,c)=>s+c.val,0);
+    custosHtml+=`<div style="margin-bottom:.5rem"><div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${cat}</div>${items.map(c=>`<div class="fin-row" style="padding:4px 0"><span class="fin-lbl" style="font-size:12px">${c.desc} <span style="font-size:10px;color:var(--muted)">(${c.data})</span></span><span class="fin-val rd" style="font-size:13px">${fmt(c.val)}</span></div>`).join("")}<div class="fin-row" style="padding:3px 0"><span class="fin-lbl" style="font-size:11px">Subtotal ${cat}</span><span class="fin-val rd" style="font-size:12px">${fmt(t)}</span></div></div>`;
   });
-  const comissoesList = Object.entries(comMap).map(([k,d]) => ({desc:"Comissão — "+k, val:d.v, cat:"Comissão"}));
-  
-  let custosHtml = "";
-  // Custos da planilha agrupados por categoria
-  Object.entries(custosPorCat).forEach(([cat, items]) => {
-    const total = items.reduce((s,c) => s+c.val, 0);
-    custosHtml += `<div style="margin-bottom:.5rem">
-      <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${cat}</div>
-      ${items.map(c => `<div class="fin-row" style="padding:4px 0"><span class="fin-lbl" style="font-size:12px">${c.desc} <span style="font-size:10px;color:var(--muted)">(${c.data})</span></span><span class="fin-val rd" style="font-size:13px">${fmt(c.val)}</span></div>`).join("")}
-      <div class="fin-row" style="padding:3px 0;border-top:none"><span class="fin-lbl" style="font-size:11px">Subtotal ${cat}</span><span class="fin-val rd" style="font-size:12px">${fmt(total)}</span></div>
-    </div>`;
-  });
-  // Comissões
-  if(comissoesList.length) {
-    custosHtml += `<div style="margin-bottom:.5rem">
-      <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Comissões</div>
-      ${comissoesList.map(c => `<div class="fin-row" style="padding:4px 0"><span class="fin-lbl" style="font-size:12px">${c.desc}</span><span class="fin-val or" style="font-size:13px">${fmt(c.val)}</span></div>`).join("")}
-    </div>`;
+  if(Object.entries(comMap).length){
+    custosHtml+=`<div style="margin-bottom:.5rem"><div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Comissões</div>${Object.entries(comMap).map(([k,d])=>`<div class="fin-row" style="padding:4px 0"><span class="fin-lbl" style="font-size:12px">Comissão — ${k}</span><span class="fin-val or" style="font-size:13px">${fmt(d.v)}</span></div>`).join("")}</div>`;
   }
-  custosHtml += `<div class="fin-row" style="font-weight:800;margin-top:4px"><span>Total Custos</span><span class="fin-val rd">${fmt(custoT+comT)}</span></div>`;
-  document.getElementById("finCustosDetalhe").innerHTML = custosHtml || `<div style="color:var(--muted);font-size:13px">Nenhum custo registrado</div>`;
+  custosHtml+=`<div class="fin-row" style="font-weight:800;margin-top:4px"><span>Total Custos</span><span class="fin-val rd">${fmt(custoT+comT)}</span></div>`;
+  document.getElementById("finCustosDetalhe").innerHTML=custosHtml||`<div style="color:var(--muted);font-size:13px">Nenhum custo registrado</div>`;
 
-  // A Pagar — contas dinâmicas + comissões
-  const comPagar=Object.entries(comMap).map(([k,d])=>({desc:"Comissão — "+k,val:d.v,status:"Pendente"}));
-  const tPagar=[...contasPagar.filter(c=>c.status==="Pendente"),...comPagar];
-  document.getElementById("finAPagar").innerHTML=tPagar.map(c=>
-    `<div class="fin-row"><span class="fin-lbl">${c.desc}</span><span class="fin-val rd">${fmt(c.val)}</span></div>`
-  ).join("")+(tPagar.length?`<div class="fin-row" style="font-weight:800"><span>Total</span><span class="fin-val rd">${fmt(tPagar.reduce((s,c)=>s+c.val,0))}</span></div>`:"<div style='color:var(--muted);font-size:13px'>Nenhuma conta pendente</div>");
+  // ── A PAGAR (detalhamento) ──
+  const tPagar=[...contasPagarPend,...Object.entries(comMap).map(([k,d])=>({desc:"Comissão — "+k,val:d.v}))];
+  document.getElementById("finAPagar").innerHTML=tPagar.length
+    ?tPagar.map(c=>`<div class="fin-row"><span class="fin-lbl">${c.desc}</span><span class="fin-val rd">${fmt(c.val)}</span></div>`).join("")+`<div class="fin-row" style="font-weight:800"><span>Total</span><span class="fin-val rd">${fmt(totalAPagar)}</span></div>`
+    :`<div style="color:var(--muted);font-size:13px">Nenhuma conta pendente</div>`;
 
-  // A Receber — contas dinâmicas + clientes pendentes
-  const recebidosList=contasReceber.filter(c=>c.status==="Recebido");
-  const pendentesList=contasReceber.filter(c=>c.status==="Pendente");
-  const totalRecebidoExtra=recebidosList.reduce((s,c)=>s+c.val,0);
-  const totalPendenteExtra=pendentesList.reduce((s,c)=>s+c.val,0);
-
+  // ── A RECEBER (corrigido — lê contasReceber diretamente) ──
+  const recebidos=contasReceber.filter(c=>c.status==="Recebido");
+  const totalRecebidoExtra=recebidos.reduce((s,c)=>s+c.val,0);
   let recHtml="";
-  if(pendentesList.length){
-    recHtml+=`<div style="font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;margin-bottom:4px">Pendentes</div>`;
-    recHtml+=pendentesList.map(c=>`<div class="fin-row"><span class="fin-lbl">${c.desc}</span><span class="fin-val or">${fmt(c.val)}</span></div>`).join("");
+  if(contasRecPend.length){
+    recHtml+=`<div style="font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;margin-bottom:4px">Contas Pendentes</div>`;
+    recHtml+=contasRecPend.map(c=>`<div class="fin-row"><span class="fin-lbl">${c.desc}</span><span class="fin-val or">${fmt(c.val)}</span></div>`).join("");
   }
-  if(pendT>0) recHtml+=`<div class="fin-row"><span class="fin-lbl">Clientes com pedido pendente</span><span class="fin-val or">${fmt(pendT)}</span></div>`;
-  if(recebidosList.length){
+  if(pendT>0) recHtml+=`<div class="fin-row"><span class="fin-lbl">Pedidos com pagamento pendente</span><span class="fin-val or">${fmt(pendT)}</span></div>`;
+  if(recebidos.length){
     recHtml+=`<div style="font-size:10px;font-weight:800;color:var(--verde);text-transform:uppercase;margin:8px 0 4px">Recebidos</div>`;
-    recHtml+=recebidosList.map(c=>`<div class="fin-row"><span class="fin-lbl">${c.desc} ${c.dataRecebido?"<span style='font-size:10px;color:var(--muted)'>("+c.dataRecebido+")</span>":""}</span><span class="fin-val vd">${fmt(c.val)}</span></div>`).join("");
+    recHtml+=recebidos.map(c=>`<div class="fin-row"><span class="fin-lbl">${c.desc}${c.dataRecebido?` <span style="font-size:10px;color:var(--muted)">(${c.dataRecebido})</span>`:""}</span><span class="fin-val vd">${fmt(c.val)}</span></div>`).join("");
+    recHtml+=`<div class="fin-row"><span class="fin-lbl" style="font-size:11px">Subtotal recebidos</span><span class="fin-val vd">${fmt(totalRecebidoExtra)}</span></div>`;
   }
-  recHtml+=`<div class="fin-row" style="font-weight:800;margin-top:4px"><span>Total recebido extra</span><span class="fin-val vd">${fmt(totalRecebidoExtra)}</span></div>`;
-  recHtml+=`<div class="fin-row" style="font-weight:800"><span>Total pendente</span><span class="fin-val or">${fmt(totalPendenteExtra+pendT)}</span></div>`;
+  recHtml+=`<div class="fin-row" style="font-weight:800;margin-top:4px"><span>Total a Receber</span><span class="fin-val or">${fmt(totalAReceber)}</span></div>`;
   document.getElementById("finAReceber").innerHTML=recHtml||`<div style="color:var(--muted);font-size:13px">Sem contas</div>`;
 }
 
+// ══════════════════════════════════════════
 // ── PROJEÇÃO ──
-const CUSTO_MODELO = {Torcedor:65, Jogador:67, Feminina:65, Retro:65};
-const CORES_MODELO = {Torcedor:"var(--verde)", Jogador:"var(--blue)", Feminina:"var(--orange)", Retro:"var(--purple)"};
-
+// ══════════════════════════════════════════
 function buildSliders(){
-  const grid = document.getElementById("slidersGrid");
+  const grid=document.getElementById("slidersGrid");
   if(!grid) return;
-  grid.innerHTML = Object.keys(ESTOQUE).map(m=>`
+  grid.innerHTML=Object.keys(ESTOQUE).map(m=>`
     <div class="slider-card" style="border-top:3px solid ${CORES_MODELO[m]}">
       <div class="slider-card-title">${m}</div>
       <div class="slider-val" id="sv-${m}">R$ ${precosSlider[m]}</div>
@@ -1277,38 +1083,37 @@ function buildSliders(){
     </div>`).join("");
 }
 
-function onModelSlider(modelo, val){
-  precosSlider[modelo] = parseInt(val);
-  const el = document.getElementById("sv-"+modelo);
-  if(el) el.textContent = "R$ "+val;
+function onModelSlider(modelo,val){
+  precosSlider[modelo]=parseInt(val);
+  const el=document.getElementById("sv-"+modelo);
+  if(el) el.textContent="R$ "+val;
   calcProj();
 }
 
 function calcProj(){
-  const comVPct = parseFloat(document.getElementById("p-compctvendas")?.value)||30;
-  const custoT   = custos.reduce((s,c)=>s+c.val, 0);
-  const comT     = pedidos.reduce((s,p)=>s+(p.com||0), 0);
-  const liqAtual = pedidos.reduce((s,p)=>s+p.liq, 0) - custoT;
-  const fatAtual = pedidos.reduce((s,p)=>s+p.sub, 0);
-  const totalCustos = custoT + comT;
+  const comVPct=parseFloat(document.getElementById("p-compctvendas")?.value)||30;
+  const custoT=custos.reduce((s,c)=>s+c.val,0);
+  const comT=pedidos.reduce((s,p)=>s+(p.com||0),0);
+  const liqAtual=pedidos.reduce((s,p)=>s+p.liq,0)-custoT;
+  const fatAtual=pedidos.reduce((s,p)=>s+p.sub,0);
+  const totalCustos=custoT+comT;
 
-  let totalEstoque=0, totalFatProj=0, totalLucroProj=0;
+  let totalEstoque=0,totalFatProj=0,totalLucroProj=0;
 
-  const cardsEl = document.getElementById("projCards");
+  // Cards por modelo
+  const cardsEl=document.getElementById("projCards");
   if(cardsEl){
-    cardsEl.innerHTML = Object.keys(ESTOQUE).map(m=>{
-      const preco   = precosSlider[m];
-      const custo   = CUSTO_MODELO[m];
-      const estq    = estoquePorModelo[m]||0;
-      const comDesc = preco*(comVPct/100)*COM_PCT;
-      const margem  = preco - custo - comDesc;
-      const margemPct = preco>0?(margem/preco*100):0;
-      const fatMod  = estq*preco;
-      const liqMod  = estq*margem;
-      totalEstoque  += estq;
-      totalFatProj  += fatMod;
-      totalLucroProj+= liqMod;
-      const si = document.getElementById("si-"+m);
+    cardsEl.innerHTML=Object.keys(ESTOQUE).map(m=>{
+      const preco=precosSlider[m];
+      const custo=CUSTO_MODELO[m];
+      const estq=estoquePorModelo[m]||0;
+      const comDesc=preco*(comVPct/100)*COM_PCT;
+      const margem=preco-custo-comDesc;
+      const margemPct=preco>0?(margem/preco*100):0;
+      const fatMod=estq*preco;
+      const liqMod=estq*margem;
+      totalEstoque+=estq;totalFatProj+=fatMod;totalLucroProj+=liqMod;
+      const si=document.getElementById("si-"+m);
       if(si) si.innerHTML=`${estq} un. · Margem ${margemPct.toFixed(1)}% · ${fmt(margem)}/un.`;
       return `<div class="stat-card" style="border-top:3px solid ${CORES_MODELO[m]}">
         <div class="stat-lbl">${m}</div>
@@ -1320,13 +1125,14 @@ function calcProj(){
     }).join("");
   }
 
-  const margemMediaProj = totalEstoque>0 ? totalLucroProj/totalEstoque : 0;
-  const deficitAtual = totalCustos - (liqAtual+comT);
-  const breakevenRestante = margemMediaProj>0 ? Math.max(0,Math.ceil(deficitAtual/margemMediaProj)) : "—";
-  const receitaTotal = fatAtual + totalFatProj;
-  const lucroTotal   = liqAtual + totalLucroProj;
+  const margemMedia=totalEstoque>0?totalLucroProj/totalEstoque:0;
+  const deficit=totalCustos-(liqAtual+comT);
+  const beRest=margemMedia>0?Math.max(0,Math.ceil(deficit/margemMedia)):"—";
+  const receitaTotal=fatAtual+totalFatProj;
+  const lucroTotal=liqAtual+totalLucroProj;
 
-  const projResult = document.getElementById("projResult");
+  // Resultado total simulado
+  const projResult=document.getElementById("projResult");
   if(projResult){
     projResult.innerHTML=`
       <div class="proj-result-row"><span style="color:var(--muted)">Faturamento atual (vendas)</span><span style="color:var(--amarelo)">${fmt(fatAtual)}</span></div>
@@ -1335,55 +1141,51 @@ function calcProj(){
       <div class="proj-result-row"><span style="color:var(--muted)">Custos totais registrados</span><span style="color:var(--red)">${fmt(totalCustos)}</span></div>
       <div class="proj-result-row"><span style="color:var(--muted)">Lucro atual</span><span style="color:var(--verde)">${fmt(liqAtual)}</span></div>
       <div class="proj-result-row"><span style="color:var(--muted)">Estoque restante</span><span>${totalEstoque} camisas</span></div>
-      <div class="proj-result-row"><span style="color:var(--muted)">Break-even restante</span><span style="color:var(--orange)">${typeof breakevenRestante==="number"?breakevenRestante+" camisas":breakevenRestante}</span></div>
+      <div class="proj-result-row"><span style="color:var(--muted)">Break-even restante</span><span style="color:var(--orange)">${typeof beRest==="number"?beRest+" camisas":beRest}</span></div>
       <div class="proj-result-row"><span>💰 Lucro total simulado</span><span style="color:var(--verde);font-size:20px">${fmt(lucroTotal)}</span></div>`;
   }
 
-  const resumo = document.getElementById("projResumoCards");
+  // Cards de resumo
+  const resumo=document.getElementById("projResumoCards");
   if(resumo){
-    const contasPagarPend = contasPagar.filter(c=>c.status==="Pendente").reduce((s,c)=>s+c.val,0);
+    const contasPagarPend=contasPagar.filter(c=>c.status==="Pendente").reduce((s,c)=>s+c.val,0);
     resumo.innerHTML=`
-      <div class="stat-card rd"><div class="stat-lbl">Custos Totais (+ a pagar)</div><div class="stat-val rd">${fmt(totalCustos+contasPagarPend)}</div><div class="stat-sub">registrados + pendentes</div></div>
+      <div class="stat-card rd"><div class="stat-lbl">Custos Totais + A Pagar</div><div class="stat-val rd">${fmt(totalCustos+contasPagarPend)}</div><div class="stat-sub">registrados + pendentes</div></div>
       <div class="stat-card am"><div class="stat-lbl">Receita Garantida</div><div class="stat-val am">${fmt(fatAtual)}</div><div class="stat-sub">já vendido</div></div>
       <div class="stat-card bl"><div class="stat-lbl">Estoque Restante</div><div class="stat-val bl">${totalEstoque}</div><div class="stat-sub">camisas para vender</div></div>
       <div class="stat-card"><div class="stat-lbl">Resultado Atual</div><div class="stat-val ${liqAtual>=0?"vd":"rd"}">${fmt(liqAtual)}</div><div class="stat-sub">lucro líquido real</div></div>`;
   }
 
-  buildProjTable(comVPct, fatAtual, liqAtual, totalCustos);
+  buildProjTable(comVPct,fatAtual,liqAtual,totalCustos,comT);
 }
 
-function buildProjTable(comVPct, fatAtual, liqAtual, totalCustos){
-  const tbody = document.getElementById("projTableBody");
+function buildProjTable(comVPct,fatAtual,liqAtual,totalCustos,comT){
+  const tbody=document.getElementById("projTableBody");
   if(!tbody) return;
-  const comT = pedidos.reduce((s,p)=>s+(p.com||0),0);
   let rows="";
-  for(let preco=100; preco<=250; preco+=5){
-    let fatRestante=0, lucroRestante=0, estoqueTotal=0, custoTotal=0, estqTotal=0;
+  for(let preco=100;preco<=250;preco+=5){
+    let fatRest=0,lucroRest=0,estqTotal=0,custoPonderado=0;
     Object.keys(ESTOQUE).forEach(m=>{
       const custo=CUSTO_MODELO[m];
       const estq=estoquePorModelo[m]||0;
       const comDesc=preco*(comVPct/100)*COM_PCT;
-      const margem=preco-custo-comDesc;
-      fatRestante+=estq*preco;
-      lucroRestante+=estq*margem;
-      estoqueTotal+=estq;
-      custoTotal+=custo*estq;
+      fatRest+=estq*preco;
+      lucroRest+=estq*(preco-custo-comDesc);
       estqTotal+=estq;
+      custoPonderado+=custo*estq;
     });
-    const receitaTotal=fatAtual+fatRestante;
-    const lucroMaximo=liqAtual+lucroRestante;
-    const margemMedia=estoqueTotal>0?lucroRestante/estoqueTotal:0;
+    const receitaTotal=fatAtual+fatRest;
+    const lucroMax=liqAtual+lucroRest;
+    const margemMedia=estqTotal>0?lucroRest/estqTotal:0;
     const beTotal=margemMedia>0?Math.ceil(totalCustos/margemMedia):"∞";
     const deficit=totalCustos-(liqAtual+comT);
     const beRest=margemMedia>0?Math.max(0,Math.ceil(deficit/margemMedia)):"∞";
-    const avgCusto=estqTotal>0?Object.keys(ESTOQUE).reduce((s,m)=>s+(CUSTO_MODELO[m]*(estoquePorModelo[m]||0)),0)/estqTotal:65;
-    const comDescAvg=preco*(comVPct/100)*COM_PCT;
-    const margemPct=preco>0?((preco-avgCusto-comDescAvg)/preco*100):0;
-    const lucroClass=lucroMaximo>=0?"pos":"neg";
+    const avgCusto=estqTotal>0?custoPonderado/estqTotal:65;
+    const margemPct=preco>0?((preco-avgCusto-preco*(comVPct/100)*COM_PCT)/preco*100):0;
     rows+=`<tr>
       <td>R$ ${preco}</td>
       <td>${fmt(receitaTotal)}</td>
-      <td class="${lucroClass}">${fmt(lucroMaximo)}</td>
+      <td class="${lucroMax>=0?"pos":"neg"}">${fmt(lucroMax)}</td>
       <td>${typeof beTotal==="number"?beTotal+" un.":beTotal}</td>
       <td>${typeof beRest==="number"?beRest+" un.":beRest}</td>
       <td class="${margemPct>=0?"pos":"neg"}">${margemPct.toFixed(1)}%</td>
@@ -1392,6 +1194,80 @@ function buildProjTable(comVPct, fatAtual, liqAtual, totalCustos){
   tbody.innerHTML=rows;
 }
 
+// ── CONTAS ──
+async function addContaPagar(){
+  const desc=document.getElementById("cp-desc").value.trim();
+  const val=parseFloat(document.getElementById("cp-val").value)||0;
+  const cat=document.getElementById("cp-cat").value;
+  if(!desc||!val){toast("⚠ Preencha descrição e valor","error");return;}
+  const id=String(Date.now());
+  await api("addContaPagar",{row:[id,desc,val,cat,"Pendente"]});
+  contasPagar.unshift({id,desc,val,cat,status:"Pendente"});
+  document.getElementById("cp-desc").value="";document.getElementById("cp-val").value="";
+  toast("✅ Conta adicionada","success");renderContas();
+}
+async function addContaReceber(){
+  const desc=document.getElementById("cr-desc").value.trim();
+  const val=parseFloat(document.getElementById("cr-val").value)||0;
+  if(!desc||!val){toast("⚠ Preencha descrição e valor","error");return;}
+  const id=String(Date.now());
+  await api("addContaReceber",{row:[id,desc,val,"Pendente"]});
+  contasReceber.unshift({id,desc,val,status:"Pendente"});
+  document.getElementById("cr-desc").value="";document.getElementById("cr-val").value="";
+  toast("✅ Conta adicionada","success");renderContas();
+}
+async function pagarConta(id){
+  const c=contasPagar.find(x=>x.id===id);if(!c) return;
+  await api("updateContaPagar",{id,status:"Pago"});
+  await api("addCusto",{row:[new Date().toLocaleDateString("pt-BR"),c.desc,c.cat||"Fornecedor",c.val,Date.now()]});
+  c.status="Pago";
+  custos.unshift({id:Date.now(),data:new Date().toLocaleDateString("pt-BR"),desc:c.desc,cat:c.cat||"Fornecedor",val:c.val});
+  toast("✅ Pago e lançado nos custos","success");renderContas();
+}
+async function receberConta(id){
+  const c=contasReceber.find(x=>x.id===id);if(!c) return;
+  const dataHoje=new Date().toLocaleDateString("pt-BR");
+  await api("updateContaReceber",{id,status:"Recebido",dataRecebido:dataHoje});
+  c.status="Recebido";c.dataRecebido=dataHoje;
+  toast("✅ Marcado como recebido","success");renderContas();
+}
+async function delContaPagar(id){
+  if(!confirm("Remover esta conta?")) return;
+  await api("deleteContaPagar",{id});
+  contasPagar=contasPagar.filter(c=>c.id!==id);renderContas();
+}
+async function delContaReceber(id){
+  if(!confirm("Remover esta conta?")) return;
+  await api("deleteContaReceber",{id});
+  contasReceber=contasReceber.filter(c=>c.id!==id);renderContas();
+}
+
+function renderContas(){
+  const lp=document.getElementById("listContasPagar");
+  const totalPagar=contasPagar.filter(c=>c.status==="Pendente").reduce((s,c)=>s+c.val,0);
+  lp.innerHTML=(contasPagar.length?`<div style="font-size:13px;color:var(--red);font-weight:700;margin-bottom:.75rem">Total pendente: ${fmt(totalPagar)}</div>`:"")+
+    (contasPagar.length?contasPagar.map(c=>`
+    <div class="custo-row" style="margin-bottom:8px;${c.status==="Pago"?"opacity:.5":""}">
+      <div class="custo-info"><div class="custo-desc">${c.desc}</div><div class="custo-meta"><span class="cat-badge">${c.cat||"Fornecedor"}</span> · <span style="color:${c.status==="Pago"?"var(--verde)":"var(--orange)"}">● ${c.status}</span></div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red)">${fmt(c.val)}</div>
+        ${c.status==="Pendente"?`<button class="btn btn-vd" onclick="pagarConta('${c.id}')" style="padding:5px 10px;font-size:11px">✅ Pagar</button>`:""}
+        <button class="btn btn-rd" onclick="delContaPagar('${c.id}')" style="padding:5px 9px;font-size:12px">✕</button>
+      </div>
+    </div>`).join(""):'<div class="empty">Nenhuma conta a pagar.</div>');
+
+  const pendentes=contasReceber.filter(c=>c.status==="Pendente");
+  const recebidos=contasReceber.filter(c=>c.status==="Recebido");
+  document.getElementById("listContasReceber").innerHTML=pendentes.length
+    ?`<div style="font-size:13px;color:var(--verde);font-weight:700;margin-bottom:.75rem">Total pendente: ${fmt(pendentes.reduce((s,c)=>s+c.val,0))}</div>`+
+      pendentes.map(c=>`<div class="custo-row" style="margin-bottom:8px"><div class="custo-info"><div class="custo-desc">${c.desc}</div><div class="custo-meta"><span style="color:var(--orange)">● Pendente</span></div></div><div style="display:flex;align-items:center;gap:8px"><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--verde)">${fmt(c.val)}</div><button class="btn btn-vd" onclick="receberConta('${c.id}')" style="padding:5px 10px;font-size:11px">✅ Receber</button><button class="btn btn-rd" onclick="delContaReceber('${c.id}')" style="padding:5px 9px;font-size:12px">✕</button></div></div>`).join("")
+    :'<div class="empty" style="padding:1rem">Nenhuma conta pendente.</div>';
+
+  document.getElementById("listRecebidos").innerHTML=recebidos.length
+    ?`<div style="font-size:13px;color:var(--verde);font-weight:700;margin-bottom:.75rem">Total recebido: ${fmt(recebidos.reduce((s,c)=>s+c.val,0))}</div>`+
+      recebidos.map(c=>`<div class="custo-row" style="margin-bottom:8px;opacity:.85"><div class="custo-info"><div class="custo-desc">${c.desc}</div><div class="custo-meta">${c.dataRecebido||""} · <span style="color:var(--verde)">● Recebido</span></div></div><div style="display:flex;align-items:center;gap:8px"><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--verde)">${fmt(c.val)}</div><button class="btn btn-rd" onclick="delContaReceber('${c.id}')" style="padding:5px 9px;font-size:12px">✕</button></div></div>`).join("")
+    :'<div class="empty" style="padding:1rem">Nenhum recebimento ainda.</div>';
+}
 
 // ── MODAL ──
 function closeModal(id){document.getElementById(id).classList.remove("open");editando=null;}
@@ -1404,147 +1280,11 @@ function toast(msg,type=""){
   setTimeout(()=>t.classList.remove("show"),3500);
 }
 
-// ── CONTAS A PAGAR / A RECEBER ──
-async function carregarContas(){
-  setLoading(true);
-  const resPagar   = await apiGet("readContasPagar");
-  const resReceber = await apiGet("readContasReceber");
-  if(resPagar?.rows?.length>1)   contasPagar   = resPagar.rows.slice(1).map(r=>({id:String(r[0]),desc:r[1],val:parseFloat(r[2])||0,cat:r[3],status:r[4]||"Pendente"})).filter(r=>r.desc);
-  if(resReceber?.rows?.length>1) contasReceber = resReceber.rows.slice(1).map(r=>({id:String(r[0]),desc:r[1],val:parseFloat(r[2])||0,status:r[3]||"Pendente",dataRecebido:r[4]||""})).filter(r=>r.desc);
-  setLoading(false);
-  renderContas();
-}
-
-async function addContaPagar(){
-  const desc=document.getElementById("cp-desc").value.trim();
-  const val=parseFloat(document.getElementById("cp-val").value)||0;
-  const cat=document.getElementById("cp-cat").value;
-  if(!desc||!val){toast("⚠ Preencha descrição e valor","error");return;}
-  const id=String(Date.now());
-  const row=[id,desc,val,cat,"Pendente"];
-  await api("addContaPagar",{row});
-  contasPagar.unshift({id,desc,val,cat,status:"Pendente"});
-  document.getElementById("cp-desc").value="";
-  document.getElementById("cp-val").value="";
-  toast("✅ Conta adicionada","success");
-  renderContas();
-}
-
-async function addContaReceber(){
-  const desc=document.getElementById("cr-desc").value.trim();
-  const val=parseFloat(document.getElementById("cr-val").value)||0;
-  if(!desc||!val){toast("⚠ Preencha descrição e valor","error");return;}
-  const id=String(Date.now());
-  const row=[id,desc,val,"Pendente"];
-  await api("addContaReceber",{row});
-  contasReceber.unshift({id,desc,val,status:"Pendente"});
-  document.getElementById("cr-desc").value="";
-  document.getElementById("cr-val").value="";
-  toast("✅ Conta adicionada","success");
-  renderContas();
-}
-
-async function pagarConta(id){
-  const c=contasPagar.find(x=>x.id===id);
-  if(!c) return;
-  // Marca como pago e lança nos custos
-  await api("updateContaPagar",{id,status:"Pago"});
-  await api("addCusto",{row:[new Date().toLocaleDateString("pt-BR"),c.desc,c.cat||"Fornecedor",c.val,Date.now()]});
-  c.status="Pago";
-  custos.unshift({id:Date.now(),data:new Date().toLocaleDateString("pt-BR"),desc:c.desc,cat:c.cat||"Fornecedor",val:c.val});
-  toast("✅ Pago e lançado nos custos","success");
-  renderContas();
-}
-
-async function receberConta(id){
-  const c=contasReceber.find(x=>x.id===id);
-  if(!c) return;
-  const dataHoje=new Date().toLocaleDateString("pt-BR");
-  await api("updateContaReceber",{id,status:"Recebido",dataRecebido:dataHoje});
-  c.status="Recebido";
-  c.dataRecebido=dataHoje;
-  toast("✅ Marcado como recebido — faturamento atualizado","success");
-  renderContas();
-}
-
-async function delContaPagar(id){
-  if(!confirm("Remover esta conta?")) return;
-  await api("deleteContaPagar",{id});
-  contasPagar=contasPagar.filter(c=>c.id!==id);
-  renderContas();
-}
-
-async function delContaReceber(id){
-  if(!confirm("Remover esta conta?")) return;
-  await api("deleteContaReceber",{id});
-  contasReceber=contasReceber.filter(c=>c.id!==id);
-  renderContas();
-}
-
-function renderContas(){
-  // A PAGAR
-  const lp=document.getElementById("listContasPagar");
-  const totalPagar=contasPagar.filter(c=>c.status==="Pendente").reduce((s,c)=>s+c.val,0);
-  lp.innerHTML=(contasPagar.length?`<div style="font-size:13px;color:var(--red);font-weight:700;margin-bottom:.75rem">Total pendente: ${fmt(totalPagar)}</div>`:"")+
-    (contasPagar.length?contasPagar.map(c=>`
-    <div class="custo-row" style="margin-bottom:8px;${c.status==="Pago"?"opacity:.5":""}">
-      <div class="custo-info">
-        <div class="custo-desc">${c.desc}</div>
-        <div class="custo-meta"><span class="cat-badge">${c.cat||"Fornecedor"}</span> · <span style="color:${c.status==="Pago"?"var(--verde)":"var(--orange)"}">● ${c.status}</span></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red)">${fmt(c.val)}</div>
-        ${c.status==="Pendente"?`<button class="btn btn-vd" onclick="pagarConta('${c.id}')" style="padding:5px 10px;font-size:11px">✅ Pagar</button>`:""}
-        <button class="btn btn-rd" onclick="delContaPagar('${c.id}')" style="padding:5px 9px;font-size:12px">✕</button>
-      </div>
-    </div>`).join(""):'<div class="empty">Nenhuma conta a pagar.</div>');
-
-  // A RECEBER — só pendentes
-  const lr=document.getElementById("listContasReceber");
-  const pendentes=contasReceber.filter(c=>c.status==="Pendente");
-  const recebidos=contasReceber.filter(c=>c.status==="Recebido");
-  const totalReceber=pendentes.reduce((s,c)=>s+c.val,0);
-  const totalRecebido=recebidos.reduce((s,c)=>s+c.val,0);
-
-  lr.innerHTML=(pendentes.length
-    ?`<div style="font-size:13px;color:var(--verde);font-weight:700;margin-bottom:.75rem">Total pendente: ${fmt(totalReceber)}</div>`+
-      pendentes.map(c=>`
-      <div class="custo-row" style="margin-bottom:8px">
-        <div class="custo-info">
-          <div class="custo-desc">${c.desc}</div>
-          <div class="custo-meta"><span style="color:var(--orange)">● Pendente</span></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--verde)">${fmt(c.val)}</div>
-          <button class="btn btn-vd" onclick="receberConta('${c.id}')" style="padding:5px 10px;font-size:11px">✅ Receber</button>
-          <button class="btn btn-rd" onclick="delContaReceber('${c.id}')" style="padding:5px 9px;font-size:12px">✕</button>
-        </div>
-      </div>`).join("")
-    :'<div class="empty" style="padding:1rem">Nenhuma conta pendente.</div>');
-
-  // RECEBIDOS
-  const lr2=document.getElementById("listRecebidos");
-  lr2.innerHTML=(recebidos.length
-    ?`<div style="font-size:13px;color:var(--verde);font-weight:700;margin-bottom:.75rem">Total recebido: ${fmt(totalRecebido)}</div>`+
-      recebidos.map(c=>`
-      <div class="custo-row" style="margin-bottom:8px;opacity:.85">
-        <div class="custo-info">
-          <div class="custo-desc">${c.desc}</div>
-          <div class="custo-meta">${c.dataRecebido||""} · <span style="color:var(--verde)">● Recebido</span></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--verde)">${fmt(c.val)}</div>
-          <button class="btn btn-rd" onclick="delContaReceber('${c.id}')" style="padding:5px 9px;font-size:12px">✕</button>
-        </div>
-      </div>`).join("")
-    :'<div class="empty" style="padding:1rem">Nenhum recebimento ainda.</div>');
-}
-
 // ── INIT ──
 async function init(){
   document.getElementById("c-data").value=new Date().toISOString().split("T")[0];
-  addItem(); calcResumo();
-  await Promise.all([carregarTudo(), carregarContas()]);
+  addItem();calcResumo();
+  await Promise.all([carregarTudo(),carregarContas()]);
 }
 </script>
 </body>
