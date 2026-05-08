@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MRD Sports — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
 <style>
 :root{--verde:#69D473;--amarelo:#FEDD00;--dark:#0D1A0D;--dark2:#111C11;--surface:#1A261A;--surface2:#223022;--border:rgba(105,212,115,.15);--txt:#F0F7F0;--muted:#7A9A7A;--red:#FF4D4D;--orange:#FFB347;--blue:#5B9BD5;--purple:#B57BFF}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -161,6 +162,26 @@ table.itb tr:last-child td{border-bottom:none}
   .fin-grid{grid-template-columns:1fr}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
 }
+
+  /* TABELA PROJEÇÃO */
+.proj-table-wrap{overflow-x:auto;margin-top:1rem}
+.proj-table{width:100%;border-collapse:collapse;font-size:12px;min-width:600px}
+.proj-table th{text-align:right;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-bottom:1px solid var(--border);font-weight:700;white-space:nowrap}
+.proj-table th:first-child{text-align:center}
+.proj-table td{padding:7px 10px;border-bottom:1px solid rgba(105,212,115,.06);text-align:right;font-size:12px}
+.proj-table td:first-child{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--amarelo)}
+.proj-table tr:hover td{background:rgba(105,212,115,.04)}
+.proj-table tr.highlight-row td{background:rgba(105,212,115,.08);color:var(--verde);font-weight:700}
+.proj-table .neg{color:var(--red)}.proj-table .pos{color:var(--verde)}.proj-table .neu{color:var(--muted)}
+
+/* SLIDERS */
+.slider-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:1.25rem}
+.slider-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1rem}
+.slider-card-title{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
+.slider-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--verde);margin-bottom:.4rem}
+.slider-card input[type=range]{width:100%;accent-color:var(--verde);margin-bottom:.3rem}
+.slider-info{font-size:11px;color:var(--muted)}
+  
 </style>
 </head>
 <body>
@@ -398,46 +419,53 @@ table.itb tr:last-child td{border-bottom:none}
     </div>
 
     <!-- PROJECAO -->
-    <div class="view" id="view-proj">
-      <div class="sec-title">Projeção de Resultados</div>
+<div class="view" id="view-proj">
+  <div class="sec-title">Projeção de Resultados</div>
 
-      <!-- SIMULADOR POR MODELO -->
-      <div class="proj-box" style="margin-bottom:1.5rem">
-        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">Preço médio por modelo</div>
-        <div class="form-grid" style="margin-bottom:1rem">
-          <div class="form-group"><label>Torcedor (R$)</label><input type="number" id="p-preco-t" value="149" min="0" step="1" oninput="calcProj()"></div>
-          <div class="form-group"><label>Jogador (R$)</label><input type="number" id="p-preco-j" value="169" min="0" step="1" oninput="calcProj()"></div>
-          <div class="form-group"><label>Feminina (R$)</label><input type="number" id="p-preco-f" value="149" min="0" step="1" oninput="calcProj()"></div>
-          <div class="form-group"><label>Retrô (R$)</label><input type="number" id="p-preco-r" value="199" min="0" step="1" oninput="calcProj()"></div>
-          <div class="form-group"><label>% Vendas Comissionadas</label><input type="number" id="p-compctvendas" value="30" min="0" step="1" oninput="calcProj()"></div>
-        </div>
+  <!-- CARDS DE RESUMO -->
+  <div class="stats-grid" id="projResumoCards" style="margin-bottom:1.5rem"></div>
 
-        <!-- SLIDER -->
-        <div style="margin-bottom:1.25rem">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
-            <label style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Simulador de preço (todos os modelos)</label>
-            <span id="sliderVal" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--verde)">R$ 159</span>
-          </div>
-          <input type="range" id="p-slider" min="100" max="250" value="159" step="5" oninput="onSlider()" style="width:100%;accent-color:var(--verde)">
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px"><span>R$ 100</span><span>R$ 250</span></div>
-        </div>
+  <!-- SLIDERS + CARDS POR MODELO -->
+  <div class="proj-box">
+    <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">Preço de venda por modelo</div>
+    <div class="slider-grid" id="slidersGrid"></div>
 
-        <!-- RESULTADOS CARDS -->
-        <div id="projCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:1.25rem"></div>
-
-        <!-- GRÁFICO DE BARRAS -->
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem">Projeção de lucro por preço</div>
-        <div id="projChart" style="position:relative;height:220px;display:flex;align-items:flex-end;gap:8px;padding:0 4px"></div>
-        <div style="display:flex;gap:16px;margin-top:1rem;flex-wrap:wrap">
-          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><div style="width:12px;height:12px;border-radius:3px;background:var(--verde)"></div>Torcedor</div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><div style="width:12px;height:12px;border-radius:3px;background:var(--blue)"></div>Jogador</div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><div style="width:12px;height:12px;border-radius:3px;background:var(--orange)"></div>Feminina</div>
-        </div>
-
-        <!-- TOTALIZADOR -->
-        <div class="proj-result" id="projResult" style="margin-top:1.25rem"></div>
+    <div style="margin-top:.5rem;margin-bottom:1.25rem">
+      <div class="form-group" style="max-width:260px">
+        <label>% Vendas Comissionadas</label>
+        <input type="number" id="p-compctvendas" value="30" min="0" max="100" step="1" oninput="calcProj()"
+          style="background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:9px 11px;font-size:13px;color:var(--txt);font-family:'Figtree',sans-serif;outline:none">
       </div>
     </div>
+
+    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem">Projeção por modelo</div>
+    <div id="projCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:1.5rem"></div>
+
+    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem">Resultado total simulado</div>
+    <div class="proj-result" id="projResult"></div>
+  </div>
+
+  <!-- TABELA DE CENÁRIOS -->
+  <div class="proj-box">
+    <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem">Tabela de cenários — R$100 a R$250</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:1rem">Cada linha simula vender todo o estoque restante ao preço indicado</div>
+    <div class="proj-table-wrap">
+      <table class="proj-table" id="projTable">
+        <thead>
+          <tr>
+            <th>Preço</th>
+            <th>Receita Total</th>
+            <th>Lucro Máx.</th>
+            <th>Break-even Total</th>
+            <th>Break-even Rest.</th>
+            <th>Margem %</th>
+          </tr>
+        </thead>
+        <tbody id="projTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
   </div>
 </div>
@@ -461,6 +489,7 @@ table.itb tr:last-child td{border-bottom:none}
 const SENHA = "MRD@123";
 const COM_PCT = 0.10;
 const APPS_URL = "https://script.google.com/macros/s/AKfycbyF8piBI1h4jSXwDF1mgEYTQP9NS6nLIleXs_eCPQ18cN8FalwkiXwFi9O1lujjRqL9xQ/exec";
+let precosSlider = {Torcedor:149, Jogador:169, Feminina:149, Retro:199};
 
 const ESTOQUE = {
   Torcedor:{cores:["Amarela","Azul","Preta","Verde"],tamanhos:["P","M","G","GG","XGG"],preco:149,custo:65},
@@ -474,6 +503,7 @@ let contasPagar = [];
 let contasReceber = [];
 
 let pedidos=[], custos=[], itemN=0, loc="PG", comisionada=false, chipAtual="todos", editando=null;
+
 
 // ── AUTH ──
 function tryLogin(){
@@ -501,7 +531,7 @@ function showView(id,btn){
   if(id==="fin") renderFin();
   if(id==="custos") renderCustos();
   if(id==="contas"){carregarContas();}
-  if(id==="proj"){carregarEstoque().then(calcProj);}
+  if(id==="proj"){carregarEstoque().then(()=>{buildSliders();calcProj();});}
 }
 
 // ── LOADING ──
@@ -1130,6 +1160,9 @@ function renderFin(){
   const liqReal=pedidos.reduce((s,p)=>s+p.liq,0)-custoT+recebidosExtra;
   const pendT=pedidos.filter(p=>p.status==="Pendente").reduce((s,p)=>s+p.liq,0);
   const camsT=pedidos.reduce((s,p)=>s+p.itens.reduce((ss,i)=>ss+i.qtd,0),0);
+  let totalUnidades=0, somaPrecos=0;
+  pedidos.forEach(p=>p.itens.forEach(i=>{somaPrecos+=i.preco*i.qtd; totalUnidades+=i.qtd;}));
+  const precoMedio = totalUnidades>0 ? somaPrecos/totalUnidades : 0;
 
   document.getElementById("finStats").innerHTML=`
     <div class="stat-card am"><div class="stat-lbl">Faturamento Bruto</div><div class="stat-val am">${fmt(fat)}</div><div class="stat-sub">vendas + recebimentos</div></div>
@@ -1137,12 +1170,15 @@ function renderFin(){
     <div class="stat-card"><div class="stat-lbl">Lucro Líquido</div><div class="stat-val vd">${fmt(liqReal)}</div></div>
     <div class="stat-card rd"><div class="stat-lbl">A Receber (pendente)</div><div class="stat-val rd">${fmt(pendT)}</div><div class="stat-sub">${pedidos.filter(p=>p.status==="Pendente").length} pedidos</div></div>
     <div class="stat-card bl"><div class="stat-lbl">Camisas Vendidas</div><div class="stat-val bl">${camsT}</div></div>
+    <div class="stat-card rd"><div class="stat-lbl">Contas a Pagar</div><div class="stat-val rd">${fmt(totalContasPagar+comT)}</div><div class="stat-sub">contas + comissões</div></div>
+    <div class="stat-card or"><div class="stat-lbl">Preço Médio / Camisa</div><div class="stat-val or">${fmt(precoMedio)}</div><div class="stat-sub">${totalUnidades} unidades</div></div>
     <div class="stat-card"><div class="stat-lbl">Pedidos</div><div class="stat-val">${pedidos.length}</div></div>`;
 
   const pg=pedidos.filter(p=>p.loc==="PG"),fora=pedidos.filter(p=>p.loc==="Fora");
   document.getElementById("finLoc").innerHTML=`
     <div class="fin-row"><span class="fin-lbl">📍 Ponta Grossa</span><div style="text-align:right"><span class="fin-val bl">${fmt(pg.reduce((s,p)=>s+p.liq,0))}</span><div style="font-size:11px;color:var(--muted)">${pg.length} pedidos</div></div></div>
-    <div class="fin-row"><span class="fin-lbl">🚚 Fora</span><div style="text-align:right"><span class="fin-val am">${fmt(fora.reduce((s,p)=>s+p.liq,0))}</span><div style="font-size:11px;color:var(--muted)">${fora.length} pedidos</div></div></div>`;
+    <div class="fin-row"><span class="fin-lbl">🚚 Fora</span><div style="text-align:right"><span class="fin-val am">${fmt(fora.reduce((s,p)=>s+p.liq,0))}</span><div style="font-size:11px;color:var(--muted)">${fora.length} pedidos</div></div></div>`
+    <div class="fin-row" style="font-weight:800"><span class="fin-lbl" style="color:var(--txt)">Total Receita Vendas</span><span class="fin-val vd">${fmt(pg.reduce((s,p)=>s+p.liq,0)+fora.reduce((s,p)=>s+p.liq,0))}</span></div>;
 
   const comMap={};
   pedidos.filter(p=>p.comisionada).forEach(p=>{
@@ -1226,102 +1262,136 @@ function renderFin(){
 const CUSTO_MODELO = {Torcedor:65, Jogador:67, Feminina:65, Retro:65};
 const CORES_MODELO = {Torcedor:"var(--verde)", Jogador:"var(--blue)", Feminina:"var(--orange)", Retro:"var(--purple)"};
 
-function onSlider(){
-  const v = document.getElementById("p-slider").value;
-  document.getElementById("sliderVal").textContent = "R$ "+v;
-  ["p-preco-t","p-preco-j","p-preco-f","p-preco-r"].forEach(id=>{
-    document.getElementById(id).value = v;
-  });
+function buildSliders(){
+  const grid = document.getElementById("slidersGrid");
+  if(!grid) return;
+  grid.innerHTML = Object.keys(ESTOQUE).map(m=>`
+    <div class="slider-card" style="border-top:3px solid ${CORES_MODELO[m]}">
+      <div class="slider-card-title">${m}</div>
+      <div class="slider-val" id="sv-${m}">R$ ${precosSlider[m]}</div>
+      <input type="range" min="100" max="250" step="5" value="${precosSlider[m]}"
+        oninput="onModelSlider('${m}',this.value)"
+        style="width:100%;accent-color:${CORES_MODELO[m]}">
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted)"><span>R$100</span><span>R$250</span></div>
+      <div class="slider-info" id="si-${m}" style="margin-top:.5rem"></div>
+    </div>`).join("");
+}
+
+function onModelSlider(modelo, val){
+  precosSlider[modelo] = parseInt(val);
+  const el = document.getElementById("sv-"+modelo);
+  if(el) el.textContent = "R$ "+val;
   calcProj();
 }
 
 function calcProj(){
-  const precoT  = parseFloat(document.getElementById("p-preco-t")?.value)||149;
-  const precoJ  = parseFloat(document.getElementById("p-preco-j")?.value)||169;
-  const precoF  = parseFloat(document.getElementById("p-preco-f")?.value)||149;
-  const precoR  = parseFloat(document.getElementById("p-preco-r")?.value)||199;
   const comVPct = parseFloat(document.getElementById("p-compctvendas")?.value)||30;
+  const custoT   = custos.reduce((s,c)=>s+c.val, 0);
+  const comT     = pedidos.reduce((s,p)=>s+(p.com||0), 0);
+  const liqAtual = pedidos.reduce((s,p)=>s+p.liq, 0) - custoT;
+  const fatAtual = pedidos.reduce((s,p)=>s+p.sub, 0);
+  const totalCustos = custoT + comT;
 
-  const precos  = {Torcedor:precoT, Jogador:precoJ, Feminina:precoF, Retro:precoR};
-  const custoT2 = custos.reduce((s,c)=>s+c.val,0);
-  const recebidosE = contasReceber.filter(c=>c.status==="Recebido").reduce((s,c)=>s+c.val,0);
-  const liqAtual = pedidos.reduce((s,p)=>s+p.liq,0) - custoT2 + recebidosE;
-
-  // Por modelo
-  const modelos = ["Torcedor","Jogador","Feminina"];
-  let totalFatProj=0, totalLiqProj=0, totalEstoque=0;
+  let totalEstoque=0, totalFatProj=0, totalLucroProj=0;
 
   const cardsEl = document.getElementById("projCards");
-  cardsEl.innerHTML = modelos.map(m=>{
-    const preco  = precos[m];
-    const custo  = CUSTO_MODELO[m];
-    const estq   = estoquePorModelo[m]||0;
-    const comDesc= preco * (comVPct/100) * 0.10;
-    const margem = preco - custo - comDesc;
-    const fatMod = estq * preco;
-    const liqMod = estq * margem;
-    totalFatProj += fatMod;
-    totalLiqProj += liqMod;
-    totalEstoque += estq;
-    return `<div class="stat-card" style="border-top:3px solid ${CORES_MODELO[m]}">
-      <div class="stat-lbl">${m}</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">${estq} un. · custo R$${custo}</div>
-      <div style="font-size:13px;color:var(--amarelo);font-weight:700">${fmt(fatMod)}</div>
-      <div style="font-size:12px;color:var(--verde)">Lucro: ${fmt(liqMod)}</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:2px">Margem: ${fmt(margem)}/un.</div>
-    </div>`;
-  }).join("");
-
-  // Retrô separado (menor)
-  const estqR  = estoquePorModelo["Retro"]||0;
-  const margemR= precoR - 65 - precoR*(comVPct/100)*0.10;
-  totalFatProj += estqR*precoR;
-  totalLiqProj += estqR*margemR;
-  totalEstoque += estqR;
-
-  // Gráfico de barras por preço (R$130 a R$200)
-  const chartEl = document.getElementById("projChart");
-  const precos_range = [130,140,150,160,170,180,190,200];
-  const lucros_range = precos_range.map(p=>{
-    let l=0;
-    ["Torcedor","Jogador","Feminina","Retro"].forEach(m=>{
-      const c=CUSTO_MODELO[m];
-      const e=estoquePorModelo[m]||0;
-      const com=p*(comVPct/100)*0.10;
-      l+=e*(p-c-com);
-    });
-    return l;
-  });
-  const maxL = Math.max(...lucros_range, 1);
-
-  // 3 barras por preço: T, J, F
-  chartEl.innerHTML = precos_range.map((p,pi)=>{
-    const bars = modelos.map(m=>{
-      const c=CUSTO_MODELO[m];
-      const e=estoquePorModelo[m]||0;
-      const com=p*(comVPct/100)*0.10;
-      const l=Math.max(0,e*(p-c-com));
-      const h=Math.round((l/maxL)*180);
-      return `<div style="width:100%;background:${CORES_MODELO[m]};height:${h}px;border-radius:3px 3px 0 0;opacity:.9" title="${m}: ${fmt(l)}"></div>`;
+  if(cardsEl){
+    cardsEl.innerHTML = Object.keys(ESTOQUE).map(m=>{
+      const preco   = precosSlider[m];
+      const custo   = CUSTO_MODELO[m];
+      const estq    = estoquePorModelo[m]||0;
+      const comDesc = preco*(comVPct/100)*COM_PCT;
+      const margem  = preco - custo - comDesc;
+      const margemPct = preco>0?(margem/preco*100):0;
+      const fatMod  = estq*preco;
+      const liqMod  = estq*margem;
+      totalEstoque  += estq;
+      totalFatProj  += fatMod;
+      totalLucroProj+= liqMod;
+      const si = document.getElementById("si-"+m);
+      if(si) si.innerHTML=`${estq} un. · Margem ${margemPct.toFixed(1)}% · ${fmt(margem)}/un.`;
+      return `<div class="stat-card" style="border-top:3px solid ${CORES_MODELO[m]}">
+        <div class="stat-lbl">${m}</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">${estq} un. restantes · custo R$${custo}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--amarelo)">${fmt(fatMod)}</div>
+        <div style="font-size:12px;color:var(--verde);margin-top:2px">Lucro: ${fmt(liqMod)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Margem: ${margemPct.toFixed(1)}% · ${fmt(margem)}/un.</div>
+      </div>`;
     }).join("");
-    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
-      <div style="width:100%;display:flex;gap:2px;align-items:flex-end;height:180px">${bars}</div>
-      <div style="font-size:10px;color:var(--muted);margin-top:4px">R$${p}</div>
-    </div>`;
-  }).join("");
+  }
 
-  // Breakeven
-  const margemMedia = totalEstoque>0?totalLiqProj/totalEstoque:0;
-  const breakeven   = margemMedia>0?Math.ceil(custoT2/margemMedia):0;
+  const margemMediaProj = totalEstoque>0 ? totalLucroProj/totalEstoque : 0;
+  const deficitAtual = totalCustos - (liqAtual+comT);
+  const breakevenRestante = margemMediaProj>0 ? Math.max(0,Math.ceil(deficitAtual/margemMediaProj)) : "—";
+  const receitaTotal = fatAtual + totalFatProj;
+  const lucroTotal   = liqAtual + totalLucroProj;
 
-  document.getElementById("projResult").innerHTML=`
-    <div class="proj-result-row"><span style="color:var(--muted)">Custos totais</span><span style="color:var(--red)">${fmt(custoT2)}</span></div>
-    <div class="proj-result-row"><span style="color:var(--muted)">Lucro atual</span><span style="color:var(--verde)">${fmt(liqAtual)}</span></div>
-    <div class="proj-result-row"><span style="color:var(--muted)">Estoque restante</span><span>${totalEstoque} camisas</span></div>
-    <div class="proj-result-row"><span style="color:var(--muted)">Break-even (restante)</span><span style="color:var(--orange)">${breakeven} camisas</span></div>
-    <div class="proj-result-row"><span style="color:var(--muted)">Faturamento projetado (restante)</span><span style="color:var(--amarelo)">${fmt(totalFatProj)}</span></div>
-    <div class="proj-result-row"><span>💰 Lucro projetado total</span><span style="color:var(--verde)">${fmt(liqAtual+totalLiqProj)}</span></div>`;
+  const projResult = document.getElementById("projResult");
+  if(projResult){
+    projResult.innerHTML=`
+      <div class="proj-result-row"><span style="color:var(--muted)">Faturamento atual (vendas)</span><span style="color:var(--amarelo)">${fmt(fatAtual)}</span></div>
+      <div class="proj-result-row"><span style="color:var(--muted)">Faturamento projetado (restante)</span><span style="color:var(--amarelo)">${fmt(totalFatProj)}</span></div>
+      <div class="proj-result-row"><span style="color:var(--muted)">Receita total (atual + projetado)</span><span style="color:var(--amarelo)">${fmt(receitaTotal)}</span></div>
+      <div class="proj-result-row"><span style="color:var(--muted)">Custos totais registrados</span><span style="color:var(--red)">${fmt(totalCustos)}</span></div>
+      <div class="proj-result-row"><span style="color:var(--muted)">Lucro atual</span><span style="color:var(--verde)">${fmt(liqAtual)}</span></div>
+      <div class="proj-result-row"><span style="color:var(--muted)">Estoque restante</span><span>${totalEstoque} camisas</span></div>
+      <div class="proj-result-row"><span style="color:var(--muted)">Break-even restante</span><span style="color:var(--orange)">${typeof breakevenRestante==="number"?breakevenRestante+" camisas":breakevenRestante}</span></div>
+      <div class="proj-result-row"><span>💰 Lucro total simulado</span><span style="color:var(--verde);font-size:20px">${fmt(lucroTotal)}</span></div>`;
+  }
+
+  const resumo = document.getElementById("projResumoCards");
+  if(resumo){
+    const contasPagarPend = contasPagar.filter(c=>c.status==="Pendente").reduce((s,c)=>s+c.val,0);
+    resumo.innerHTML=`
+      <div class="stat-card rd"><div class="stat-lbl">Custos Totais (+ a pagar)</div><div class="stat-val rd">${fmt(totalCustos+contasPagarPend)}</div><div class="stat-sub">registrados + pendentes</div></div>
+      <div class="stat-card am"><div class="stat-lbl">Receita Garantida</div><div class="stat-val am">${fmt(fatAtual)}</div><div class="stat-sub">já vendido</div></div>
+      <div class="stat-card bl"><div class="stat-lbl">Estoque Restante</div><div class="stat-val bl">${totalEstoque}</div><div class="stat-sub">camisas para vender</div></div>
+      <div class="stat-card"><div class="stat-lbl">Resultado Atual</div><div class="stat-val ${liqAtual>=0?"vd":"rd"}">${fmt(liqAtual)}</div><div class="stat-sub">lucro líquido real</div></div>`;
+  }
+
+  buildProjTable(comVPct, fatAtual, liqAtual, totalCustos);
 }
+
+function buildProjTable(comVPct, fatAtual, liqAtual, totalCustos){
+  const tbody = document.getElementById("projTableBody");
+  if(!tbody) return;
+  const comT = pedidos.reduce((s,p)=>s+(p.com||0),0);
+  let rows="";
+  for(let preco=100; preco<=250; preco+=5){
+    let fatRestante=0, lucroRestante=0, estoqueTotal=0, custoTotal=0, estqTotal=0;
+    Object.keys(ESTOQUE).forEach(m=>{
+      const custo=CUSTO_MODELO[m];
+      const estq=estoquePorModelo[m]||0;
+      const comDesc=preco*(comVPct/100)*COM_PCT;
+      const margem=preco-custo-comDesc;
+      fatRestante+=estq*preco;
+      lucroRestante+=estq*margem;
+      estoqueTotal+=estq;
+      custoTotal+=custo*estq;
+      estqTotal+=estq;
+    });
+    const receitaTotal=fatAtual+fatRestante;
+    const lucroMaximo=liqAtual+lucroRestante;
+    const margemMedia=estoqueTotal>0?lucroRestante/estoqueTotal:0;
+    const beTotal=margemMedia>0?Math.ceil(totalCustos/margemMedia):"∞";
+    const deficit=totalCustos-(liqAtual+comT);
+    const beRest=margemMedia>0?Math.max(0,Math.ceil(deficit/margemMedia)):"∞";
+    const avgCusto=estqTotal>0?Object.keys(ESTOQUE).reduce((s,m)=>s+(CUSTO_MODELO[m]*(estoquePorModelo[m]||0)),0)/estqTotal:65;
+    const comDescAvg=preco*(comVPct/100)*COM_PCT;
+    const margemPct=preco>0?((preco-avgCusto-comDescAvg)/preco*100):0;
+    const lucroClass=lucroMaximo>=0?"pos":"neg";
+    rows+=`<tr>
+      <td>R$ ${preco}</td>
+      <td>${fmt(receitaTotal)}</td>
+      <td class="${lucroClass}">${fmt(lucroMaximo)}</td>
+      <td>${typeof beTotal==="number"?beTotal+" un.":beTotal}</td>
+      <td>${typeof beRest==="number"?beRest+" un.":beRest}</td>
+      <td class="${margemPct>=0?"pos":"neg"}">${margemPct.toFixed(1)}%</td>
+    </tr>`;
+  }
+  tbody.innerHTML=rows;
+}
+
 
 // ── MODAL ──
 function closeModal(id){document.getElementById(id).classList.remove("open");editando=null;}
