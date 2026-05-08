@@ -390,25 +390,7 @@ table.itb tr:last-child td{border-bottom:none}
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem">Resultado total simulado</div>
         <div class="proj-result" id="projResult"></div>
       </div>
-      <div class="proj-box">
-        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem">Tabela de cenários — R$100 a R$250</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:1rem">Cada linha simula vender todo o estoque restante ao preço indicado, mantendo o % de comissão configurado acima</div>
-        <div class="proj-table-wrap">
-          <table class="proj-table">
-            <thead>
-              <tr>
-                <th>Preço</th>
-                <th>Receita Total</th>
-                <th>Lucro Máx.</th>
-                <th>Break-even Total</th>
-                <th>Break-even Rest.</th>
-                <th>Margem %</th>
-              </tr>
-            </thead>
-            <tbody id="projTableBody"></tbody>
-          </table>
-        </div>
-      </div>
+      
     </div>
 
   </div>
@@ -1166,43 +1148,6 @@ function calcProj(){
       <div class="stat-card bl"><div class="stat-lbl">Estoque Restante</div><div class="stat-val bl">${totalEstoque}</div><div class="stat-sub">camisas para vender</div></div>
       <div class="stat-card"><div class="stat-lbl">Resultado Atual</div><div class="stat-val ${resultadoAtual>=0?"vd":"rd"}">${fmt(resultadoAtual)}</div><div class="stat-sub">sem duplicar contas pagas</div></div>`;
   }
-
-  buildProjTable(comVPct,receitaGarantida,resultadoAtual,totalObrigacoes);
-}
-
-function buildProjTable(comVPct,receitaGarantida,resultadoAtual,totalObrigacoes){
-  const tbody=document.getElementById("projTableBody");
-  if(!tbody) return;
-  let rows="";
-  for(let preco=100;preco<=250;preco+=5){
-    let fatRest=0,lucroRest=0,estqTotal=0,custoPonderado=0;
-    Object.keys(ESTOQUE).forEach(m=>{
-      const custo=CUSTO_MODELO[m];
-      const estq=estoquePorModelo[m]||0;
-      const comDesc=preco*(comVPct/100)*COM_PCT;
-      fatRest+=estq*preco;
-      lucroRest+=estq*(preco-custo-comDesc);
-      estqTotal+=estq;
-      custoPonderado+=custo*estq;
-    });
-    const receitaTotal=receitaGarantida+fatRest;
-    const lucroMax=resultadoAtual+lucroRest;
-    const margemMedia=estqTotal>0?lucroRest/estqTotal:0;
-    const beTotal=margemMedia>0?Math.ceil(totalObrigacoes/margemMedia):"∞";
-    const deficitAtual=Math.max(0,-resultadoAtual);
-    const beRest=margemMedia>0?Math.ceil(deficitAtual/margemMedia):"∞";
-    const avgCusto=estqTotal>0?custoPonderado/estqTotal:65;
-    const margemPct=preco>0?((preco-avgCusto-preco*(comVPct/100)*COM_PCT)/preco*100):0;
-    rows+=`<tr>
-      <td>R$ ${preco}</td>
-      <td>${fmt(receitaTotal)}</td>
-      <td class="${lucroMax>=0?"pos":"neg"}">${fmt(lucroMax)}</td>
-      <td>${typeof beTotal==="number"?beTotal+" un.":beTotal}</td>
-      <td>${typeof beRest==="number"?beRest+" un.":beRest}</td>
-      <td class="${margemPct>=0?"pos":"neg"}">${margemPct.toFixed(1)}%</td>
-    </tr>`;
-  }
-  tbody.innerHTML=rows;
 }
 
 // ── CONTAS ──
