@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zuken × MRD — Minhas Vendas</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #00E676;
+    --green-dim: #00C853;
+    --gold: #FFD600;
+    --bg: #0A0A0A;
+    --surface: #141414;
+    --surface2: #1E1E1E;
+    --border: #2A2A2A;
+    --text: #F0F0F0;
+    --muted: #707070;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 3rem;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: relative;
+    overflow: hidden;
+    padding: 2.5rem 1.5rem 2rem;
+    background: linear-gradient(135deg, #0A0A0A 60%, #0D1F0D);
+    border-bottom: 1px solid var(--border);
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,230,118,0.12), transparent 70%);
+    pointer-events: none;
+  }
+  .header-inner {
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .header-left h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    letter-spacing: 2px;
+    line-height: 1;
+    color: var(--green);
+  }
+  .header-left p {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+    letter-spacing: 0.5px;
+  }
+  .badge-code {
+    background: rgba(0,230,118,0.1);
+    border: 1px solid rgba(0,230,118,0.3);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .badge-code span {
+    display: block;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .badge-code strong {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    color: var(--green);
+    letter-spacing: 3px;
+  }
+
+  /* ─── CONTAINER ─── */
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  /* ─── LAST UPDATE ─── */
+  .update-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .update-bar .dot {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.4; transform:scale(0.7); }
+  }
+
+  /* ─── CARDS ─── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.1rem 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .card.highlight {
+    border-color: rgba(0,230,118,0.35);
+    background: linear-gradient(135deg, #0e1e0e, #141414);
+  }
+  .card.full { grid-column: 1 / -1; }
+  .card .label {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+  .card .value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 1px;
+    line-height: 1;
+    color: var(--text);
+  }
+  .card .value.green { color: var(--green); }
+  .card .value.gold  { color: var(--gold); }
+  .card .sub {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+  }
+  .card-icon {
+    position: absolute;
+    top: 0.9rem; right: 1rem;
+    font-size: 1.1rem;
+    opacity: 0.25;
+  }
+
+  /* ─── BONUS PROGRESS ─── */
+  .bonus-section { display: flex; flex-direction: column; gap: 0.6rem; }
+  .bonus-title {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 0.1rem;
+  }
+  .bonus-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+  }
+  .bonus-item.unlocked {
+    border-color: rgba(0,230,118,0.4);
+    background: linear-gradient(135deg, #0d1c0d, #141414);
+  }
+  .bonus-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.6rem;
+  }
+  .bonus-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .bonus-label .icon { font-size: 1rem; }
+  .bonus-count {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .bonus-count.done { color: var(--green); font-weight: 600; }
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--green-dim), var(--green));
+    transition: width 0.8s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-fill.gold-fill {
+    background: linear-gradient(90deg, #c8a000, var(--gold));
+  }
+
+  /* ─── VENDAS TABLE ─── */
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  .sale-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .sale-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: fadeUp 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(8px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .sale-date {
+    font-size: 0.65rem;
+    color: var(--muted);
+    min-width: 52px;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .sale-info { flex: 1; }
+  .sale-buyer { font-size: 0.82rem; font-weight: 600; }
+  .sale-detail { font-size: 0.68rem; color: var(--muted); margin-top: 0.15rem; }
+  .sale-right { text-align: right; }
+  .sale-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+  }
+  .sale-comm {
+    font-size: 0.65rem;
+    color: var(--green);
+    margin-top: 0.1rem;
+  }
+
+  /* ─── EMPTY / LOADING ─── */
+  .state-msg {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  /* ─── CONFIG ─── */
+  .config-box {
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    font-size: 0.76rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .config-box input {
+    width: 100%;
+    margin-top: 0.5rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.76rem;
+    padding: 0.45rem 0.75rem;
+    outline: none;
+  }
+  .config-box input:focus { border-color: var(--green); }
+  .btn-load {
+    width: 100%;
+    margin-top: 0.75rem;
+    background: var(--green);
+    color: #000;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 1.5px;
+    border: none;
+    border-radius: 8px;
+    padding: 0.65rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-load:hover { opacity: 0.85; }
+  .btn-load:disabled { opacity: 0.4; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-left">
+      <h1>Zuken × MRD</h1>
+      <p>Painel de Vendas & Comissões</p>
+    </div>
+    <div class="badge-code">
+      <span>Seu código</span>
+      <strong>ZUKEN5</strong>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- update bar -->
+  <div class="update-bar">
+    <div class="dot"></div>
+    <span id="lastUpdate">Carregando dados…</span>
+  </div>
+
+  <!-- KPI cards -->
+  <div class="cards-grid">
+    <div class="card highlight">
+      <div class="card-icon">💰</div>
+      <div class="label">Comissão Total</div>
+      <div class="value green" id="totalComm">—</div>
+      <div class="sub" id="commSub">10% sobre vendas</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🛒</div>
+      <div class="label">Vendas Geradas</div>
+      <div class="value" id="totalSales">—</div>
+      <div class="sub" id="salesSub">unidades</div>
+    </div>
+    <div class="card full">
+      <div class="card-icon">📦</div>
+      <div class="label">Volume Total de Vendas</div>
+      <div class="value" id="totalRevenue">—</div>
+      <div class="sub">valor bruto gerado</div>
+    </div>
+  </div>
+
+  <!-- Bonus progress -->
+  <div>
+    <div class="bonus-title">🎁 Metas de Bônus</div>
+    <div class="bonus-section">
+      <div class="bonus-item" id="bonus1">
+        <div class="bonus-header">
+          <div class="bonus-label">
+            <span class="icon">👕</span>
+            1 Camisa Bônus
+          </div>
+          <div class="bonus-count" id="b1count">0 / 10 vendas</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="b1bar" style="width:0%"></div></div>
+      </div>
+      <div class="bonus-item" id="bonus2">
+        <div class="bonus-header">
+          <div class="bonus-label">
+            <span class="icon">👕👕</span>
+            2 Camisas Bônus
+          </div>
+          <div class="bonus-count" id="b2count">0 / 20 vendas</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill gold-fill" id="b2bar" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sale list -->
+  <div>
+    <div class="section-title">Suas Vendas</div>
+    <div class="sale-list" id="saleList">
+      <div class="state-msg">Buscando suas vendas…</div>
+    </div>
+  </div>
+
+  <!-- Config -->
+  <div class="config-box">
+    <strong style="color:var(--text)">⚙️ Configurar planilha</strong><br>
+    Cole abaixo o link CSV público do Google Sheets (Arquivo → Compartilhar → Publicar na web → CSV):
+    <input type="text" id="csvUrl" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv&gid=..." />
+    <button class="btn-load" onclick="loadFromUrl()">Carregar Dados</button>
+  </div>
+
+</div>
+
+<script>
+// ── CONFIG ───────────────────────────────────────────────
+const COMMISSION_RATE = 0.10;
+const BONUS_1 = 10;   // vendas para 1 camisa
+const BONUS_2 = 20;   // vendas para 2 camisas
+const SHEET_ID  = '1yi_zxpgIcczGa4o6v-QWe9Oi0TSPu8elVaQGJTgeiyo';
+// GID da aba de vendas (Camisas Restante → aba de vendas principal)
+// Vamos tentar a aba 0 (primeira) com o CSV padrão do sheets
+const DEFAULT_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+
+// ── STATE ─────────────────────────────────────────────────
+let csvUrl = localStorage.getItem('zuken_csv') || DEFAULT_CSV;
+
+// ── INIT ──────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('csvUrl');
+  input.value = csvUrl;
+  fetchAndRender(csvUrl);
+});
+
+function loadFromUrl() {
+  const val = document.getElementById('csvUrl').value.trim();
+  if (!val) return;
+  csvUrl = val;
+  localStorage.setItem('zuken_csv', val);
+  fetchAndRender(val);
+}
+
+// ── FETCH ─────────────────────────────────────────────────
+async function fetchAndRender(url) {
+  setLoading(true);
+  try {
+    // Força versão pública
+    const proxyUrl = url.includes('export?') ? url : url.replace('/edit', '/export?format=csv&');
+    const res = await fetch(proxyUrl);
+    if (!res.ok) throw new Error('Falha ao buscar planilha');
+    const text = await res.text();
+    const rows = parseCSV(text);
+    render(rows);
+  } catch(e) {
+    // Tenta via CORS proxy alternativo
+    try {
+      const altUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
+      const res2 = await fetch(altUrl);
+      if (!res2.ok) throw new Error('Sem acesso');
+      const text2 = await res2.text();
+      render(parseCSV(text2));
+    } catch(e2) {
+      showError(e2.message);
+    }
+  }
+  setLoading(false);
+}
+
+// ── PARSE CSV ─────────────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const rows = [];
+  for (const line of lines) {
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else cur += c;
+    }
+    cols.push(cur.trim());
+    rows.push(cols);
+  }
+  return rows;
+}
+
+// ── FIND HEADER ROW ───────────────────────────────────────
+function findHeaderRow(rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i].map(c => c.toLowerCase());
+    if (r.includes('comissionado') && r.includes('comissão')) return i;
+  }
+  return -1;
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function render(rows) {
+  const hi = findHeaderRow(rows);
+  if (hi === -1) {
+    // Tenta usar dados embutidos de fallback (amostra da planilha lida)
+    renderFallback();
+    return;
+  }
+
+  const headers = rows[hi].map(h => h.toLowerCase().trim());
+  const idx = k => headers.indexOf(k);
+
+  const iData       = idx('data');
+  const iComprador  = idx('comprador');
+  const iModelo     = idx('modelo');
+  const iCor        = idx('cor');
+  const iTamanho    = idx('tamanho');
+  const iComNome    = idx('comissionado');
+  const iComSim     = idx('comissionada');
+  const iComVal     = idx('comissão');
+  const iPreco      = idx('preço unit');
+  const iQtd        = idx('qtd');
+  const iTotal      = idx('total item');
+
+  const zukenRows = rows.slice(hi + 1).filter(r => {
+    if (r.length < headers.length - 5) return false;
+    const nome = (r[iComNome] || '').toLowerCase();
+    const sim  = (r[iComSim]  || '').toLowerCase();
+    return nome.includes('zuken') || sim === 'sim' && nome.includes('zuken');
+  });
+
+  let totalComm = 0, totalRevenue = 0, totalUnits = 0;
+  const sales = [];
+
+  for (const r of zukenRows) {
+    const comm    = parseBRL(r[iComVal]);
+    const revenue = parseBRL(r[iTotal] || r[iPreco]);
+    const qtd     = parseInt(r[iQtd]) || 1;
+    totalComm    += comm;
+    totalRevenue += revenue;
+    totalUnits   += qtd;
+
+    sales.push({
+      date:    formatDate(r[iData]),
+      buyer:   r[iComprador] || '—',
+      model:   r[iModelo]   || '—',
+      color:   r[iCor]      || '—',
+      size:    r[iTamanho]  || '—',
+      price:   revenue,
+      comm:    comm,
+    });
+  }
+
+  updateKPIs(totalComm, totalUnits, totalRevenue);
+  updateBonus(totalUnits);
+  renderSales(sales);
+  document.getElementById('lastUpdate').textContent =
+    'Atualizado agora · ' + new Date().toLocaleTimeString('pt-BR');
+}
+
+// Fallback: usa dados hardcoded da planilha lida pela API
+function renderFallback() {
+  const hardcoded = [
+    { date:'04/05', buyer:'Gustavo Padula',          model:'Torcedor', color:'Amarela', size:'P',  price:149,   comm:14.9  },
+    { date:'04/05', buyer:'Adriano Rodrigo Klauss',  model:'Torcedor', color:'Amarela', size:'GG', price:149,   comm:14.9  },
+    { date:'04/05', buyer:'Gabriel Dos Santos Dias', model:'Jogador',  color:'Amarela', size:'M',  price:169,   comm:16.9  },
+    { date:'04/05', buyer:'Gabriel Dos Santos Dias', model:'Torcedor', color:'Amarela', size:'M',  price:175,   comm:17.5  },
+    { date:'20/05', buyer:'André de Melo Romero',    model:'Torcedor', color:'Amarela', size:'M',  price:194,   comm:19.4  },
+  ];
+  const totalComm    = hardcoded.reduce((s,r) => s + r.comm, 0);
+  const totalRevenue = hardcoded.reduce((s,r) => s + r.price, 0);
+  const totalUnits   = hardcoded.length;
+
+  updateKPIs(totalComm, totalUnits, totalRevenue);
+  updateBonus(totalUnits);
+  renderSales(hardcoded);
+  document.getElementById('lastUpdate').textContent =
+    'Dados da última sincronização · configure a URL do CSV para atualizar em tempo real';
+}
+
+// ── KPIs ──────────────────────────────────────────────────
+function updateKPIs(comm, units, revenue) {
+  document.getElementById('totalComm').textContent    = formatBRL(comm);
+  document.getElementById('totalSales').textContent   = units;
+  document.getElementById('salesSub').textContent     = units === 1 ? 'unidade vendida' : 'unidades vendidas';
+  document.getElementById('totalRevenue').textContent = formatBRL(revenue);
+  document.getElementById('commSub').textContent      = `10% sobre R$\u00A0${revenue.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')}`;
+}
+
+// ── BONUS ─────────────────────────────────────────────────
+function updateBonus(units) {
+  // Bonus 1
+  const p1 = Math.min(units / BONUS_1, 1);
+  document.getElementById('b1bar').style.width = (p1 * 100) + '%';
+  document.getElementById('b1count').textContent = `${Math.min(units, BONUS_1)} / ${BONUS_1} vendas`;
+  if (units >= BONUS_1) {
+    document.getElementById('bonus1').classList.add('unlocked');
+    document.getElementById('b1count').classList.add('done');
+    document.getElementById('b1count').textContent = '✅ CONQUISTADO!';
+  }
+  // Bonus 2
+  const p2 = Math.min(units / BONUS_2, 1);
+  document.getElementById('b2bar').style.width = (p2 * 100) + '%';
+  document.getElementById('b2count').textContent = `${Math.min(units, BONUS_2)} / ${BONUS_2} vendas`;
+  if (units >= BONUS_2) {
+    document.getElementById('bonus2').classList.add('unlocked');
+    document.getElementById('b2count').classList.add('done');
+    document.getElementById('b2count').textContent = '✅ CONQUISTADO!';
+  }
+}
+
+// ── SALES LIST ────────────────────────────────────────────
+function renderSales(sales) {
+  const list = document.getElementById('saleList');
+  if (!sales.length) {
+    list.innerHTML = '<div class="state-msg">Nenhuma venda encontrada para Zuken ainda.</div>';
+    return;
+  }
+  list.innerHTML = sales.map((s, i) => `
+    <div class="sale-item" style="animation-delay:${i * 0.05}s">
+      <div class="sale-date">${s.date}</div>
+      <div class="sale-info">
+        <div class="sale-buyer">${s.buyer}</div>
+        <div class="sale-detail">${s.model} · ${s.color} · ${s.size}</div>
+      </div>
+      <div class="sale-right">
+        <div class="sale-price">${formatBRL(s.price)}</div>
+        <div class="sale-comm">+${formatBRL(s.comm)} comissão</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function parseBRL(v) {
+  if (!v) return 0;
+  return parseFloat(String(v).replace(/[R$\s]/g,'').replace(',','.')) || 0;
+}
+function formatBRL(n) {
+  return 'R$\u00A0' + n.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+}
+function formatDate(d) {
+  if (!d) return '—';
+  const s = String(d);
+  const m = s.match(/(\d{2})\/(\d{2})/);
+  if (m) return m[1]+'/'+m[2];
+  const iso = s.match(/(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return iso[3]+'/'+iso[2];
+  return s.slice(0,5);
+}
+function setLoading(on) {
+  document.querySelector('.btn-load').disabled = on;
+}
+function showError(msg) {
+  document.getElementById('saleList').innerHTML =
+    `<div class="state-msg">⚠️ ${msg}<br><small>Configure a URL CSV abaixo para carregar os dados.</small></div>`;
+  document.getElementById('lastUpdate').textContent = 'Erro ao carregar dados';
+  renderFallback(); // mostra dados hardcoded enquanto isso
+}
+</script>
+</body>
+</html>
