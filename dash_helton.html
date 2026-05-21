@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helton × MRD — Minhas Vendas</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #FF6B00;
+    --accent-dim: #CC5500;
+    --bg: #0A0A0A;
+    --surface: #141414;
+    --surface2: #1E1E1E;
+    --border: #2A2A2A;
+    --text: #F0F0F0;
+    --muted: #707070;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 3rem;
+  }
+
+  header {
+    position: relative;
+    overflow: hidden;
+    padding: 2.5rem 1.5rem 2rem;
+    background: linear-gradient(135deg, #0A0A0A 60%, #1a0d00);
+    border-bottom: 1px solid var(--border);
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,107,0,0.12), transparent 70%);
+    pointer-events: none;
+  }
+  .header-inner {
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .header-left h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    letter-spacing: 2px;
+    line-height: 1;
+    color: var(--accent);
+  }
+  .header-left p {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+    letter-spacing: 0.5px;
+  }
+  .badge-comm {
+    background: rgba(255,107,0,0.1);
+    border: 1px solid rgba(255,107,0,0.3);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .badge-comm span {
+    display: block;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .badge-comm strong {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    color: var(--accent);
+    letter-spacing: 2px;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .update-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .update-bar .dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.4; transform:scale(0.7); }
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.1rem 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .card.highlight {
+    border-color: rgba(255,107,0,0.35);
+    background: linear-gradient(135deg, #1a0d00, #141414);
+  }
+  .card.full { grid-column: 1 / -1; }
+  .card .label {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+  .card .value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+  .card .value.accent { color: var(--accent); }
+  .card .sub {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+  }
+  .card-icon {
+    position: absolute;
+    top: 0.9rem; right: 1rem;
+    font-size: 1.1rem;
+    opacity: 0.25;
+  }
+
+  .bonus-section { display: flex; flex-direction: column; gap: 0.6rem; }
+  .bonus-title {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 0.1rem;
+  }
+  .bonus-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+  }
+  .bonus-item.unlocked {
+    border-color: rgba(255,107,0,0.4);
+    background: linear-gradient(135deg, #1a0d00, #141414);
+  }
+  .bonus-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.6rem;
+  }
+  .bonus-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .bonus-count { font-size: 0.72rem; color: var(--muted); }
+  .bonus-count.done { color: var(--accent); font-weight: 600; }
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+    transition: width 0.8s cubic-bezier(.4,0,.2,1);
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  .sale-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .sale-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: fadeUp 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(8px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .sale-date { font-size: 0.65rem; color: var(--muted); min-width: 52px; text-align: center; line-height: 1.3; }
+  .sale-info { flex: 1; }
+  .sale-buyer { font-size: 0.82rem; font-weight: 600; }
+  .sale-detail { font-size: 0.68rem; color: var(--muted); margin-top: 0.15rem; }
+  .sale-right { text-align: right; }
+  .sale-price { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.5px; }
+  .sale-comm { font-size: 0.65rem; color: var(--accent); margin-top: 0.1rem; }
+
+  .state-msg { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.82rem; }
+
+  .config-box {
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    font-size: 0.76rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .config-box input {
+    width: 100%;
+    margin-top: 0.5rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.76rem;
+    padding: 0.45rem 0.75rem;
+    outline: none;
+  }
+  .config-box input:focus { border-color: var(--accent); }
+  .btn-load {
+    width: 100%;
+    margin-top: 0.75rem;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 1.5px;
+    border: none;
+    border-radius: 8px;
+    padding: 0.65rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-load:hover { opacity: 0.85; }
+  .btn-load:disabled { opacity: 0.4; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-left">
+      <h1>Helton × MRD</h1>
+      <p>Painel de Vendas & Comissões</p>
+    </div>
+    <div class="badge-comm">
+      <span>Comissão</span>
+      <strong>10%</strong>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="update-bar">
+    <div class="dot"></div>
+    <span id="lastUpdate">Carregando dados…</span>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card highlight">
+      <div class="card-icon">💰</div>
+      <div class="label">Comissão Total</div>
+      <div class="value accent" id="totalComm">—</div>
+      <div class="sub" id="commSub">10% sobre vendas</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🛒</div>
+      <div class="label">Vendas Geradas</div>
+      <div class="value" id="totalSales">—</div>
+      <div class="sub" id="salesSub">unidades</div>
+    </div>
+    <div class="card full">
+      <div class="card-icon">📦</div>
+      <div class="label">Volume Total de Vendas</div>
+      <div class="value" id="totalRevenue">—</div>
+      <div class="sub">valor bruto gerado</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="bonus-title">🎁 Meta de Bônus</div>
+    <div class="bonus-section">
+      <div class="bonus-item" id="bonus1">
+        <div class="bonus-header">
+          <div class="bonus-label">
+            <span>👕</span>
+            1 Camisa Bônus — 15 vendas
+          </div>
+          <div class="bonus-count" id="b1count">0 / 15 vendas</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="b1bar" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-title">Suas Vendas</div>
+    <div class="sale-list" id="saleList">
+      <div class="state-msg">Buscando suas vendas…</div>
+    </div>
+  </div>
+
+  <div class="config-box">
+    <strong style="color:var(--text)">⚙️ Configurar planilha</strong><br>
+    Cole abaixo o link CSV público do Google Sheets:
+    <input type="text" id="csvUrl" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv&gid=..." />
+    <button class="btn-load" onclick="loadFromUrl()">Carregar Dados</button>
+  </div>
+
+</div>
+
+<script>
+const INFLUENCER_NAME = 'Helton';
+const COMMISSION_RATE = 0.10;
+const BONUS_1 = 15;
+const SHEET_ID = '1yi_zxpgIcczGa4o6v-QWe9Oi0TSPu8elVaQGJTgeiyo';
+const DEFAULT_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+
+let csvUrl = localStorage.getItem('helton_csv') || DEFAULT_CSV;
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('csvUrl').value = csvUrl;
+  fetchAndRender(csvUrl);
+});
+
+function loadFromUrl() {
+  const val = document.getElementById('csvUrl').value.trim();
+  if (!val) return;
+  csvUrl = val;
+  localStorage.setItem('helton_csv', val);
+  fetchAndRender(val);
+}
+
+async function fetchAndRender(url) {
+  setLoading(true);
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Falha ao buscar planilha');
+    const text = await res.text();
+    render(parseCSV(text));
+  } catch(e) {
+    try {
+      const res2 = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`);
+      if (!res2.ok) throw new Error('Sem acesso');
+      render(parseCSV(await res2.text()));
+    } catch(e2) { showError(e2.message); }
+  }
+  setLoading(false);
+}
+
+function parseCSV(text) {
+  return text.trim().split('\n').map(line => {
+    const cols = []; let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else cur += c;
+    }
+    cols.push(cur.trim());
+    return cols;
+  });
+}
+
+function findHeaderRow(rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i].map(c => c.toLowerCase());
+    if (r.includes('comissionado') && r.includes('comissão')) return i;
+  }
+  return -1;
+}
+
+function render(rows) {
+  const hi = findHeaderRow(rows);
+  if (hi === -1) { renderFallback(); return; }
+
+  const headers = rows[hi].map(h => h.toLowerCase().trim());
+  const idx = k => headers.indexOf(k);
+  const iData = idx('data'), iComprador = idx('comprador');
+  const iModelo = idx('modelo'), iCor = idx('cor'), iTamanho = idx('tamanho');
+  const iComNome = idx('comissionado'), iComSim = idx('comissionada');
+  const iComVal = idx('comissão'), iTotal = idx('total item');
+
+  const myRows = rows.slice(hi + 1).filter(r => {
+    if (r.length < headers.length - 5) return false;
+    return (r[iComNome] || '').toLowerCase().includes(INFLUENCER_NAME.toLowerCase());
+  });
+
+  let totalComm = 0, totalRevenue = 0, totalUnits = 0;
+  const sales = [];
+  for (const r of myRows) {
+    const comm = parseBRL(r[iComVal]);
+    const revenue = parseBRL(r[iTotal]);
+    totalComm += comm; totalRevenue += revenue; totalUnits++;
+    sales.push({ date: formatDate(r[iData]), buyer: r[iComprador] || '—',
+      model: r[iModelo] || '—', color: r[iCor] || '—', size: r[iTamanho] || '—',
+      price: revenue, comm });
+  }
+
+  updateKPIs(totalComm, totalUnits, totalRevenue);
+  updateBonus(totalUnits);
+  renderSales(sales);
+  document.getElementById('lastUpdate').textContent = 'Atualizado agora · ' + new Date().toLocaleTimeString('pt-BR');
+}
+
+function renderFallback() {
+  updateKPIs(0, 0, 0);
+  updateBonus(0);
+  document.getElementById('saleList').innerHTML = '<div class="state-msg">Configure a URL da planilha abaixo para carregar as vendas.</div>';
+  document.getElementById('lastUpdate').textContent = 'Aguardando configuração da planilha';
+}
+
+function updateKPIs(comm, units, revenue) {
+  document.getElementById('totalComm').textContent = formatBRL(comm);
+  document.getElementById('totalSales').textContent = units;
+  document.getElementById('salesSub').textContent = units === 1 ? 'unidade vendida' : 'unidades vendidas';
+  document.getElementById('totalRevenue').textContent = formatBRL(revenue);
+  document.getElementById('commSub').textContent = `10% sobre R$\u00A0${revenue.toFixed(0)}`;
+}
+
+function updateBonus(units) {
+  const p1 = Math.min(units / BONUS_1, 1);
+  document.getElementById('b1bar').style.width = (p1 * 100) + '%';
+  if (units >= BONUS_1) {
+    document.getElementById('bonus1').classList.add('unlocked');
+    document.getElementById('b1count').classList.add('done');
+    document.getElementById('b1count').textContent = '✅ CONQUISTADO!';
+  } else {
+    document.getElementById('b1count').textContent = `${units} / ${BONUS_1} vendas`;
+  }
+}
+
+function renderSales(sales) {
+  const list = document.getElementById('saleList');
+  if (!sales.length) { list.innerHTML = '<div class="state-msg">Nenhuma venda encontrada ainda.</div>'; return; }
+  list.innerHTML = sales.map((s, i) => `
+    <div class="sale-item" style="animation-delay:${i * 0.05}s">
+      <div class="sale-date">${s.date}</div>
+      <div class="sale-info">
+        <div class="sale-buyer">${s.buyer}</div>
+        <div class="sale-detail">${s.model} · ${s.color} · ${s.size}</div>
+      </div>
+      <div class="sale-right">
+        <div class="sale-price">${formatBRL(s.price)}</div>
+        <div class="sale-comm">+${formatBRL(s.comm)} comissão</div>
+      </div>
+    </div>`).join('');
+}
+
+function parseBRL(v) { return parseFloat(String(v||0).replace(/[R$\s]/g,'').replace(',','.')) || 0; }
+function formatBRL(n) { return 'R$\u00A0' + n.toFixed(2).replace('.',','); }
+function formatDate(d) {
+  const s = String(d||'');
+  const m = s.match(/(\d{2})\/(\d{2})/); if (m) return m[1]+'/'+m[2];
+  const iso = s.match(/(\d{4})-(\d{2})-(\d{2})/); if (iso) return iso[3]+'/'+iso[2];
+  return s.slice(0,5) || '—';
+}
+function setLoading(on) { document.querySelector('.btn-load').disabled = on; }
+function showError(msg) {
+  document.getElementById('saleList').innerHTML = `<div class="state-msg">⚠️ ${msg}<br><small>Configure a URL CSV abaixo.</small></div>`;
+  document.getElementById('lastUpdate').textContent = 'Erro ao carregar dados';
+}
+</script>
+</body>
+</html>
