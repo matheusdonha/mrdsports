@@ -257,6 +257,20 @@ table.itb tr:last-child td{border-bottom:none}
           </div>
         </div>
         <hr class="divider">
+        <div class="form-group" style="margin-bottom:.9rem"><label>Personalizada?</label>
+          <div class="toggle-row">
+            <button class="toggle-btn active" onclick="setPers(false,this)">Não</button>
+            <button class="toggle-btn" onclick="setPers(true,this)">✍️ Sim</button>
+          </div>
+        </div>
+        <div id="persFields" style="display:none;margin-bottom:.9rem">
+          <div class="form-grid">
+            <div class="form-group"><label>Nome da Personalização</label><input type="text" id="v-pers-nome" placeholder="Ex: SILVA" oninput="calcResumo()"></div>
+            <div class="form-group"><label>Número</label><input type="number" id="v-pers-num" placeholder="Ex: 10" min="0" oninput="calcResumo()"></div>
+          </div>
+          <div style="font-size:11px;color:var(--orange);margin-top:6px;padding:6px 10px;background:rgba(255,179,71,.08);border-radius:8px;border:1px solid rgba(255,179,71,.2)">✍️ Personalização: +R$60 no preço e +R$60 no custo por item</div>
+        </div>
+        <hr class="divider">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
           <label style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Itens do Pedido</label>
           <button class="btn btn-ol" onclick="addItem()" style="padding:5px 11px;font-size:12px">+ Item</button>
@@ -267,6 +281,7 @@ table.itb tr:last-child td{border-bottom:none}
           <div class="resumo-row" id="r-desc-row" style="display:none"><span>Desconto</span><span id="r-desc" style="color:var(--orange)">—</span></div>
           <div class="resumo-row" id="r-taxa-row" style="display:none"><span>Taxa Cartão</span><span id="r-taxa" style="color:var(--orange)">—</span></div>
           <div class="resumo-row" id="r-com-row" style="display:none"><span>Comissão (10%)</span><span id="r-com" style="color:var(--orange)">—</span></div>
+          <div class="resumo-row" id="r-pers-row" style="display:none"><span>✍️ Personalização</span><span id="r-pers" style="color:var(--orange)">—</span></div>
           <div class="resumo-row" id="r-frete-row" style="display:none"><span>Frete + Embalagem</span><span id="r-frete">—</span></div>
           <div class="resumo-row total"><span>💰 Total Líquido</span><span id="r-liq" class="vd">R$ 0,00</span></div>
         </div>
@@ -426,7 +441,7 @@ const CORES_MODELO={Torcedor:"var(--verde)",Jogador:"var(--blue)",Feminina:"var(
 
 let precosSlider={Torcedor:149,Jogador:169,Feminina:149,Retro:199};
 let contasPagar=[],contasReceber=[];
-let pedidos=[],custos=[],itemN=0,loc="PG",comisionada=false,chipAtual2="todos",editando=null;
+let pedidos=[],custos=[],itemN=0,loc="PG",comisionada=false,personalizada=false,chipAtual2="todos",editando=null;
 let estoquePorModelo={Torcedor:0,Jogador:0,Feminina:0,Retro:0};
 
 const fmt=v=>"R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -576,6 +591,14 @@ function setCom(v,btn){
   if(!v) document.getElementById("v-com").value="";
   calcResumo();
 }
+function setPers(v,btn){
+  personalizada=v;
+  btn.closest(".toggle-row").querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("persFields").style.display=v?"block":"none";
+  if(!v){document.getElementById("v-pers-nome").value="";document.getElementById("v-pers-num").value="";}
+  calcResumo();
+}
 function toggleCartao(){
   document.getElementById("taxaCartaoGroup").style.display=document.getElementById("v-pag").value==="Cartão"?"block":"none";
   calcResumo();
@@ -634,7 +657,9 @@ function getItens(){
 
 function calcResumo(){
   const itens=getItens();
-  const sub=itens.reduce((s,i)=>s+i.preco*i.qtd,0);
+  const qtdTotal=itens.reduce((s,i)=>s+i.qtd,0);
+  const persTotal=personalizada?qtdTotal*60:0;
+  const sub=itens.reduce((s,i)=>s+i.preco*i.qtd,0)+persTotal;
   const descTipo=document.getElementById("v-desc-tipo")?.value||"fixo";
   const descVal=parseFloat(document.getElementById("v-desc")?.value)||0;
   const desc=descTipo==="pct"?sub*(descVal/100):descVal;
@@ -652,6 +677,8 @@ function calcResumo(){
   document.getElementById("r-taxa").textContent="— "+fmt(taxa);
   document.getElementById("r-com-row").style.display=comisionada?"flex":"none";
   document.getElementById("r-com").textContent="— "+fmt(com);
+  document.getElementById("r-pers-row").style.display=personalizada?"flex":"none";
+  document.getElementById("r-pers").textContent=fmt(persTotal)+" (+R$60 × "+qtdTotal+" un.)";
   document.getElementById("r-frete-row").style.display=(frete+emb)>0?"flex":"none";
   document.getElementById("r-frete").textContent="— "+fmt(frete+emb);
   document.getElementById("r-liq").textContent=fmt(liq);
@@ -672,7 +699,11 @@ async function confirmar(){
   if(comisionada&&!document.getElementById("v-com").value){toast("⚠ Selecione o comissionado","error");return;}
   const nums=pedidos.map(p=>parseInt(p.numeroPedido)||0);
   const numStr=String(nums.length?Math.max(...nums)+1:1).padStart(3,"0");
-  const sub=itens.reduce((s,i)=>s+i.preco*i.qtd,0);
+  const qtdTotal=itens.reduce((s,i)=>s+i.qtd,0);
+  const persNome=document.getElementById("v-pers-nome").value.trim();
+  const persNum=document.getElementById("v-pers-num").value.trim();
+  const persAdicional=personalizada?qtdTotal*60:0;
+  const sub=itens.reduce((s,i)=>s+i.preco*i.qtd,0)+persAdicional;
   const descTipo=document.getElementById("v-desc-tipo").value;
   const descVal=parseFloat(document.getElementById("v-desc").value)||0;
   const desc=descTipo==="pct"?sub*(descVal/100):descVal;
@@ -692,12 +723,13 @@ async function confirmar(){
   const tipo=document.getElementById("v-tipo").value;
   const lote=document.getElementById("v-lote").value;
   const tel=document.getElementById("v-tel").value.trim();
-  const rows=itens.map(item=>[data,hora,nome,tel,item.modelo,item.cor,item.tamanho,item.qtd,item.preco,item.preco*item.qtd,pagamento,status,loc,comisionada?"Sim":"Não",comisionado||"",comisionada?parseFloat((item.preco*item.qtd*COM_PCT).toFixed(2)):0,frete,emb,parseFloat(liq.toFixed(2)),entrega?entrega.cpf:"",entrega?entrega.cep:"",entrega?entrega.rua:"",entrega?entrega.bairro:"",entrega?entrega.cidade:"",tipo,lote,numStr]);
+  const persInfo=personalizada?(persNome||persNum?`${persNome}${persNome&&persNum?" / ":""}${persNum}`:"Sim"):"Não";
+  const rows=itens.map(item=>[data,hora,nome,tel,item.modelo,item.cor,item.tamanho,item.qtd,item.preco,item.preco*item.qtd,pagamento,status,loc,comisionada?"Sim":"Não",comisionado||"",comisionada?parseFloat((item.preco*item.qtd*COM_PCT).toFixed(2)):0,frete,emb,parseFloat(liq.toFixed(2)),entrega?entrega.cpf:"",entrega?entrega.cep:"",entrega?entrega.rua:"",entrega?entrega.bairro:"",entrega?entrega.cidade:"",tipo,lote,numStr,persInfo,personalizada?60:0]);
   const btn=document.getElementById("btnConf");
   btn.disabled=true;btn.textContent="Salvando…";
   try{
     await api("addVenda",{rows});
-    pedidos.unshift({numeroPedido:numStr,data,hora,nome,tel,pagamento,status,loc,comisionada,comisionado,frete,emb,tipo,lote,itens,sub,com,custos:frete+emb,liq});
+    pedidos.unshift({numeroPedido:numStr,data,hora,nome,tel,pagamento,status,loc,comisionada,comisionado,frete,emb,tipo,lote,itens,sub,com,custos:frete+emb,liq,personalizada,persInfo});
     toast("✅ Pedido #"+numStr+" salvo!","success");
     resetForm();
   }catch(e){toast("⚠ Erro ao salvar","error");}
@@ -711,10 +743,13 @@ function resetForm(){
   document.getElementById("v-tipo").value="Pré-Venda";
   document.getElementById("v-lote").value="1";
   document.getElementById("itensList").innerHTML="";
-  itemN=0;loc="PG";comisionada=false;
+  itemN=0;loc="PG";comisionada=false;personalizada=false;
   document.getElementById("entregaFields").style.display="none";
   document.getElementById("comFields").style.display="none";
   document.getElementById("taxaCartaoGroup").style.display="none";
+  document.getElementById("persFields").style.display="none";
+  const pn=document.getElementById("v-pers-nome");if(pn)pn.value="";
+  const pnu=document.getElementById("v-pers-num");if(pnu)pnu.value="";
   document.querySelectorAll(".toggle-row").forEach(row=>{
     row.querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("active"));
     const first=row.querySelector(".toggle-btn");if(first)first.classList.add("active");
@@ -747,6 +782,7 @@ function renderPedidos(){
           <span class="badge ${p.loc==="PG"?"b-pg":"b-fora"}">${p.loc}</span>
           ${p.comisionada?`<span class="badge b-com">🤝 ${p.comisionado}</span>`:""}
           <span class="badge b-pre">${p.tipo||"Pré-Venda"} L${p.lote||1}</span>
+          ${p.personalizada?`<span class="badge" style="background:rgba(255,179,71,.15);color:var(--orange);border:1px solid rgba(255,179,71,.3)">✍️ ${p.persInfo||"Personalizada"}</span>`:""}
         </div>
         <div class="pedido-val">${fmt(p.liq)}</div>
       </div>
@@ -755,6 +791,7 @@ function renderPedidos(){
           <thead><tr><th>Modelo</th><th>Cor</th><th>Tam.</th><th>Qtd</th><th>Unit.</th><th>Total</th></tr></thead>
           <tbody>${p.itens.map(i=>`<tr><td>${i.modelo}</td><td>${i.cor}</td><td>${i.tamanho}</td><td>${i.qtd}</td><td>${fmt(i.preco)}</td><td>${fmt(i.preco*i.qtd)}</td></tr>`).join("")}</tbody>
         </table>
+        ${p.personalizada?`<div style="font-size:12px;color:var(--orange);margin-top:8px">✍️ Personalização: ${p.persInfo||""} (+${fmt(60*p.itens.reduce((s,i)=>s+i.qtd,0))})</div>`:""}
         ${p.comisionada?`<div style="font-size:12px;color:var(--orange);margin-top:8px">🤝 Comissão ${p.comisionado}: ${fmt(p.com)}</div>`:""}
         ${p.custos>0?`<div style="font-size:12px;color:var(--muted);margin-top:4px">📦 Frete+Emb: ${fmt(p.custos)}</div>`:""}
         <div class="pedido-actions">
